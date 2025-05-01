@@ -10,10 +10,7 @@ Thành viên thực hiện:
 |   Thành viên    | 
 |-----------------|
 | Trần Anh Quốc   |
-|-----------------|
 | Trần Nhật Quang |
-|-----------------|
 | Nguyễn Văn Quyền|
-|-----------------|
 | Nguyễn Minh Quốc|
 |-----------------|
