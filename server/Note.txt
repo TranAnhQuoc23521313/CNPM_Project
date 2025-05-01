@@ -1,0 +1,6 @@
+Controllers: Business Layer: Xử lý request
+Services: Business Layer: Logic nghiệp vụ
+Models: Data Layer: Định nghĩa và truy xuất DB
+Routes: Liên kết route đến controller
+Config: Kết nối Database
+Middlewares: Xác thực, lỗi, ...

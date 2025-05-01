@@ -1,0 +1,3 @@
+Components: Giao diện tái sử dụng
+Pages: Các trang chính
+Services: Gọi API backend

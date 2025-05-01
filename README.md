@@ -22,3 +22,6 @@ Thành viên thực hiện:
 - Chỉ được commit lên branch 
 - Cách đặt tên branch: Tên file ( không cần đuôi file )
 - Khi commit cần comment tóm tắt tác dụng của script vừa viết hoặc thông tin thay đổi gì so với trước
+
+---
+## Đọc Note.txt trong mỗi folder client / server để hiễu rõ cấu trúc file và mô hình đang sử dụng
