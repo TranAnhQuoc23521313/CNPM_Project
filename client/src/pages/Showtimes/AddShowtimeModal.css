@@ -1,0 +1,167 @@
+/* AddShowtimeModal.css */
+
+/* Kế thừa style chung của modal overlay nếu có trong ShowtimesPage.css */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Nền mờ nhẹ hơn */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    font-family: sans-serif; /* Đặt font chung nếu chưa có */
+  }
+  
+  .modal-content { /* Style chung cho các modal nếu cần */
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      max-height: 90vh;
+  }
+  
+  /* Style cụ thể cho Add Showtime Modal */
+  .add-showtime-modal.modal-content {
+    max-width: 750px; /* Tăng chiều rộng modal */
+    width: 90%;
+    padding: 0;
+  }
+  
+  .add-showtime-modal .modal-header {
+    background-color: #fff; /* Header nền trắng */
+    padding: 18px 25px; /* Tăng padding header */
+    border-bottom: 1px solid #eaeaea; /* Viền header nhạt hơn */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .add-showtime-modal .modal-header h2 {
+    margin: 0;
+    font-size: 1.2em; /* Giảm nhẹ size chữ header */
+    color: #333;
+    font-weight: 600; /* Đậm hơn */
+  }
+  
+  .add-showtime-modal .modal-close-button {
+    color: #aaa; /* Màu nút X xám nhạt */
+    font-size: 1.6em;
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+  }
+  .add-showtime-modal .modal-close-button:hover {
+    color: #555;
+  }
+  
+  .add-showtime-modal form {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Cho form chiếm hết không gian dọc còn lại */
+  }
+  
+  .add-showtime-modal .modal-body {
+    padding: 25px 30px; /* Giữ padding cho body */
+    overflow-y: auto; /* Cho phép body cuộn nếu cần */
+    flex-grow: 1;
+  }
+  
+  /* --- LAYOUT FORM GROUP (LABEL Ở TRÊN) --- */
+  .form-group {
+    margin-bottom: 20px; /* Tăng khoảng cách giữa các trường */
+  }
+  
+  .form-group label {
+    display: block; /* Label hiển thị trên một dòng riêng */
+    margin-bottom: 8px; /* Khoảng cách giữa label và input */
+    font-weight: 500; /* Font weight cho label */
+    color: #555; /* Màu chữ label */
+    font-size: 0.9em;
+    text-align: left; /* Căn trái label */
+  }
+  
+  .input-wrapper {
+    position: relative; /* Để định vị icon tuyệt đối nếu cần */
+    display: flex; /* Cho phép icon nằm cạnh input nếu muốn */
+    align-items: center;
+  }
+  
+  .form-group select,
+  .form-group input {
+    width: 100%; /* Input/Select chiếm toàn bộ chiều rộng */
+    padding: 10px 12px; /* Tăng padding */
+    border: 1px solid #ccc; /* Viền nhạt hơn */
+    border-radius: 5px; /* Bo góc nhiều hơn */
+    font-size: 1em; /* Tăng nhẹ font-size */
+    box-sizing: border-box; /* Quan trọng */
+  }
+  
+  /* Điều chỉnh padding nếu có icon */
+  .input-wrapper.with-icon input {
+    padding-right: 35px; /* Tạo không gian cho icon bên phải */
+  }
+  
+  .input-icon {
+    position: absolute; /* Định vị icon */
+    right: 10px; /* Cách lề phải 10px */
+    top: 50%;
+    transform: translateY(-50%); /* Căn giữa icon theo chiều dọc */
+    color: #888; /* Màu icon */
+    font-size: 1.1em; /* Kích thước icon */
+    pointer-events: none; /* Không cho icon bắt sự kiện click */
+  }
+  
+  /* Loại bỏ mũi tên mặc định của trình duyệt nếu muốn */
+  input[type="date"]::-webkit-inner-spin-button,
+  input[type="date"]::-webkit-calendar-picker-indicator {
+      opacity: 0.5;
+      cursor: pointer;
+      margin-right: 5px;
+  }
+  input[type="time"]::-webkit-inner-spin-button,
+  input[type="time"]::-webkit-clear-button {
+      opacity: 0.5;
+      cursor: pointer;
+      margin-right: 5px;
+  }
+  
+  .form-group select {
+    /* Trình duyệt tự thêm mũi tên */
+    padding-right: 30px; /* Đảm bảo có không gian cho mũi tên mặc định */
+    background-color: #fff;
+  }
+  
+  .form-group select:focus,
+  .form-group input:focus {
+    outline: none;
+    border-color: #86b7fe; /* Màu viền khi focus */
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); /* Shadow khi focus */
+  }
+  
+  .add-showtime-modal .modal-footer {
+    padding: 15px 30px;
+    border-top: 1px solid #eaeaea;
+    display: flex;
+    justify-content: flex-end;
+    background-color: #f8f9fa; /* Nền footer sáng */
+  }
+  
+  .accept-button {
+    background-color: #0d6efd; /* Màu xanh dương chủ đạo */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 18px; /* Nút to hơn */
+    font-size: 1.1em; /* Icon tick to hơn */
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+    transition: background-color 0.2s;
+  }
+  .accept-button:hover {
+    background-color: #0b5ed7; /* Màu xanh đậm hơn khi hover */
+  }
