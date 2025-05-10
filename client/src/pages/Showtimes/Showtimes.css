@@ -1,211 +1,259 @@
 /* src/pages/Showtimes/ShowtimesPage.css */
 
-/* Style cơ bản cho trang */
 .showtimes-management-page {
-    padding: 20px;
-    font-family: Arial, sans-serif;
-    position: relative; 
-  }
-  
-  .showtimes-page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #dee2e6;
-  }
-  
-  .showtimes-page-header h1 {
-    margin: 0;
-    font-size: 1.8em;
-  }
-  
-  /* Movie Cards Section */
-  .movie-cards-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin-bottom: 30px;
-    justify-content: flex-start;
-  }
-  
-  .movie-card-item {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    width: 200px;
-    display: flex;
-    flex-direction: column; /* Quan trọng: xếp các phần tử con theo chiều dọc */
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-    overflow: hidden;
-    box-sizing: border-box;
-  }
-  
-  .movie-poster-display {
-    height: 280px; 
-    background-color: #f0f2f5; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-  }
-  .movie-poster-display:hover {
-    background-color: #e4e7eb;
-  }
-  
-  .actual-poster-img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: cover;
-  }
-  
-  .poster-placeholder-text {
-    font-size: 1.3em;
-    color: #888;
-    font-weight: 500;
-  }
-  
-  .movie-title-bar {
-    padding: 10px;
-    font-size: 0.9em;
-    font-weight: 600;
-    color: #333;
-    background-color: #f8f9fa;
-    text-align: center;
-    border-top: 1px solid #e9ecef;
-    border-bottom: 1px solid #e9ecef;
-    height: 60px; /* Đảm bảo chiều cao cố định */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    line-height: 1.3;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    /* Nếu muốn đảm bảo text không bao giờ xuống quá 2 dòng và hiển thị "..."
-       bạn có thể cần bọc text trong 1 thẻ con và áp dụng các thuộc tính webkit-line-clamp
-       hoặc tính toán bằng JS, nhưng với height cố định và overflow:hidden thường là đủ.
-    */
-  }
-  
-  .showtime-toggle-button {
-    padding: 12px 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-size: 0.9em;
-    font-weight: 500;
-    transition: background-color 0.2s;
-    width: 100%;
-    box-sizing: border-box;
-    text-align: center;
-    margin-top: auto; /* Đẩy nút xuống dưới cùng nếu các phần tử trên có chiều cao động */
-  }
-  .showtime-toggle-button:hover {
-    background-color: #0056b3;
-  }
-  
-  /* --- CSS CHO MODAL ĐƠN GIẢN HIỂN THỊ DANH SÁCH LỊCH CHIẾU --- */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-  
-  .modal-content {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    width: 90%;
-    max-width: 800px;
-    max-height: 85vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-  
-  .simple-showtime-list-modal.modal-content {
-    padding: 0;
-  }
-  
-  .simple-showtime-list-modal .modal-header {
-    padding: 15px 25px;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .simple-showtime-list-modal .modal-header h2 {
-    margin: 0;
-    font-size: 1.5em;
-    color: #333;
-  }
-  
-  .modal-close-button {
-    background: none;
-    border: none;
-    font-size: 1.8em;
-    line-height: 1;
-    cursor: pointer;
-    padding: 0 5px;
-    color: #777;
-  }
-  .modal-close-button:hover {
-    color: #333;
-  }
-  
-  .simple-showtime-list-modal .modal-body {
-    padding: 20px 25px;
-    overflow-y: auto;
-    flex-grow: 1;
-  }
-  
-  .showtimes-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 0;
-  }
-  
-  .showtimes-table th,
-  .showtimes-table td {
-    border: 1px solid #ddd;
-    padding: 10px 12px;
-    text-align: left;
-  }
-  
-  .showtimes-table th {
-    background-color: #f2f2f2;
-    font-weight: bold;
-  }
-  
-  .showtime-row {
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  .showtime-row:hover {
-    background-color: #f5f5f5;
-  }
-  
-  .detail-button {
-    padding: 6px 12px;
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.85em;
-  }
-  .detail-button:hover {
-    background-color: #5a6268;
-  }
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; /* Font chữ hệ thống */
+  position: relative; /* Cần cho việc định vị modal nếu dùng position: absolute */
+  background-color: #fff; /* Nền trắng cho trang */
+}
+
+/* --- HEADER STYLE (THEO HÌNH MỚI NHẤT) --- */
+.showtimes-page-header {
+  display: flex;
+  justify-content: space-between; /* Title trái, actions phải */
+  align-items: center; /* Căn giữa dọc */
+  margin-bottom: 30px; /* Khoảng cách dưới */ 
+}
+
+.showtimes-page-header h1 {
+  margin: 0;
+  font-size: 1.75em; /* Kích thước tiêu đề */
+  color: #343a40; /* Màu chữ tiêu đề */
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0; /* Không co title lại */
+}
+
+/* Không cần .header-actions ở đây nếu cấu trúc JSX khác */
+/* Nếu JSX là <h1><input><Button>, thì không cần div này */
+
+.showtime-search-input { /* Style cho search bar */
+  flex-grow: 1; /* Cho phép co giãn */
+  padding: 10px 20px; /* Padding bên trong */
+  border: 1px solid #e9ecef; /* Viền rất nhạt */
+  border-radius: 999px; /* Bo tròn tối đa (pill shape) */
+  font-size: 0.95em;
+  max-width: 600px; /* Điều chỉnh độ dài tối đa */
+  margin: 0 20px; /* Khoảng cách ngang với title và button */
+  background-color: #f8f9fa; /* Nền sáng/xám nhạt */
+  color: #495057; /* Màu chữ input */
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.03); /* Shadow rất nhẹ bên trong */
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.showtime-search-input::placeholder {
+    color: #adb5bd; /* Màu placeholder nhạt */
+    font-style: italic; /* Chữ nghiêng */
+}
+.showtime-search-input:focus {
+    outline: none;
+    border-color: #a5b4fc; /* Màu viền tím nhạt khi focus */
+    box-shadow: 0 0 0 3px rgba(165, 180, 252, 0.3), inset 0 1px 2px rgba(0,0,0,0.03); /* Shadow tím nhạt khi focus */
+}
+
+/* Nút Add sử dụng Component Button và variant="primary" */
+.showtimes-page-header .common-button { /* Hoặc class gốc của component Button */
+  flex-shrink: 0; /* Không co nút lại */
+  /* Style màu xanh dương và chữ trắng sẽ đến từ component Button */
+}
+/* --- KẾT THÚC HEADER STYLE --- */
+
+/* --- MOVIE CARDS --- */
+.movie-cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 25px; /* Tăng khoảng cách giữa các thẻ */
+  margin-bottom: 30px;
+  justify-content: flex-start; /* Căn trái các thẻ */
+}
+
+.movie-card-item {
+  border: 1px solid #e9ecef; /* Viền nhạt hơn */
+  border-radius: 8px;
+  width: 210px; /* Tăng nhẹ chiều rộng thẻ */
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* Shadow rất nhẹ */
+  overflow: hidden;
+  box-sizing: border-box;
+  transition: transform 0.25s ease-out, box-shadow 0.25s ease-out; /* Hiệu ứng mượt hơn */
+}
+
+.movie-card-item:hover {
+  transform: translateY(-4px) scale(1.03); /* Hiệu ứng nhấc lên và phóng to nhẹ */
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1); /* Shadow rõ hơn khi hover */
+  z-index: 10;
+}
+
+.movie-poster-display {
+  height: 300px; /* Tăng chiều cao poster */
+  background-color: #f8f9fa; /* Nền placeholder sáng hơn */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* cursor: default; Bỏ cursor pointer */
+}
+
+.actual-poster-img {
+  width: 100%; /* Ảnh sẽ cố gắng chiếm đầy chiều rộng */
+  height: 100%; /* Ảnh sẽ cố gắng chiếm đầy chiều cao */
+  object-fit: cover; /* Đảm bảo ảnh che phủ khu vực, cắt nếu cần */
+  display: block; /* Tránh khoảng trắng thừa dưới ảnh */
+}
+
+.poster-placeholder-text {
+  font-size: 1.2em;
+  color: #adb5bd; /* Màu chữ placeholder nhạt */
+  font-weight: 500;
+}
+
+.movie-title-bar {
+  padding: 12px 10px; /* Tăng padding dọc */
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #343a40; /* Màu chữ đậm hơn */
+  background-color: #fff; /* Nền trắng cho title bar */
+  text-align: center;
+  border-top: 1px solid #f1f3f5; /* Viền rất nhạt */
+  /* border-bottom: 1px solid #f1f3f5; Không cần viền dưới nếu nút ngay sát */
+  min-height: 55px; /* Chiều cao tối thiểu, cho phép 2 dòng */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.showtime-toggle-button {
+  padding: 12px 15px;
+  background-color: #0d6efd; /* Màu nút xanh dương */
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  margin-top: auto; /* Đảm bảo nút luôn ở dưới cùng */
+  border-bottom-left-radius: 8px; /* Bo góc dưới cho nút khớp với thẻ */
+  border-bottom-right-radius: 8px;
+  border-top: 1px solid rgba(0,0,0,0.05); /* Thêm đường kẻ nhẹ trên nút */
+}
+.showtime-toggle-button:hover {
+  background-color: #0b5ed7; /* Xanh đậm hơn khi hover */
+}
+
+
+/* --- CSS CƠ BẢN CHO CÁC MODAL (ShowtimeListModal sẽ dùng cái này) --- */
+/* Các modal chi tiết hơn sẽ có CSS riêng (AddShowtimeModal.css, ShowtimeDetailModal.css) */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  font-family: inherit; /* Kế thừa font từ trang */
+}
+
+.modal-content {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: 90vh; /* Giới hạn chiều cao */
+  width: 90%; /* Chiều rộng mặc định */
+}
+
+/* Style cụ thể cho modal danh sách đơn giản */
+.simple-showtime-list-modal.modal-content {
+  max-width: 800px; /* Chiều rộng tối đa cho modal danh sách */
+  padding: 0; /* Header/Body tự quản lý padding */
+}
+
+.simple-showtime-list-modal .modal-header {
+  padding: 15px 25px;
+  border-bottom: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fa; /* Nền sáng cho header modal danh sách */
+}
+
+.simple-showtime-list-modal .modal-header h2 {
+  margin: 0;
+  font-size: 1.4em;
+  color: #343a40;
+  font-weight: 600;
+}
+
+.modal-close-button { /* Style chung cho nút đóng modal */
+  background: none;
+  border: none;
+  font-size: 1.6em;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 5px;
+  color: #6c757d; /* Màu nút X */
+}
+.modal-close-button:hover {
+  color: #343a40;
+}
+
+.simple-showtime-list-modal .modal-body {
+  padding: 20px 25px;
+  overflow-y: auto; /* Cho phép cuộn nếu bảng dài */
+  flex-grow: 1;
+}
+
+/* Style cho bảng (tái sử dụng trong các modal) */
+.showtimes-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 0; /* Không cần margin nếu là phần tử cuối */
+}
+
+.showtimes-table th,
+.showtimes-table td {
+  border: 1px solid #dee2e6; /* Viền nhạt hơn */
+  padding: 12px 15px; /* Tăng padding cho dễ đọc */
+  text-align: left;
+  vertical-align: middle; /* Căn giữa nội dung theo chiều dọc */
+}
+
+.showtimes-table th {
+  background-color: #f8f9fa; /* Nền header bảng */
+  font-weight: 600; /* Chữ header đậm hơn */
+  font-size: 0.9em;
+  color: #495057;
+}
+
+.showtime-row {
+  /* cursor: pointer; Bỏ nếu chỉ nút Detail mới tương tác */
+  transition: background-color 0.15s ease-in-out;
+}
+.showtime-row:hover {
+  background-color: #f1f3f5; /* Màu hover nhạt hơn */
+}
+
+.detail-button {
+  padding: 6px 14px; /* Padding nút Detail */
+  background-color: #6c757d; /* Màu xám cho nút Detail */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85em;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+.detail-button:hover {
+  background-color: #5a6268; /* Xám đậm hơn khi hover */
+}

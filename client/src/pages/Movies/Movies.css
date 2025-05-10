@@ -1,149 +1,293 @@
+/* src/pages/Movies/Movies.css (hoặc MoviesPage.css) */
+
+/* --- PAGE CONTAINER --- */
+.movies-page-container { /* Sử dụng class cụ thể của trang Movies */
+  padding: 25px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  background-color: #fff;
+  position: relative;
+}
+
+/* --- HEADER STYLE (Phong cách nhẹ nhàng giống ItemsPage) --- */
+.movies-page-header { /* Sử dụng class cụ thể của trang Movies */
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  margin-bottom: 30px; 
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f1f3f5; /* Viền dưới rất nhạt */
+}
+
+.movies-page-header h1 { 
+  margin: 0;
+  font-size: 1.5em; /* Kích thước giống ItemsPage */
+  color: #1f2937;   /* Màu chữ giống ItemsPage */
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Style cho Search Bar (có thể dùng class chung page-header-search-input nếu muốn) */
+.movies-page-header input[type="text"] { /* Target trực tiếp input trong header này */
+  flex-grow: 1; 
+  padding: 10px 20px; 
+  border: 1px solid #e9ecef; 
+  border-radius: 999px; /* Bo tròn */
+  font-size: 0.95em;
+  max-width: 600px; 
+  margin: 0 20px; 
+  background-color: #f8f9fa; 
+  color: #495057; 
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.03); 
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.movies-page-header input[type="text"]::placeholder {
+    color: #adb5bd; 
+    font-style: normal;
+}
+.movies-page-header input[type="text"]:focus {
+    outline: none;
+    border-color: #a5b4fc; 
+    box-shadow: 0 0 0 3px rgba(165, 180, 252, 0.3), inset 0 1px 2px rgba(0,0,0,0.03); 
+}
+
+/* Style cho nút "+ Add New Movie" (sử dụng variant="secondary" hoặc class override) */
+.movies-page-header .common-button.btn-secondary, /* Target variant secondary */
+.movies-page-header .add-new-movie-button-override /* Hoặc target class bạn tự thêm */
+{
+  flex-shrink: 0;
+  background-color: #fff !important; 
+  color: #374151 !important; 
+  border: 1px solid #d1d5db !important; 
+  padding: 8px 16px !important; 
+  font-weight: 500 !important; 
+  border-radius: 6px !important; 
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important; 
+  transition: background-color 0.2s, border-color 0.2s !important;
+}
+.movies-page-header .common-button.btn-secondary:hover,
+.movies-page-header .add-new-movie-button-override:hover
+{
+  background-color: #f9fafb !important; 
+  border-color: #adb5bd !important; 
+  color: #1f2937 !important;
+}
+/* Nếu bạn muốn nút Add New Movie màu xanh (primary), 
+   thì xóa hoặc comment lại khối CSS ghi đè trên và đảm bảo 
+   Button trong JSX có variant="primary". 
+   Trong trường hợp đó, chỉ cần:
+.movies-page-header .common-button { 
+    flex-shrink: 0;
+}
+*/
+/* --- KẾT THÚC HEADER STYLE --- */
+
+
+/* --- STYLE CHO PHẦN THẺ FLIP CARD (Từ code cũ của bạn) --- */
 .movies-list-cards {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-    padding-top: 20px;
-  }
-  
-  .flip-card {
-    background-color: transparent;
-    width: 220px;
-    height: 330px;
-    perspective: 1000px;
-    cursor: pointer;
-    font-family: Arial, sans-serif;
-    transition: transform 0.3s ease-in-out; /* Transition cho hiệu ứng scale */
-  }
-  
-  .flip-card:hover {
-    transform: scale(1.1);
-    z-index: 10;
-  }
-  
-  .flip-card-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    text-align: center;
-    transition: transform 0.6s;
-    transform-style: preserve-3d;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-    border-radius: 10px;
-  }
-  
-  .flip-card.flipped .flip-card-inner {
-    transform: rotateY(180deg);
-  }
-  
-  .flip-card-front, .flip-card-back {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    border-radius: 10px;
-    overflow: hidden;
-  }
-  
-  .flip-card-front {
-    background-color: #f8f9fa;
-    color: black;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .poster-area {
-    flex-grow: 1;
-    background-color: #e9ecef;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.2em;
-    color: #6c757d;
-    border-bottom: 1px solid #dee2e6;
-  }
-  .poster-area img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: cover;
-  }
-  
-  .film-name-front {
-    padding: 10px;
-    font-weight: bold;
-    font-size: 1em;
-    background-color: #ffffff;
-    min-height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .flip-card-back {
-    background-color: #343a40;
-    color: white;
-    transform: rotateY(180deg);
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: flex-start;
-  }
-  
-  .film-info-content {
-    width: 100%;
-    text-align: left;
-    flex-grow: 1;
-  }
-  
-  .flip-card-back h4 {
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 1.1em;
-    border-bottom: 1px solid #495057;
-    padding-bottom: 5px;
-    width: 100%;
-  }
-  
-  .flip-card-back p {
-    margin: 6px 0;
-    font-size: 0.85em;
-  }
-  
-  .flip-card-back p strong {
-      color: #adb5bd;
-  }
-  
-  .film-actions {
-    margin-top: auto;
-    padding-top: 15px;
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-  }
-  
-  .film-actions button {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1.1em;
-    transition: background-color 0.2s ease;
-  }
-  
-  .film-actions .edit-button {
-    background-color: #007bff;
-    color: white;
-  }
-  .film-actions .edit-button:hover {
-    background-color: #0056b3;
-  }
-  
-  .film-actions .delete-button {
-    background-color: #dc3545;
-    color: white;
-  }
-  .film-actions .delete-button:hover {
-    background-color: #c82333;
-  }
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start; /* Căn thẻ về trái, hoặc 'center' */
+  gap: 25px; /* Khoảng cách giữa các thẻ */
+  padding-top: 20px;
+}
+
+.flip-card {
+  background-color: transparent;
+  width: 210px; /* Điều chỉnh chiều rộng thẻ nếu cần */
+  height: 330px; /* Điều chỉnh chiều cao thẻ nếu cần */
+  perspective: 1000px;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Sửa lại transition */
+  border-radius: 8px; /* Thêm bo góc cho cả thẻ */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* Shadow nhẹ ban đầu */
+}
+
+.flip-card:hover {
+  transform: translateY(-4px) scale(1.08); /* Tăng scale một chút */
+  box-shadow: 0 8px 16px rgba(0,0,0,0.12); /* Shadow rõ hơn khi hover */
+  z-index: 10;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+  border-radius: 8px; /* Đảm bảo inner cũng bo góc */
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.1); /* Điều chỉnh shadow cho inner nếu cần */
+}
+
+.flip-card.flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front, .flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 8px; /* Bo góc cho front và back */
+  overflow: hidden; /* Đảm bảo nội dung không tràn ra ngoài bo góc */
+  box-sizing: border-box; /* Thêm để padding không làm tăng kích thước */
+}
+
+.flip-card-front {
+  background-color: #fff; /* Nền trắng cho mặt trước */
+  color: black;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e9ecef; /* Thêm viền nhẹ nếu muốn */
+}
+
+.poster-area {
+  flex-grow: 1;
+  background-color: #f8f9fa; /* Nền placeholder */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2em;
+  color: #adb5bd; /* Màu chữ placeholder */
+  /* border-bottom: 1px solid #e9ecef;  Có thể bỏ nếu film-name-front có border-top */
+}
+.poster-area img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+}
+
+.film-name-front {
+  padding: 12px 10px;
+  font-weight: 600;
+  font-size: 0.95em;
+  background-color: #fff; /* Nền trắng */
+  border-top: 1px solid #f1f3f5; /* Viền trên rất nhạt */
+  min-height: 55px; /* Chiều cao tối thiểu cho tên phim */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #343a40;
+  word-break: break-word; /* Cho phép xuống dòng nếu tên quá dài */
+  line-height: 1.3;
+}
+
+.flip-card-back {
+  background-color: #343a40; /* Nền tối cho mặt sau */
+  color: white;
+  transform: rotateY(180deg);
+  padding: 20px; /* Tăng padding mặt sau */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+    
+.film-info-content {
+  width: 100%;
+  text-align: left;
+  flex-grow: 1; /* Cho phép phần này chiếm không gian */
+}
+
+.flip-card-back h4 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 1.15em;
+  border-bottom: 1px solid #495057; /* Viền dưới đậm hơn trên nền tối */
+  padding-bottom: 8px;
+  width: 100%;
+}
+
+.flip-card-back p {
+  margin: 6px 0;
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+    
+.flip-card-back p strong {
+    color: #adb5bd; /* Màu nhãn */
+    margin-right: 5px;
+}
+
+.film-actions {
+  margin-top: auto; /* Đẩy nút xuống dưới */
+  padding-top: 15px;
+  display: flex;
+  justify-content: space-around; /* Hoặc flex-end nếu muốn nút về 1 phía */
+  width: 100%;
+}
+
+.film-actions button { /* Style chung cho nút trong film-actions */
+  padding: 8px 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em; /* Kích thước icon/chữ */
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+  color: white; /* Đảm bảo chữ/icon màu trắng */
+}
+
+.film-actions .edit-button {
+  background-color: #0d6efd; /* Xanh dương */
+}
+.film-actions .edit-button:hover {
+  background-color: #0b5ed7;
+}
+
+.film-actions .delete-button {
+  background-color: #dc3545; /* Đỏ */
+}
+.film-actions .delete-button:hover {
+  background-color: #c82333;
+}
+
+
+/* --- THÔNG BÁO KHI KHÔNG CÓ PHIM --- */
+.movies-page-container .no-items-found { /* Thêm class cha nếu cần tăng độ ưu tiên */
+    text-align: center; 
+    padding: 40px 20px; 
+    color: #6b7280; 
+    font-style: italic; 
+    background-color: #fff; 
+    border: 1px dashed #e5e7eb; 
+    border-radius: 8px; 
+    margin-top: 20px;
+    grid-column: 1 / -1; /* Nếu movies-list-cards là grid */
+}
+
+/* --- CSS CƠ BẢN CHO MODAL (NẾU DÙNG MODAL TRONG TRANG NÀY) --- */
+/* Style này có thể dùng chung nếu AddMovieModal.css không tồn tại */
+/* Hoặc nếu bạn muốn style modal chung ở đây */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1030; /* Đảm bảo z-index phù hợp */
+}
+
+.modal-content { /* Style chung cho các modal nếu chúng kế thừa từ đây */
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: 90vh;
+}
+
+/* Ví dụ: Style cho header của AddMovieModal nếu dùng chung */
+/* 
+.modal-content.add-item-modal-content { max-width: 500px; padding: 0; }
+.add-item-modal-header { padding: 15px 20px; border-bottom: 1px solid #e9ecef; ... }
+.add-item-modal-header h2 { ... }
+.add-item-modal-close-button { ... }
+.add-item-modal-body { ... }
+.add-item-modal-footer { ... }
+*/

@@ -1,0 +1,171 @@
+/* EditItemModal.css */
+
+/* Kế thừa style chung của modal overlay và content nếu có */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1020; /* Đảm bảo cao hơn các modal khác nếu cần */
+    font-family: sans-serif;
+  }
+  
+  .modal-content {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      max-height: 90vh;
+  }
+  
+  /* Style cụ thể cho Edit Item Modal */
+  .edit-item-modal.modal-content {
+    max-width: 500px; /* Chiều rộng modal edit nhỏ hơn */
+    width: 90%;
+    padding: 0;
+  }
+  
+  .edit-item-modal .modal-header {
+    background-color: #f8f9fa; /* Nền sáng header */
+    padding: 15px 20px;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .edit-item-modal .modal-header h2 {
+    margin: 0;
+    font-size: 1.15em;
+    color: #343a40;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Cắt bớt tên phim nếu quá dài */
+    max-width: calc(100% - 40px); /* Tránh đè lên nút X */
+  }
+  
+  .edit-item-modal .modal-close-button {
+    color: #6c757d;
+    font-size: 1.6em;
+    /* ... các style khác của nút đóng ... */
+    background: none; border: none; cursor: pointer; line-height: 1; padding: 0;
+  }
+  .edit-item-modal .modal-close-button:hover { color: #343a40; }
+  
+  
+  .edit-item-modal form { display: flex; flex-direction: column; flex-grow: 1; }
+  
+  .edit-modal-body {
+    padding: 20px 25px;
+    display: flex; /* Sử dụng flex để poster và fields nằm cạnh nhau */
+    gap: 20px; /* Khoảng cách giữa poster và các trường */
+    overflow-y: auto;
+    flex-grow: 1;
+  }
+  
+  .edit-poster-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0; /* Không co cột poster lại */
+  }
+  
+  .edit-poster-section label {
+    font-size: 0.85em;
+    color: #495057;
+    font-weight: 500;
+  }
+  
+  .edit-poster-area {
+    width: 120px; /* Kích thước khu vực poster */
+    height: 160px;
+    border: 2px dashed #ced4da; /* Viền dashed */
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: #f8f9fa;
+    transition: border-color 0.2s, background-color 0.2s;
+    overflow: hidden; /* Đảm bảo ảnh preview không tràn */
+  }
+  .edit-poster-area:hover {
+    border-color: #adb5bd;
+    background-color: #e9ecef;
+  }
+  
+  .poster-preview-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Hiển thị toàn bộ ảnh preview */
+  }
+  
+  .poster-edit-placeholder {
+    font-size: 0.9em;
+    color: #6c757d;
+    text-align: center;
+    padding: 5px;
+  }
+  
+  .edit-fields-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Khoảng cách giữa các trường input */
+    flex-grow: 1; /* Cho phép chiếm không gian còn lại */
+  }
+  
+  .form-group.edit-form-group { /* Style chung cho các group trong form edit */
+    display: flex;
+    flex-direction: column; /* Label ở trên */
+    margin-bottom: 0; /* Bỏ margin bottom vì đã có gap ở container cha */
+  }
+  
+  .edit-form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #495057;
+    font-size: 0.9em;
+    text-align: left;
+  }
+  
+  .edit-input { /* Style chung cho input trong modal edit */
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 0.95em;
+    box-sizing: border-box;
+  }
+  .edit-input:focus {
+    outline: none;
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+  }
+  
+  
+  .edit-modal-footer {
+    padding: 15px 25px;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: flex-end; /* Nút Save bên phải */
+    background-color: #f8f9fa;
+  }
+  
+  .save-changes-button {
+    background-color: #198754; /* Màu xanh lá cây */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 9px 18px;
+    font-size: 0.95em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  .save-changes-button:hover {
+    background-color: #157347; /* Xanh lá cây đậm hơn */
+  }

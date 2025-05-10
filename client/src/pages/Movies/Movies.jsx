@@ -1,132 +1,195 @@
-import React, { useState } from 'react';
-// import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import Button from '../../components/common/Button.jsx';
-import './Movies.css'; // << --- IMPORT FILE CSS Ở ĐÂY
+import './Movies.css'; // CSS riêng của MoviesPage
+import AddMovieModal from './AddMovieModal.jsx';
+import EditMovieModal from './EditMovieModal.jsx';
+import MovieDetailModal from './MovieDetailModal.jsx';
+
+// --- DỮ LIỆU GIẢ LẬP BAN ĐẦU (Bao gồm các trường mới) ---
+const initialMoviesData = [
+  { 
+    id: 1, title: 'The Shawshank Redemption', year: 1994, type: 'Drama', country: 'USA', 
+    genre: 'Drama', duration: 142, posterUrl: null, posterPlaceholder: 'Poster SR',
+    director: 'Frank Darabont', 
+    language: 'English',
+    description: 'Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.'
+  },
+  { 
+    id: 2, title: 'The Godfather', year: 1972, type: 'Crime', country: 'USA', 
+    genre: 'Crime', duration: 175, posterUrl: null, posterPlaceholder: 'Poster GF',
+    director: 'Francis Ford Coppola',
+    language: 'English, Italian, Latin',
+    description: 'The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.'
+  },
+  { 
+    id: 3, title: 'The Dark Knight', year: 2008, type: 'Action', country: 'USA', 
+    genre: 'Action, Crime, Drama', duration: 152, posterUrl: null, posterPlaceholder: 'Poster DK',
+    director: 'Christopher Nolan',
+    language: 'English, Mandarin',
+    description: 'When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.'
+  },
+  { 
+    id: 4, title: 'Pulp Fiction', year: 1994, type: 'Crime', country: 'USA', 
+    genre: 'Crime, Drama', duration: 154, posterUrl: null, posterPlaceholder: 'Poster PF',
+    director: 'Quentin Tarantino',
+    language: 'English, Spanish, French',
+    description: 'The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption.'
+  },
+  { 
+    id: 5, title: 'Forrest Gump', year: 1994, type: 'Drama', country: 'USA', 
+    genre: 'Drama, Romance', duration: 142, posterUrl: null, posterPlaceholder: 'Poster FG',
+    director: 'Robert Zemeckis',
+    language: 'English',
+    description: 'The presidencies of Kennedy and Johnson, the Vietnam War, the Watergate scandal and other historical events unfold from the perspective of an Alabama man with an IQ of 75, whose only desire is to be reunited with his childhood sweetheart.'
+  },
+];
+// --- KẾT THÚC DỮ LIỆU GIẢ LẬP ---
 
 const MoviesPage = () => {
   const pageTitle = 'Movies';
-
-  const movies = [
-    { id: 1, title: 'The Shawshank Redemption', year: 1994, type: 'Drama', country: 'USA', genre: 'Drama', duration: 142, posterUrl: null },
-    { id: 2, title: 'The Godfather', year: 1972, type: 'Crime', country: 'USA', genre: 'Crime', duration: 175, posterUrl: null },
-    { id: 3, title: 'The Dark Knight', year: 2008, type: 'Action', country: 'USA', genre: 'Action', duration: 152, posterUrl: null },
-    { id: 4, title: 'Pulp Fiction', year: 1994, type: 'Crime', country: 'USA', genre: 'Crime', duration: 154, posterUrl: null },
-    { id: 5, title: 'Forrest Gump', year: 1994, type: 'Drama', country: 'USA', genre: 'Drama', duration: 142, posterUrl: null },
-  ];
-
+  const [movies, setMovies] = useState(initialMoviesData);
+  const [filteredMovies, setFilteredMovies] = useState(initialMoviesData);
+  const [searchQuery, setSearchQuery] = useState('');
   const [flippedStates, setFlippedStates] = useState({});
+  
+  // States cho các Modals
+  const [isAddMovieModalOpen, setIsAddMovieModalOpen] = useState(false);
+  const [isEditMovieModalOpen, setIsEditMovieModalOpen] = useState(false);
+  const [movieToEdit, setMovieToEdit] = useState(null);
+  const [isMovieDetailModalOpen, setIsMovieDetailModalOpen] = useState(false);
+  const [selectedMovieForDetails, setSelectedMovieForDetails] = useState(null);
+  const [movieToDelete, setMovieToDelete] = useState(null);
 
-  const handleCardFlip = (movieId) => {
-    setFlippedStates(prevStates => ({
-      ...prevStates,
-      [movieId]: !prevStates[movieId]
-    }));
+  // --- HÀM HANDLER ---
+  const handleSearchChange = (event) => {
+    const query = event.target.value.toLowerCase();
+    setSearchQuery(query);
+    const currentItems = movies; 
+    const filtered = currentItems.filter(movie => movie.title.toLowerCase().includes(query));
+    setFilteredMovies(filtered);
   };
 
-  const handleAddMovieClick = () => {
-    alert('Navigate to Add New Movie form (not implemented yet)');
+  // Add Modal
+  const handleOpenAddMovieModal = () => { setIsAddMovieModalOpen(true); };
+  const handleCloseAddMovieModal = () => { setIsAddMovieModalOpen(false); };
+  const handleAddMovieSubmit = (newMovieData) => {
+    const newMovieId = Date.now(); 
+    const movieToAdd = {
+      ...newMovieData, id: newMovieId,
+      posterPlaceholder: `Poster ${newMovieData.title.split(' ')[0] || 'Movie'}` // Tạo placeholder
+    };
+    const newMoviesList = [movieToAdd, ...movies];
+    setMovies(newMoviesList);
+    setFilteredMovies(newMoviesList.filter(movie => movie.title.toLowerCase().includes(searchQuery.toLowerCase())));
+    alert(`Added new movie: ${newMovieData.title}`);
+    handleCloseAddMovieModal();
   };
 
-  const handleEditMovie = (movieId) => {
-    alert(`Navigate to Edit Movie form for movie ID: ${movieId} (not implemented yet)`);
+  // Edit Modal
+  const handleOpenEditMovieModal = (movie) => { setMovieToEdit(movie); setIsEditMovieModalOpen(true); };
+  const handleCloseEditMovieModal = () => { setIsEditMovieModalOpen(false); setMovieToEdit(null); };
+  const handleUpdateMovieSubmit = (movieId, updatedData) => {
+    const updatedMoviesList = movies.map(movie => movie.id === movieId ? { ...movie, ...updatedData } : movie);
+    setMovies(updatedMoviesList);
+    setFilteredMovies(updatedMoviesList.filter(movie => movie.title.toLowerCase().includes(searchQuery.toLowerCase())));
+    alert('Movie updated successfully!');
+    handleCloseEditMovieModal();
   };
 
-  const handleDeleteMovie = (movieId) => {
-    alert(`Delete movie with ID: ${movieId} (not implemented yet)`);
-  };
+  // Detail Modal
+  const handleOpenMovieDetailModal = (movie) => { setSelectedMovieForDetails(movie); setIsMovieDetailModalOpen(true); };
+  const handleCloseMovieDetailModal = () => { setIsMovieDetailModalOpen(false); setSelectedMovieForDetails(null); };
 
-  // Hằng số flipCardStyles đã được xóa bỏ
+  // Delete Confirmation Modal
+  const handleDeleteClick = (movie) => { setMovieToDelete(movie); };
+  const confirmDelete = () => {
+    if (movieToDelete) {
+      const newMovies = movies.filter(m => m.id !== movieToDelete.id);
+      setMovies(newMovies);
+      setFilteredMovies(newMovies.filter(m => m.title.toLowerCase().includes(searchQuery.toLowerCase())));
+      alert(`Đã xóa phim: ${movieToDelete.title}`);
+      setMovieToDelete(null);
+    }
+  };
+  const cancelDelete = () => { setMovieToDelete(null); };
+
+  // Flip Card
+  const handleCardFlip = (movieId) => { setFlippedStates(prev => ({ ...prev, [movieId]: !prev[movieId] })); };
+  // --- KẾT THÚC HÀM HANDLER ---
+
+  const moviesToDisplay = filteredMovies;
 
   return (
     <>
-      {/* Thẻ <style> đã được xóa bỏ */}
-      <div className="movies-page-container" style={{ padding: '2rem' }}>
-        <div
-          className="movies-page-header"
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '1.5rem',
-            paddingBottom: '1rem',
-            borderBottom: '1px solid #dee2e6',
-          }}
-        >
+      <div className="page-container movies-page-container">
+        {/* Header */}
+        <div className="page-header movies-page-header">
           <h1>{pageTitle}</h1>
-          <input
-            type="text"
-            placeholder="Search movies..."
-            style={{
-              marginRight: '1rem',
-              padding: '0.5rem 1rem',
-              border: '1px solid #ced4da',
-              borderRadius: '20px',
-              flex: '1',
-              maxWidth: '500px',
-              backgroundColor: '#f8f9fa',
-            }}
-          />
-          <Button variant="primary" size="medium" onClick={handleAddMovieClick}>
-            + Add New Movie
-          </Button>
+          <input type="text" placeholder="Search movies by title..." className="page-header-search-input" value={searchQuery} onChange={handleSearchChange}/>
+          <Button variant="primary" size="medium" onClick={handleOpenAddMovieModal}> + Add New Movie</Button>
         </div>
 
+        {/* Movie Cards */}
         <div className="movies-list-cards">
-          {movies.map((movie) => (
-            <div
-              key={movie.id}
-              className={`flip-card ${flippedStates[movie.id] ? 'flipped' : ''}`}
-              onClick={(e) => {
-                if (e.target.closest('button')) return;
-                handleCardFlip(movie.id);
-              }}
-            >
+          {moviesToDisplay.length > 0 ? (
+            moviesToDisplay.map((movie) => (
+            <div key={movie.id} className={`flip-card ${flippedStates[movie.id] ? 'flipped' : ''}`} 
+                 onClick={(e) => { 
+                    if (e.target.closest('.film-actions button, .film-actions .btn, .view-detail-button')) return; 
+                    handleCardFlip(movie.id); 
+                 }}>
               <div className="flip-card-inner">
                 <div className="flip-card-front">
-                  <div className="poster-area">
-                    Poster Film
-                  </div>
+                  <div className="poster-area">{movie.posterPlaceholder || 'Poster Film'}</div>
                   <div className="film-name-front">{movie.title}</div>
                 </div>
-
                 <div className="flip-card-back">
                   <div className="film-info-content">
-                    <h4>Film's Info</h4>
-                    <p><strong>Name:</strong> {movie.title}</p>
-                    <p><strong>Kind of Film:</strong> {movie.type}</p>
-                    <p><strong>Nation:</strong> {movie.country}</p>
-                    <p><strong>Times:</strong> {movie.duration} min</p>
+                    <h4>Thông tin tóm tắt</h4>
+                    <p><strong>Tên:</strong> {movie.title}</p>
+                    <p><strong>Thể loại:</strong> {movie.genre || movie.type}</p>
+                    <p><strong>Quốc gia:</strong> {movie.country}</p>
+                    <p><strong>Thời lượng:</strong> {movie.duration} min</p>
+                    <button 
+                        className="view-detail-button" 
+                        onClick={(e) => { e.stopPropagation(); handleOpenMovieDetailModal(movie); }}
+                    >
+                        Xem đầy đủ chi tiết
+                    </button>
                   </div>
                   <div className="film-actions">
-                    <button
-                      className="delete-button"
-                      onClick={() => handleDeleteMovie(movie.id)}
-                      title="Delete Film"
-                    >
-                      🗑️
-                    </button>
-                    <button
-                      className="edit-button"
-                      onClick={() => handleEditMovie(movie.id)}
-                      title="Edit Info"
-                    >
-                      ✏️
-                    </button>
+                     <Button variant="danger" size="small" onClick={(e) => { e.stopPropagation(); handleDeleteClick(movie); }}>Delete</Button>
+                     <Button variant="secondary" size="small" onClick={(e) => { e.stopPropagation(); handleOpenEditMovieModal(movie); }}>Edit</Button>
                   </div>
                 </div>
               </div>
             </div>
-          ))}
+          ))
+         ) : (
+            <p className="no-items-found">{searchQuery ? 'No movies found matching your search.' : 'No movies available.'}</p>
+         )}
         </div>
-
-        {movies.length === 0 && (
-          <div style={{ textAlign: 'center', marginTop: '2rem', color: '#6c757d' }}>
-            <p>No movies to display. Try adding a new one!</p>
-          </div>
-        )}
       </div>
+
+      {/* Modals */}
+      <AddMovieModal isOpen={isAddMovieModalOpen} onClose={handleCloseAddMovieModal} onAddMovie={handleAddMovieSubmit} />
+      <EditMovieModal isOpen={isEditMovieModalOpen} onClose={handleCloseEditMovieModal} movie={movieToEdit} onUpdateMovie={handleUpdateMovieSubmit}/>
+      <MovieDetailModal isOpen={isMovieDetailModalOpen} onClose={handleCloseMovieDetailModal} movie={selectedMovieForDetails} />
+      
+      {/* Modal Xác Nhận Xóa */}
+       {movieToDelete && (
+         <div className="modal-overlay confirmation-overlay" onClick={cancelDelete}>
+           <div className="modal-content confirmation-modal" onClick={(e) => e.stopPropagation()}>
+             <h3>Xác nhận xóa</h3>
+             <p>Bạn có chắc chắn muốn xóa phim "{movieToDelete.title}"?</p>
+             <div className="confirmation-actions">
+               <button onClick={cancelDelete} className="cancel-btn">Không</button>
+               <button onClick={confirmDelete} className="confirm-delete-btn">Có, Xóa</button>
+             </div>
+           </div>
+         </div>
+       )}
     </>
   );
 };
-
 export default MoviesPage;

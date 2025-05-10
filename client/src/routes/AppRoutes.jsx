@@ -7,6 +7,7 @@ import { Routes, Route } from 'react-router-dom';
 //import Dashboard from '../pages/Dashboard';
 import MoviesPage from '../pages/Movies/Movies.jsx'; // Using the simplified version for now
 import ShowtimesPage from '../pages/Showtimes/Showtimes.jsx';
+import ItemsPage from '../pages/Items/Items.jsx';
 // import Tickets from '../pages/Tickets';
 // import Users from '../pages/Users';
 
@@ -42,7 +43,7 @@ const AppRoutes = () => {
       { <Route path="/showtimes" element={<ShowtimesPage />} />
       /*<Route path="/tickets" element={<PlaceholderPage title="Tickets" />} />
       <Route path="/users" element={<PlaceholderPage title="Users" />} /> */}
-
+      <Route path="/items" element={<ItemsPage />} />
       {/* Catch-all route for any paths not matched above */}
       <Route path="*" element={<NotFound />} />
     </Routes>
