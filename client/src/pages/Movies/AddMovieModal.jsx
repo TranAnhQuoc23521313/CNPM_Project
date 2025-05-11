@@ -27,8 +27,23 @@ const AddMovieModal = ({ isOpen, onClose, onAddMovie }) => {
     }
   }, [isOpen]);
 
-  const handlePosterChange = (event) => { /* ... như trước ... */ };
-  const triggerFileInput = () => { /* ... như trước ... */ };
+  // Xử lý khi chọn file ảnh mới
+  const handlePosterChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setPosterFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => { setPosterPreview(reader.result); };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Kích hoạt input file ẩn khi click vào khu vực poster
+  const triggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
