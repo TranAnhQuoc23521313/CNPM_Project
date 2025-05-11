@@ -1,0 +1,142 @@
+/* AddShowtimeModal.css */
+
+/* ... (style cho .modal-overlay, .modal-content, .modal-header, .modal-close-button giữ nguyên) ... */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); 
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+  font-family: sans-serif;
+}
+
+.modal-content {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    max-height: 90vh;
+}
+
+.add-showtime-modal.modal-content {
+  max-width: 750px; 
+  width: 90%;
+  padding: 0;
+}
+
+.add-showtime-modal .modal-header {
+  background-color: #fff; 
+  padding: 18px 25px; 
+  border-bottom: 1px solid #eaeaea; 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.add-showtime-modal .modal-header h2 {
+  margin: 0;
+  font-size: 1.2em; 
+  color: #333;
+  font-weight: 600; 
+}
+
+.add-showtime-modal .modal-close-button {
+  color: #aaa; 
+  font-size: 1.6em;
+  background: none;
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+.add-showtime-modal .modal-close-button:hover { color: #555; }
+
+/* Thay đổi form và body */
+.add-showtime-modal form.add-showtime-form { 
+    display: flex; 
+    flex-direction: column; 
+    flex-grow: 1; /* Cho form chiếm hết chiều cao */
+    /* height: 100%; không cần nữa nếu modal-content là flex */
+}
+
+.add-showtime-modal .modal-body.add-modal-body {
+  padding: 25px 30px; 
+  overflow-y: auto; 
+  flex-grow: 1; /* Body sẽ chiếm không gian còn lại trừ header và action */
+}
+
+/* --- LAYOUT FORM GROUP (LABEL Ở TRÊN) --- */
+.form-group {
+  margin-bottom: 20px; 
+}
+
+.form-group label {
+  display: block; 
+  margin-bottom: 8px; 
+  font-weight: 500; 
+  color: #555; 
+  font-size: 0.9em;
+  text-align: left; 
+}
+
+.input-wrapper {
+  display: flex; 
+  align-items: center;
+  /* position: relative; không cần nữa nếu không có icon tùy chỉnh */
+}
+
+.form-group select,
+.form-group input {
+  width: 100%; 
+  padding: 10px 12px; 
+  border: 1px solid #ccc; 
+  border-radius: 5px; 
+  font-size: 1em; 
+  box-sizing: border-box; 
+}
+
+/* Bỏ style icon nếu không dùng */
+/* .input-wrapper.with-icon input { padding-right: 35px; } */
+/* .input-icon { ... } */
+
+/* Giữ lại style focus */
+.form-group select:focus,
+.form-group input:focus {
+  outline: none;
+  border-color: #86b7fe; 
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); 
+}
+
+.form-group select {
+  padding-right: 30px; 
+  background-color: #fff; 
+}
+
+/* --- BỎ STYLE CHO MODAL-FOOTER --- */
+/* .add-showtime-modal .modal-footer { ... } */
+
+/* --- STYLE CHO KHU VỰC CHỨA NÚT DONE TRONG BODY --- */
+.modal-form-actions {
+  display: flex;
+  justify-content: flex-end; /* Căn nút về bên phải */
+  margin-top: 25px; /* Khoảng cách phía trên nút */
+  padding-top: 20px; /* Thêm padding top để tách biệt khỏi trường cuối */
+  border-top: 1px solid #eaeaea; /* Thêm đường kẻ nhẹ phía trên nút */
+}
+
+.accept-button {
+  background-color: #0d6efd; 
+  color: white;
+  border: none;
+  border-radius: 5px; 
+  padding: 10px 25px; /* Padding lớn hơn cho nút "Done" */
+  font-size: 0.95em; /* Kích thước chữ */
+  font-weight: 600; 
+  cursor: pointer;
+  line-height: 1.4; 
+  transition: background-color 0.2s;
+}
+.accept-button:hover {
+  background-color: #0b5ed7; 
+}

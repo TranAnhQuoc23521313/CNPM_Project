@@ -1,0 +1,161 @@
+/* src/pages/Items/AddItemModal.css */
+
+/* --- MODAL OVERLAY --- */
+.modal-overlay.add-item-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1030; /* Đảm bảo z-index phù hợp nếu có nhiều modal */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+  }
+  
+  /* --- MODAL CONTENT --- */
+  .modal-content.add-item-modal-content {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    width: 90%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    max-height: 90vh;
+  }
+  
+  /* --- MODAL HEADER --- */
+  .add-item-modal-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .add-item-modal-header h2 {
+    margin: 0;
+    font-size: 1.2em;
+    color: #343a40;
+    font-weight: 600;
+  }
+  
+  .add-item-modal-close-button {
+    background: none;
+    border: none;
+    font-size: 1.6em;
+    line-height: 1;
+    color: #adb5bd;
+    cursor: pointer;
+    padding: 0;
+  }
+  .add-item-modal-close-button:hover {
+    color: #495057;
+  }
+  
+  /* --- FORM & MODAL BODY --- */
+  .add-item-form {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+  
+  .add-item-modal-body {
+    padding: 25px 30px 20px 30px; /* Giảm padding bottom */
+    overflow-y: auto;
+    flex-grow: 1;
+  }
+  
+  .form-group.add-form-group {
+    margin-bottom: 20px;
+  }
+  
+  .add-form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #495057;
+    font-size: 0.9em;
+  }
+  
+  .add-item-input,
+  .add-item-modal select { /* Style chung cho input và select */
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 0.95em;
+    box-sizing: border-box;
+    background-color: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .add-item-input:focus,
+  .add-item-modal select:focus {
+    outline: none;
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+  }
+  
+  /* Nếu bạn vẫn dùng select cho Trạng thái ở EditModal và muốn style mũi tên,
+     có thể giữ lại style select này và dùng chung class edit-input/add-item-input */
+  .add-item-modal select.add-item-input {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 30px;
+  }
+  
+  /* Khu vực Poster */
+  .add-form-group.poster-group label { margin-bottom: 8px; }
+  .add-item-poster-area {
+    width: 100px;
+    height: 130px;
+    border: 2px dashed #dee2e6;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: #f8f9fa;
+    transition: border-color 0.2s, background-color 0.2s;
+    overflow: hidden;
+    margin-top: 5px;
+  }
+  .add-item-poster-area:hover { border-color: #ced4da; background-color: #f1f3f5; }
+  .add-poster-preview-img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .add-poster-placeholder { font-size: 0.85em; color: #6c757d; text-align: center; padding: 5px; }
+  
+  
+  /* --- KHÔNG CÒN MODAL-FOOTER --- */
+  
+  /* --- STYLE CHO NÚT DONE BÊN TRONG BODY --- */
+  .form-actions-within-body {
+    display: flex;
+    justify-content: flex-end; /* Căn nút về bên phải */
+    margin-top: 25px; /* Khoảng cách với trường cuối cùng */
+    /* padding-top: 20px; Bỏ padding top nếu không có border */
+    /* border-top: 1px solid #eaeaea; Bỏ border top */
+  }
+  
+  .submit-done-button {
+    background-color: #0d6efd; /* Màu xanh dương */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 9px 20px; /* Điều chỉnh padding cho chữ "Done" */
+    font-size: 0.95em; /* Kích thước chữ */
+    font-weight: 500; /* Đậm vừa */
+    cursor: pointer;
+    line-height: 1.4;
+    transition: background-color 0.2s;
+  }
+  .submit-done-button:hover {
+    background-color: #0b5ed7; /* Xanh dương đậm hơn khi hover */
+  }

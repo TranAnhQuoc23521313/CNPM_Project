@@ -30,7 +30,7 @@
   }
   
   /* Add basic button styling if needed */
-  .header-actions button {
+  /*.header-actions button {
     padding: 8px 16px;
     border: 1px solid #d1d5db;
     background-color: #ffffff;
@@ -39,7 +39,7 @@
     cursor: pointer;
     font-size: 0.875rem;
     font-weight: 500;
-  }
+  }*/
   
   .header-actions button:hover {
       background-color: #f9fafb;

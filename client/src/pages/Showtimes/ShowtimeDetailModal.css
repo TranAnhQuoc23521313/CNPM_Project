@@ -1,0 +1,250 @@
+/* ShowtimeDetailModal.css */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+.showtime-detail-modal.modal-content {
+  background-color: #f4f6f8;
+  padding: 0;
+  border-radius: 6px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  width: 90%;
+  max-width: 980px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.showtime-detail-modal .modal-header {
+  background-color: #2c3e50;
+  color: white;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.showtime-detail-modal .modal-header h1 {
+  margin: 0;
+  font-size: 1.25em;
+  font-weight: 500;
+}
+
+.modal-body-columns {
+  display: flex;
+  flex-grow: 1;
+  overflow: hidden; /* Đổi thành hidden để các cột con tự scroll */
+  background-color: #f4f6f8;
+}
+
+/* Cột trái: Chi tiết suất chiếu */
+.showtime-info-column {
+  width: 360px;
+  padding: 20px 25px;
+  background-color: #ffffff;
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* Cho phép cột này cuộn riêng */
+  box-sizing: border-box; /* Thêm box-sizing */
+}
+
+.info-group {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.info-group label {
+  font-size: 0.8em;
+  color: #6c757d;
+  margin-bottom: 0;
+  font-weight: 500;
+  text-transform: uppercase;
+  width: 100px;
+  flex-shrink: 0;
+  text-align: left;
+}
+
+.info-group p {
+  margin: 0;
+  font-size: 0.95em;
+  color: #212529;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.info-group p a {
+  margin-left: 8px;
+  font-size: 0.9em;
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+}
+.info-group p a:hover {
+  text-decoration: underline;
+}
+
+.info-group .time-slots-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 0;
+  flex-grow: 1;
+}
+
+.time-slot-btn {
+  padding: 7px 10px;
+  border: 1px solid #ced4da;
+  background-color: #fff;
+  color: #495057;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85em;
+  font-weight: 500;
+}
+.time-slot-btn:hover {
+  border-color: #adb5bd;
+  background-color: #f8f9fa;
+}
+.time-slot-btn.active {
+  background-color: #dc3545;
+  color: white;
+  border-color: #dc3545;
+}
+
+.modal-actions-left {
+  margin-top: auto;
+  padding-top: 20px;
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px; /* QUAN TRỌNG: Thêm khoảng cách giữa các nút */
+}
+
+.delete-btn, .exit-btn {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9em;
+}
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+.delete-btn:hover {
+  background-color: #c82333;
+}
+.exit-btn {
+  background-color: #007bff;
+  color: white;
+}
+.exit-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Cột phải: Danh sách ghế */
+.seat-map-column {
+  flex-grow: 1;
+  padding: 20px 25px;
+  display: flex;
+  flex-direction: column;
+  background-color: #f4f6f8;
+  overflow-y: auto; /* Cho phép cột này cuộn riêng */
+  box-sizing: border-box; /* Thêm box-sizing */
+}
+
+.seat-map-column h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.2em;
+  color: #343a40;
+  text-align: center;
+  font-weight: 600;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.seat-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  font-size: 0.9em;
+  color: #495057;
+  padding: 0 10px;
+}
+.seat-stats span {
+    font-weight: 500;
+}
+
+/* --- ĐẢM BẢO CÁC THUỘC TÍNH NÀY ĐÚNG --- */
+.seat-grid-container {
+  display: grid; /* QUAN TRỌNG: Sử dụng Grid Layout */
+  grid-template-columns: repeat(16, 1fr); /* QUAN TRỌNG: Chia thành 16 cột bằng nhau */
+  gap: 5px; /* Khoảng cách giữa các ghế */
+  padding: 15px;
+  background-color: #ffffff;
+  border-radius: 5px;
+  border: 1px solid #dee2e6;
+  box-sizing: border-box; /* Thêm box-sizing */
+}
+
+.seat-item {
+  /* aspect-ratio: 1 / 1; Có thể gây vấn đề nếu nội dung không đủ cao, thử bỏ đi */
+  min-height: 28px; /* Đặt chiều cao tối thiểu để đảm bảo ô không quá nhỏ */
+  padding: 5px 0; /* Thêm padding dọc để chữ không sát viền */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  font-size: 0.7em; /* Chữ nhỏ hơn nữa */
+  user-select: none;
+  border: 1px solid;
+  font-weight: 500;
+  text-align: center; /* Đảm bảo chữ căn giữa */
+  box-sizing: border-box; /* Thêm box-sizing */
+}
+/* --- KẾT THÚC KIỂM TRA GRID --- */
+
+.seat-available {
+  background-color: #fff;
+  border-color: #28a745;
+  color: #28a745;
+  cursor: default;
+}
+
+.seat-booked {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+
+/* Nút đóng modal */
+.modal-close-button {
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  color: #b0bec5;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+.modal-close-button:hover {
+  color: #fff;
+}

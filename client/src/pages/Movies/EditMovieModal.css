@@ -1,0 +1,201 @@
+/* src/pages/Movies/EditMovieModal.css */
+
+/* --- MODAL OVERLAY (Có thể dùng chung từ common.css hoặc định nghĩa lại) --- */
+.modal-overlay.edit-movie-overlay { /* Thêm class riêng cho overlay nếu cần */
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6); 
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1040; /* Đảm bảo z-index phù hợp */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+  /* --- MODAL CONTENT --- */
+  .modal-content.edit-movie-modal-content { /* Thêm class riêng cho content */
+    background-color: #ffffff; 
+    border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    width: 90%;
+    max-width: 750px; /* Tăng chiều rộng cho modal edit */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Quan trọng để bo góc và scroll của body hoạt động */
+    max-height: calc(100vh - 60px); /* Giới hạn chiều cao */
+  }
+  
+  /* --- MODAL HEADER --- */
+  .edit-movie-modal-header { /* Thêm class riêng cho header */
+    padding: 16px 24px; 
+    border-bottom: 1px solid #e9ecef; 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f8f9fa; 
+    flex-shrink: 0; /* Header không co lại */
+  }
+  
+  .edit-movie-modal-header h2 {
+    margin: 0;
+    font-size: 1.2em; 
+    color: #343a40;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 35px);
+  }
+  
+  .edit-movie-modal-close-button { /* Thêm class riêng cho nút đóng */
+    background: none; border: none;
+    font-size: 1.6em; line-height: 1;
+    color: #868e96; 
+    cursor: pointer; padding: 0;
+    margin-left: 15px;
+  }
+  .edit-movie-modal-close-button:hover { color: #343a40; }
+  
+  /* --- FORM & MODAL BODY (LAYOUT 2 CỘT) --- */
+  .edit-movie-form { /* Thêm class riêng cho form */
+    display: flex;
+    flex-direction: column; /* Form sẽ chứa body và footer */
+    flex-grow: 1; 
+    overflow: hidden; /* Để body cuộn được */
+  }
+  
+  .edit-movie-modal-body { /* Thêm class riêng cho body */
+    padding: 20px 25px;
+    display: flex; /* << --- QUAN TRỌNG: Sử dụng Flexbox cho layout 2 cột --- */
+    gap: 25px; /* Khoảng cách giữa cột poster và cột fields */
+    overflow-y: auto; /* Cho phép cuộn nếu nội dung dài */
+    flex-grow: 1;
+    background-color: #fff; 
+  }
+  
+  /* CỘT POSTER BÊN TRÁI */
+  .edit-poster-section {
+    display: flex;
+    flex-direction: column; /* Label trên, khu vực ảnh dưới */
+    align-items: flex-start; /* Căn trái label */
+    gap: 8px;
+    width: 160px; /* Chiều rộng cố định cho cột poster */
+    flex-shrink: 0; /* Không cho cột này co lại */
+  }
+  
+  .edit-poster-section label {
+    font-size: 0.9em;
+    color: #495057;
+    font-weight: 500;
+    display: block; /* Để label chiếm toàn bộ chiều rộng nếu cần */
+  }
+  
+  .edit-movie-poster-area { /* Đổi tên class cho rõ ràng hơn */
+    width: 100%; /* Chiếm toàn bộ chiều rộng của .edit-poster-section */
+    height: 220px; /* Chiều cao cho khu vực poster */
+    border: 2px dashed #dee2e6;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: #f8f9fa;
+    transition: border-color 0.2s, background-color 0.2s;
+    overflow: hidden;
+  }
+  .edit-movie-poster-area:hover { border-color: #ced4da; background-color: #f1f3f5; }
+  
+  .edit-poster-preview-img { /* Đổi tên class */
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  .edit-poster-placeholder { /* Đổi tên class */
+    font-size: 0.9em;
+    color: #6c757d;
+    text-align: center;
+    padding: 10px;
+  }
+  
+  /* CỘT CÁC TRƯỜNG INPUT BÊN PHẢI */
+  .edit-fields-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* Khoảng cách giữa các trường input */
+    flex-grow: 1; /* Cho phép cột này chiếm không gian còn lại */
+    min-width: 0; /* Quan trọng cho flex item co giãn */
+  }
+  
+  .form-group.edit-movie-form-group { /* Thêm class riêng */
+    display: flex;
+    flex-direction: column; /* Label ở trên */
+    margin-bottom: 0; /* Vì đã có gap ở .edit-fields-section */
+  }
+  
+  .edit-movie-form-group label { /* Thêm class riêng */
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #495057;
+    font-size: 0.875em;
+  }
+  
+  .edit-movie-input, /* Class chung cho input/select/textarea của modal này */
+  .edit-movie-modal select.edit-movie-input,
+  .edit-movie-modal textarea.edit-movie-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 0.95em;
+    box-sizing: border-box;
+    background-color: #fff;
+    color: #495057;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .edit-movie-input::placeholder { color: #adb5bd; }
+  .edit-movie-input:focus,
+  .edit-movie-modal select.edit-movie-input:focus,
+  .edit-movie-modal textarea.edit-movie-input:focus {
+    outline: none;
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+  }
+  
+  .edit-movie-modal select.edit-movie-input {
+    appearance: none; -webkit-appearance: none; -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 30px;
+  }
+  .edit-movie-modal textarea.edit-movie-input {
+      resize: vertical; /* Cho phép thay đổi chiều cao textarea */
+      min-height: 80px; /* Chiều cao tối thiểu */
+  }
+  
+  
+  /* --- MODAL FOOTER --- */
+  .edit-movie-modal-footer { /* Thêm class riêng */
+    padding: 15px 25px;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: flex-end; /* Nút Save bên phải */
+    background-color: #f8f9fa;
+    flex-shrink: 0; /* Footer không co lại */
+  }
+  
+  .save-changes-button { /* Giữ nguyên hoặc đổi tên class */
+    background-color: #198754; /* Màu xanh lá cây */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 9px 20px;
+    font-size: 0.95em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  .save-changes-button:hover {
+    background-color: #157347; /* Xanh lá cây đậm hơn */
+  }

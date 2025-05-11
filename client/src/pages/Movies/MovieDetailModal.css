@@ -1,0 +1,134 @@
+/* src/pages/Movies/MovieDetailModal.css */
+
+/* --- MODAL OVERLAY --- */
+.modal-overlay.movie-detail-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1050; 
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* --- MODAL CONTENT --- */
+.modal-content.movie-detail-modal-content {
+  background-color: #ffffff; 
+  border-radius: 8px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2); 
+  width: 90%;
+  max-width: 700px; 
+  max-height: calc(100vh - 60px); 
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; 
+}
+
+/* --- MODAL HEADER --- */
+.movie-detail-modal-header {
+  padding: 16px 24px; 
+  border-bottom: 1px solid #e9ecef; 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fa; 
+  flex-shrink: 0; 
+}
+
+.movie-detail-modal-header h2 {
+  margin: 0;
+  font-size: 1.3em; 
+  color: #343a40; 
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 35px); 
+}
+
+.movie-detail-close-button {
+  background: none; border: none;
+  font-size: 1.7em; line-height: 1;
+  color: #868e96; 
+  cursor: pointer; padding: 0;
+  margin-left: 15px;
+}
+.movie-detail-close-button:hover { color: #343a40; }
+
+/* --- MODAL BODY & DETAIL ITEMS --- */
+.movie-detail-modal-body {
+  padding: 20px 25px;
+  overflow-y: auto; 
+  flex-grow: 1;
+  background-color: #fff; 
+}
+
+.detail-item {
+  display: flex; 
+  align-items: flex-start; /* Căn label và value theo top nếu value có thể nhiều dòng */
+  /* align-items: baseline; Hoặc dùng baseline nếu tất cả value là một dòng */
+  margin-bottom: 12px; 
+  font-size: 0.95em; 
+  line-height: 1.5; 
+}
+
+.detail-label {
+  font-weight: 600; 
+  color: #495057; 
+  min-width: 130px; /* Điều chỉnh chiều rộng tối thiểu cho label */
+  flex-shrink: 0; 
+  margin-right: 10px; 
+  text-align: left; 
+}
+
+.detail-value {
+  color: #212529; 
+  text-align: left; 
+  word-break: break-word; /* Cho phép xuống dòng nếu value dài */
+}
+
+/* Style riêng cho mô tả */
+.detail-item.description-item {
+  display: block; /* Label "Mô tả:" sẽ ở trên, text ở dưới */
+}
+.detail-item.description-item .detail-label {
+  margin-bottom: 6px; /* Khoảng cách giữa label và text */
+  min-width: auto; /* Bỏ min-width vì label ở dòng riêng */
+}
+.detail-item.description-item .detail-value.description-text-value {
+  margin-left: 0; /* Bỏ thụt lề */
+  white-space: pre-wrap; /* Giữ các dấu xuống dòng trong text mô tả */
+  font-size: 0.9em;
+  line-height: 1.6;
+  color: #343a40;
+  background-color: #f8f9fa; /* Nền nhẹ cho mô tả */
+  padding: 12px; /* Padding cho mô tả */
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+}
+
+/* --- MODAL FOOTER --- */
+.movie-detail-modal-footer {
+  padding: 15px 25px;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  justify-content: flex-end; 
+  background-color: #f8f9fa; 
+  flex-shrink: 0; 
+}
+
+.detail-modal-action-button {
+  background-color: #6c757d; 
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 9px 20px; 
+  font-size: 0.9em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.detail-modal-action-button:hover {
+  background-color: #5a6268; 
+}
