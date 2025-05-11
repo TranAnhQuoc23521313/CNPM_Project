@@ -5,7 +5,7 @@ import { Routes, Route } from 'react-router-dom';
 
 // Import your page components
 //import Dashboard from '../pages/Dashboard';
-import MoviesPage from '../pages/Movies/Movies.jsx'; // Using the simplified version for now
+import MoviesPage from '../pages/Movies/MoviesPage.jsx'; // Using the simplified version for now
 import ShowtimesPage from '../pages/Showtimes/Showtimes.jsx';
 import ItemsPage from '../pages/Items/Items.jsx';
 // import Tickets from '../pages/Tickets';
