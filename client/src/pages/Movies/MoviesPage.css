@@ -137,42 +137,64 @@
 }
 
 .flip-card-front {
-  background-color: #fff; /* Nền trắng cho mặt trước */
+  background-color: #fff;
   color: black;
   display: flex;
-  flex-direction: column;
-  border: 1px solid #e9ecef; /* Thêm viền nhẹ nếu muốn */
+  flex-direction: column; /* Quan trọng: poster trên, tên phim dưới */
+  border: 1px solid #e9ecef;
+  height: 100%; /* Đảm bảo nó chiếm toàn bộ chiều cao của .flip-card-inner */
+  box-sizing: border-box; /* Thêm để padding và border không làm tăng kích thước ngoài */
 }
 
 .poster-area {
-  flex-grow: 1;
+  flex-grow: 1; /* Nó sẽ chiếm không gian dọc còn lại */
   background-color: #f8f9fa; /* Nền placeholder */
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1.2em;
-  color: #adb5bd; /* Màu chữ placeholder */
-  /* border-bottom: 1px solid #e9ecef;  Có thể bỏ nếu film-name-front có border-top */
+  overflow: hidden; /* QUAN TRỌNG: Cắt phần ảnh thừa khi dùng object-fit: cover */
+  position: relative;
+  width: 100%; /* Chiếm toàn bộ chiều ngang của card */
+  /* Không cần set height ở đây, flex-grow sẽ xử lý */
 }
-.poster-area img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: cover;
+
+/* Style cho thẻ <img> bên trong .poster-area */
+.poster-area img.movie-poster-image { /* Thêm class .movie-poster-image vào thẻ img trong JSX */
+  width: 100%;     /* Ảnh sẽ rộng BẰNG .poster-area */
+  height: 100%;    /* Ảnh sẽ cao BẰNG .poster-area */
+  object-fit: cover; /* QUAN TRỌNG: Ảnh sẽ lấp đầy, giữ tỷ lệ và cắt phần thừa */
+  display: block; /* Loại bỏ khoảng trống thừa có thể có ở dưới ảnh inline */
 }
+
+/* Style cho placeholder text khi không có ảnh (nếu bạn dùng thẻ span) */
+.poster-area .poster-placeholder-text {
+  font-size: 1em;
+  color: #adb5bd;
+  text-align: center;
+  padding: 10px;
+}
+
 
 .film-name-front {
   padding: 12px 10px;
   font-weight: 600;
   font-size: 0.95em;
-  background-color: #fff; /* Nền trắng */
-  border-top: 1px solid #f1f3f5; /* Viền trên rất nhạt */
+  background-color: #fff;
+  border-top: 1px solid #f1f3f5;
   min-height: 55px; /* Chiều cao tối thiểu cho tên phim */
+  /* max-height: 70px; (Tùy chọn) */
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center; /* Thêm để căn giữa text nếu nó wrap nhiều dòng */
   color: #343a40;
-  word-break: break-word; /* Cho phép xuống dòng nếu tên quá dài */
+  word-break: break-word;
   line-height: 1.3;
+  flex-shrink: 0; /* Ngăn không cho co lại */
+  box-sizing: border-box;
+  overflow: hidden;
+  /* text-overflow: ellipsis; */
+  /* white-space: nowrap; */
 }
 
 .flip-card-back {

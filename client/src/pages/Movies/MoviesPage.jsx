@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback} from 'react';
 import axios from 'axios'; // Thêm dòng này
 import Button from '../../components/common/Button.jsx';
 import './MoviesPage.css'; // CSS riêng của MoviesPage
 import AddMovieModal from './AddMovieModal.jsx';
 import EditMovieModal from './EditMovieModal.jsx';
 import MovieDetailModal from './MovieDetailModal.jsx';
-import { getAllMoviesApi } from '../../services/movieApiService.js';
+import DeleteMovieModal from './DeleteMovieModal.jsx'; // Giả sử bạn có component DeleteMovieModal
+import { getAllMoviesApi, createMovieApi, updateMovieApi, deleteMovieApi } from '../../services/movieApiService.js';
 
 // --- DỮ LIỆU GIẢ LẬP BAN ĐẦU (Bao gồm các trường mới) ---
 /* const initialMoviesData = [
@@ -48,28 +49,28 @@ import { getAllMoviesApi } from '../../services/movieApiService.js';
 // --- KẾT THÚC DỮ LIỆU GIẢ LẬP ---
 
 const mapApiToClient = (apiMovie) => ({
-    id: apiMovie.MAPHIM, // Sử dụng MAPHIM làm 'id' ở client
-    title: apiMovie.TENPHIM,
-    year: apiMovie.NAMPH,
-    type: apiMovie.THELOAI,
-    country: apiMovie.QUOCGIA,
-    duration: apiMovie.THOILUONG,
-    director: apiMovie.DAODIEN,
-    language: apiMovie.NGONNGU,
-    description: apiMovie.MOTA,
-    posterUrl: apiMovie.HINHANH ? `${process.env.REACT_APP_API_URL}${apiMovie.HINHANH}` : null,
-    posterPlaceholder: `Poster ${apiMovie.TENPHIM?.split(' ')[0] || 'Movie'}`,
-    // Giữ lại các trường gốc từ API
-    MAPHIM: apiMovie.MAPHIM,
-    TENPHIM: apiMovie.TENPHIM,
-    THELOAI: apiMovie.THELOAI,
-    NAMPH: apiMovie.NAMPH,
-    DAODIEN: apiMovie.DAODIEN,
-    QUOCGIA: apiMovie.QUOCGIA,
-    NGONNGU: apiMovie.NGONNGU,
-    MOTA: apiMovie.MOTA,
-    THOILUONG: apiMovie.THOILUONG,
-    HINHANH: apiMovie.HINHANH,
+  id: apiMovie.MAPHIM, // Sử dụng MAPHIM làm 'id' ở client
+  title: apiMovie.TENPHIM,
+  year: apiMovie.NAMPH,
+  type: apiMovie.THELOAI,
+  country: apiMovie.QUOCGIA,
+  duration: apiMovie.THOILUONG,
+  director: apiMovie.DAODIEN,
+  language: apiMovie.NGONNGU,
+  description: apiMovie.MOTA,
+  posterUrl: apiMovie.HINHANH ? `${process.env.REACT_APP_API_URL}${apiMovie.HINHANH}` : null,
+  posterPlaceholder: `Poster ${apiMovie.TENPHIM?.split(' ')[0] || 'Movie'}`,
+  // Giữ lại các trường gốc từ API
+  MAPHIM: apiMovie.MAPHIM,
+  TENPHIM: apiMovie.TENPHIM,
+  THELOAI: apiMovie.THELOAI,
+  NAMPH: apiMovie.NAMPH,
+  DAODIEN: apiMovie.DAODIEN,
+  QUOCGIA: apiMovie.QUOCGIA,
+  NGONNGU: apiMovie.NGONNGU,
+  MOTA: apiMovie.MOTA,
+  THOILUONG: apiMovie.THOILUONG,
+  HINHANH: apiMovie.HINHANH,
 });
 
 const MoviesPage = () => {
@@ -78,7 +79,7 @@ const MoviesPage = () => {
   const [filteredMovies, setFilteredMovies] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [flippedStates, setFlippedStates] = useState({});
-  
+
   // States cho các Modals
   const [isAddMovieModalOpen, setIsAddMovieModalOpen] = useState(false);
   const [isEditMovieModalOpen, setIsEditMovieModalOpen] = useState(false);
@@ -93,34 +94,35 @@ const MoviesPage = () => {
   // --- LẤY DỮ LIỆU PHIM TỪ API ---
   // Sử dụng useEffect để lấy dữ liệu phim từ API
   const fetchMoviesFromApi = async () => {
-      console.log('MoviesPage: Attempting to fetch movies...');
-      setIsLoading(true);
-      setError(null);
-      try {
-          const response = await getAllMoviesApi();
-          console.log('MoviesPage: Movies fetched successfully:', response);
-          const mappedMovies = response.map(mapApiToClient); // Chuyển đổi dữ liệu từ API
-          setMovies(mappedMovies);
-          console.log('MoviesPage: Movies fetched and set to state', mappedMovies);
-          setFilteredMovies(mappedMovies);
-      } catch (err) {
-            console.error("MoviesPage: Error fetching movies", err);
-            setError(err.message || "An error occurred while fetching movies.");
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    console.log('MoviesPage: Attempting to fetch movies...');
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await getAllMoviesApi();
+      console.log('MoviesPage: Movies fetched successfully:', response);
+      const mappedMovies = response.map(mapApiToClient); // Chuyển đổi dữ liệu từ API
+      setMovies(mappedMovies);
+      console.log('MoviesPage: Movies fetched and set to state', mappedMovies);
+      console.log("Orginal API Movie Data:", mappedMovies.HINHANH);
+      setFilteredMovies(mappedMovies);
+    } catch (err) {
+      console.error("MoviesPage: Error fetching movies", err);
+      setError(err.message || "An error occurred while fetching movies.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Lấy dữ liệu phim từ API khi component mount
   useEffect(() => {
     fetchMoviesFromApi();
-  }, []);
-
+}, []);
+ 
   // --- HÀM HANDLER ---
   const handleSearchChange = (event) => {
     const query = event.target.value.toLowerCase();
     setSearchQuery(query);
-    const currentItems = movies; 
+    const currentItems = movies;
     const filtered = currentItems.filter(movie => movie.title.toLowerCase().includes(query));
     setFilteredMovies(filtered);
   };
@@ -128,46 +130,149 @@ const MoviesPage = () => {
   // Add Modal
   const handleOpenAddMovieModal = () => { setIsAddMovieModalOpen(true); };
   const handleCloseAddMovieModal = () => { setIsAddMovieModalOpen(false); };
-  const handleAddMovieSubmit = (newMovieData) => {
-    const newMovieId = Date.now(); 
-    const movieToAdd = {
-      ...newMovieData, id: newMovieId,
-      posterPlaceholder: `Poster ${newMovieData.title.split(' ')[0] || 'Movie'}` // Tạo placeholder
-    };
-    const newMoviesList = [movieToAdd, ...movies];
-    setMovies(newMoviesList);
-    setFilteredMovies(newMoviesList.filter(movie => movie.title.toLowerCase().includes(searchQuery.toLowerCase())));
-    alert(`Added new movie: ${newMovieData.title}`);
-    handleCloseAddMovieModal();
-  };
+  const handleAddMovieSubmit = useCallback(async (formDataFromModal) => {
+        console.log('MoviesPage: handleAddMovieSubmit called with:', formDataFromModal);
+        setIsLoading(true);
+        setError(null);
+
+        const dataPayload = new FormData();
+        // Server sẽ tự sinh MAPHIM
+        dataPayload.append('TENPHIM', formDataFromModal.TENPHIM); // Sử dụng tên trường từ AddMovieModal
+        dataPayload.append('NAMPH', formDataFromModal.NAMPH);
+        dataPayload.append('THELOAI', formDataFromModal.THELOAI);
+        dataPayload.append('QUOCGIA', formDataFromModal.QUOCGIA || '');
+        dataPayload.append('THOILUONG', formDataFromModal.THOILUONG || 0);
+        dataPayload.append('DAODIEN', formDataFromModal.DAODIEN || '');
+        dataPayload.append('NGONNGU', formDataFromModal.NGONNGU || '');
+        dataPayload.append('MOTA', formDataFromModal.MOTA || '');
+
+        // Trong AddMovieModal, bạn đặt tên là HINHANH cho file
+        if (formDataFromModal.HINHANH) { // Kiểm tra HINHANH (là posterFile)
+            dataPayload.append('HINHANH_FILE', formDataFromModal.HINHANH, formDataFromModal.HINHANH.name);
+            console.log('MoviesPage: Appended HINHANH_FILE to FormData');
+        } else {
+            console.log('MoviesPage: No posterFile (HINHANH) to append.');
+        }
+
+        try {
+            const newMovie = await createMovieApi(dataPayload);
+            console.log('MoviesPage: Movie added successfully via API', newMovie);
+            alert(`Movie "${newMovie.TENPHIM || formDataFromModal.TENPHIM}" (ID: ${newMovie.MAPHIM}) added successfully!`);
+            // handleCloseAddMovieModal đã được useCallback, gọi trực tiếp
+            handleCloseAddMovieModal();
+            // fetchMoviesFromApi đã được useCallback, gọi trực tiếp
+            fetchMoviesFromApi();
+        } catch (err) {
+            console.error("MoviesPage: Failed to add movie via API", err);
+            const apiError = err.message || "Could not add movie. Please check data and try again.";
+            setError(apiError);
+            alert(apiError);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [fetchMoviesFromApi, handleCloseAddMovieModal]); // Dependencies cho useCallback
 
   // Edit Modal
   const handleOpenEditMovieModal = (movie) => { setMovieToEdit(movie); setIsEditMovieModalOpen(true); };
   const handleCloseEditMovieModal = () => { setIsEditMovieModalOpen(false); setMovieToEdit(null); };
-  const handleUpdateMovieSubmit = (movieId, updatedData) => {
-    const updatedMoviesList = movies.map(movie => movie.id === movieId ? { ...movie, ...updatedData } : movie);
-    setMovies(updatedMoviesList);
-    setFilteredMovies(updatedMoviesList.filter(movie => movie.title.toLowerCase().includes(searchQuery.toLowerCase())));
-    alert('Movie updated successfully!');
-    handleCloseEditMovieModal();
-  };
+ const handleUpdateMovieSubmit = useCallback(async (movieId, updatedDataFromModal) => {
+    console.log(`MoviesPage: handleUpdateMovieSubmit for ID ${movieId} with data from modal:`, JSON.stringify(updatedDataFromModal, null, 2));
+    setIsLoading(true);
+    setError(null);
+
+    const dataPayload = new FormData();
+
+    // Đọc trực tiếp các key đã là tên trường server từ updatedDataFromModal
+    if (updatedDataFromModal.TENPHIM !== undefined) dataPayload.append('TENPHIM', updatedDataFromModal.TENPHIM);
+    if (updatedDataFromModal.NAMPH !== undefined) {
+        dataPayload.append('NAMPH', updatedDataFromModal.NAMPH === null ? '' : updatedDataFromModal.NAMPH.toString());
+    }
+    if (updatedDataFromModal.THELOAI !== undefined) dataPayload.append('THELOAI', updatedDataFromModal.THELOAI);
+    if (updatedDataFromModal.QUOCGIA !== undefined) dataPayload.append('QUOCGIA', updatedDataFromModal.QUOCGIA);
+    if (updatedDataFromModal.THOILUONG !== undefined) {
+        dataPayload.append('THOILUONG', updatedDataFromModal.THOILUONG === null ? '' : updatedDataFromModal.THOILUONG.toString());
+    }
+    if (updatedDataFromModal.DAODIEN !== undefined) dataPayload.append('DAODIEN', updatedDataFromModal.DAODIEN);
+    if (updatedDataFromModal.NGONNGU !== undefined) dataPayload.append('NGONNGU', updatedDataFromModal.NGONNGU);
+    if (updatedDataFromModal.MOTA !== undefined) dataPayload.append('MOTA', updatedDataFromModal.MOTA);
+
+
+    // Xử lý file ảnh (logic này có vẻ ổn từ trước, dựa trên newPosterFile và currentPosterDisplayUrl)
+    if (updatedDataFromModal.newPosterFile) {
+        dataPayload.append('HINHANH_FILE', updatedDataFromModal.newPosterFile, updatedDataFromModal.newPosterFile.name);
+        console.log('MoviesPage: Appended NEW HINHANH_FILE to FormData for update');
+    } else if (updatedDataFromModal.currentPosterDisplayUrl === null) {
+        // Người dùng muốn xóa ảnh (ví dụ: đã nhấn "Remove Poster" trong EditModal)
+        dataPayload.append('HINHANH', ''); // Gửi chuỗi rỗng để server hiểu là xóa
+        console.log('MoviesPage: Sending empty HINHANH to delete poster');
+    } else {
+        // Không có file mới, và currentPosterDisplayUrl không phải null
+        // => Có thể là giữ lại ảnh cũ. Server không nên cập nhật HINHANH nếu không có HINHANH_FILE
+        // và HINHANH không phải là chuỗi rỗng.
+        // Nếu bạn muốn server *luôn* nhận được giá trị HINHANH (dù là giữ cũ), bạn có thể gửi lại HINHANH gốc.
+        const originalMovie = movies.find(m => m.id === movieId);
+        if (originalMovie && updatedDataFromModal.currentPosterDisplayUrl === originalMovie.posterUrl && originalMovie.HINHANH) {
+            // dataPayload.append('HINHANH', originalMovie.HINHANH); // Gửi lại đường dẫn ảnh gốc từ DB
+            console.log('MoviesPage: Keeping existing image. HINHANH field for update will rely on server logic if not explicitly sent or cleared.');
+        }
+    }
+
+    console.log('MoviesPage: FormData entries being sent for update:');
+    for (let pair of dataPayload.entries()) {
+        console.log(pair[0], '=', pair[1] instanceof File ? pair[1].name : pair[1]);
+    }
+
+    try {
+        const updatedMovieResult = await updateMovieApi(movieId, dataPayload); // Gọi API service
+        console.log('MoviesPage: Movie updated successfully via API', updatedMovieResult);
+        alert('Movie updated successfully!');
+        handleCloseEditMovieModal();
+        fetchMoviesFromApi(); // Tải lại danh sách
+    } catch (err) {
+        console.error("MoviesPage: Failed to update movie via API", err);
+        const apiError = err.message || "Could not update movie. Please try again.";
+        setError(apiError);
+        alert(apiError);
+    } finally {
+        setIsLoading(false);
+    }
+}, [movies, fetchMoviesFromApi, handleCloseEditMovieModal]); // Dependencies
 
   // Detail Modal
   const handleOpenMovieDetailModal = (movie) => { setSelectedMovieForDetails(movie); setIsMovieDetailModalOpen(true); };
   const handleCloseMovieDetailModal = () => { setIsMovieDetailModalOpen(false); setSelectedMovieForDetails(null); };
 
   // Delete Confirmation Modal
-  const handleDeleteClick = (movie) => { setMovieToDelete(movie); };
-  const confirmDelete = () => {
-    if (movieToDelete) {
-      const newMovies = movies.filter(m => m.id !== movieToDelete.id);
-      setMovies(newMovies);
-      setFilteredMovies(newMovies.filter(m => m.title.toLowerCase().includes(searchQuery.toLowerCase())));
-      alert(`Đã xóa phim: ${movieToDelete.title}`);
-      setMovieToDelete(null);
-    }
-  };
-  const cancelDelete = () => { setMovieToDelete(null); };
+   const handleDeleteClick = useCallback((movie) => {
+        console.log('MoviesPage: handleDeleteClick for movie:', movie);
+        setMovieToDelete(movie);
+    }, []);
+
+  const confirmDelete = useCallback(async () => {
+        if (!movieToDelete) return;
+
+        console.log(`MoviesPage: Confirming deletion for movie ID: ${movieToDelete.id}`);
+        setIsLoading(true);
+        setError(null);
+        try {
+            await deleteMovieApi(movieToDelete.id); // Gọi API service
+            alert(`Movie "${movieToDelete.title}" deleted successfully.`);
+            setMovieToDelete(null); // Đóng modal xác nhận
+            fetchMoviesFromApi(); // Tải lại danh sách phim
+        } catch (err) {
+            console.error("MoviesPage: Failed to delete movie via API", err);
+            const apiError = err.message || "Could not delete movie. Please try again.";
+            setError(apiError);
+            alert(apiError); // Hiển thị lỗi cho người dùng
+        } finally {
+            setIsLoading(false);
+        }
+    }, [movieToDelete, fetchMoviesFromApi]); // Dependencies
+    
+  const cancelDelete = useCallback(() => {
+        console.log('MoviesPage: Deletion cancelled.');
+        setMovieToDelete(null);
+    }, []);
 
   // Flip Card
   const handleCardFlip = (movieId) => { setFlippedStates(prev => ({ ...prev, [movieId]: !prev[movieId] })); };
@@ -181,7 +286,7 @@ const MoviesPage = () => {
         {/* Header */}
         <div className="page-header movies-page-header">
           <h1>{pageTitle}</h1>
-          <input type="text" placeholder="Search movies by title..." className="page-header-search-input" value={searchQuery} onChange={handleSearchChange}/>
+          <input type="text" placeholder="Search movies by title..." className="page-header-search-input" value={searchQuery} onChange={handleSearchChange} />
           <Button variant="primary" size="medium" onClick={handleOpenAddMovieModal}> + Add New Movie</Button>
         </div>
 
@@ -189,62 +294,74 @@ const MoviesPage = () => {
         <div className="movies-list-cards">
           {moviesToDisplay.length > 0 ? (
             moviesToDisplay.map((movie) => (
-            <div key={movie.id} className={`flip-card ${flippedStates[movie.id] ? 'flipped' : ''}`} 
-                 onClick={(e) => { 
-                    if (e.target.closest('.film-actions button, .film-actions .btn, .view-detail-button')) return; 
-                    handleCardFlip(movie.id); 
-                 }}>
-              <div className="flip-card-inner">
-                <div className="flip-card-front">
-                  <div className="poster-area">{movie.posterPlaceholder || 'Poster Film'}</div>
-                  <div className="film-name-front">{movie.title}</div>
-                </div>
-                <div className="flip-card-back">
-                  <div className="film-info-content">
-                    <h4>Thông tin tóm tắt</h4>
-                    <p><strong>Tên:</strong> {movie.title}</p>
-                    <p><strong>Thể loại:</strong> {movie.genre || movie.type}</p>
-                    <p><strong>Quốc gia:</strong> {movie.country}</p>
-                    <p><strong>Thời lượng:</strong> {movie.duration} min</p>
-                    <button 
-                        className="view-detail-button" 
-                        onClick={(e) => { e.stopPropagation(); handleOpenMovieDetailModal(movie); }}
-                    >
-                        Xem đầy đủ chi tiết
-                    </button>
+              <div key={movie.id} className={`flip-card ${flippedStates[movie.id] ? 'flipped' : ''}`}
+                onClick={(e) => {
+                  if (e.target.closest('.film-actions button, .film-actions .btn, .view-detail-button')) return;
+                  handleCardFlip(movie.id);
+                }}>
+                <div className="flip-card-inner">
+                  <div className="flip-card-front">
+                    <div className="poster-area">
+                      {movie.posterUrl ? (
+                        <img src={movie.posterUrl} alt={movie.title || 'Movie poster'} className="poster-area img" />
+                      ) : (
+                        <span className="poster-placeholder-text">{movie.posterPlaceholder || 'No Poster'}</span>
+                      )}
+                    </div>
+                    <div className="film-name-front">{movie.title}</div>
                   </div>
-                  <div className="film-actions">
-                     <Button variant="danger" size="small" onClick={(e) => { e.stopPropagation(); handleDeleteClick(movie); }}>Delete</Button>
-                     <Button variant="secondary" size="small" onClick={(e) => { e.stopPropagation(); handleOpenEditMovieModal(movie); }}>Edit</Button>
+                  <div className="flip-card-back">
+                    <div className="film-info-content">
+                      <h4>Thông tin tóm tắt</h4>
+                      <p><strong>Tên:</strong> {movie.title}</p>
+                      <p><strong>Thể loại:</strong> {movie.genre || movie.type}</p>
+                      <p><strong>Quốc gia:</strong> {movie.country}</p>
+                      <p><strong>Thời lượng:</strong> {movie.duration} min</p>
+                      <button
+                        className="view-detail-button"
+                        onClick={(e) => { e.stopPropagation(); handleOpenMovieDetailModal(movie); }}
+                      >
+                        Xem đầy đủ chi tiết
+                      </button>
+                    </div>
+                    <div className="film-actions">
+                      <Button variant="danger" size="small" onClick={(e) => { e.stopPropagation(); handleDeleteClick(movie); }}>Delete</Button>
+                      <Button variant="secondary" size="small" onClick={(e) => { e.stopPropagation(); handleOpenEditMovieModal(movie); }}>Edit</Button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))
-         ) : (
+            ))
+          ) : (
             <p className="no-items-found">{searchQuery ? 'No movies found matching your search.' : 'No movies available.'}</p>
-         )}
+          )}
         </div>
       </div>
 
       {/* Modals */}
       <AddMovieModal isOpen={isAddMovieModalOpen} onClose={handleCloseAddMovieModal} onAddMovie={handleAddMovieSubmit} />
-      <EditMovieModal isOpen={isEditMovieModalOpen} onClose={handleCloseEditMovieModal} movie={movieToEdit} onUpdateMovie={handleUpdateMovieSubmit}/>
+      <EditMovieModal isOpen={isEditMovieModalOpen} onClose={handleCloseEditMovieModal} movie={movieToEdit} onUpdateMovie={handleUpdateMovieSubmit} />
       <MovieDetailModal isOpen={isMovieDetailModalOpen} onClose={handleCloseMovieDetailModal} movie={selectedMovieForDetails} />
-      
+
       {/* Modal Xác Nhận Xóa */}
-       {movieToDelete && (
-         <div className="modal-overlay confirmation-overlay" onClick={cancelDelete}>
-           <div className="modal-content confirmation-modal" onClick={(e) => e.stopPropagation()}>
-             <h3>Xác nhận xóa</h3>
-             <p>Bạn có chắc chắn muốn xóa phim "{movieToDelete.title}"?</p>
-             <div className="confirmation-actions">
-               <button onClick={cancelDelete} className="cancel-btn">Không</button>
-               <button onClick={confirmDelete} className="confirm-delete-btn">Có, Xóa</button>
-             </div>
-           </div>
-         </div>
-       )}
+      {/*movieToDelete && (
+        <div className="modal-overlay confirmation-overlay" onClick={cancelDelete}>
+          <div className="modal-content confirmation-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Xác nhận xóa</h3>
+            <p>Bạn có chắc chắn muốn xóa phim "{movieToDelete.title}"?</p>
+            <div className="confirmation-actions">
+              <button onClick={cancelDelete} className="cancel-btn">Không</button>
+              <button onClick={confirmDelete} className="confirm-delete-btn">Có, Xóa</button>
+            </div>
+          </div>
+        </div>
+      )  */}
+      <DeleteMovieModal
+        isOpen={!!movieToDelete}
+        onClose={cancelDelete}
+        onConfirm={confirmDelete}
+        movieName={movieToDelete ? movieToDelete.title : ''}
+        isLoading={isLoading}>  </DeleteMovieModal>
     </>
   );
 };

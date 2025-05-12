@@ -10,52 +10,77 @@ const EditMovieModal = ({ isOpen, onClose, movie, onUpdateMovie }) => {
   const [editedDirector, setEditedDirector] = useState('');
   const [editedLanguage, setEditedLanguage] = useState('');
   const [editedDescription, setEditedDescription] = useState('');
+
   const [posterPreview, setPosterPreview] = useState(null);
   const [posterFile, setPosterFile] = useState(null);
 
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    if (movie) {
+    if (isOpen && movie) {
+      console.log('EditMovieModal: Populating form with movie data:', movie);
       setEditedTitle(movie.title || '');
       setEditedYear(movie.year?.toString() || '');
-      setEditedType(movie.type || movie.genre || '');
+      // Sử dụng movie.type vì mapApiToClient đã map THELOAI sang type
+      setEditedType(movie.type || '');
       setEditedCountry(movie.country || '');
       setEditedDuration(movie.duration?.toString() || '');
       setEditedDirector(movie.director || '');
       setEditedLanguage(movie.language || '');
       setEditedDescription(movie.description || '');
-      setPosterPreview(movie.posterUrl || null);
-      setPosterFile(null);
-    } else {
-      // Reset
-      setEditedTitle(''); setEditedYear(''); setEditedType(''); setEditedCountry(''); 
-      setEditedDuration(''); setEditedDirector(''); setEditedLanguage(''); 
-      setEditedDescription(''); setPosterPreview(null); setPosterFile(null);
-    }
-  }, [movie]);
 
-  const handlePosterChange = (event) => { /* ... như trước ... */ };
-  const triggerFileInput = () => { /* ... như trước ... */ };
+      setPosterPreview(movie.posterUrl || null); // Hiển thị ảnh hiện tại (URL từ server)
+      setPosterFile(null); // Reset trạng thái file mới
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""; // Reset input file để có thể chọn lại cùng file
+      }
+    } else if (!isOpen) {
+      // Tùy chọn: Reset hoàn toàn khi đóng (nếu không muốn giữ lại state)
+      // Tuy nhiên, việc reset khi movie thay đổi hoặc isOpen đã đủ
+    }
+  }, [movie]); // Chạy lại khi modal mở hoặc phim cần sửa thay đổi
+
+  const handlePosterChange = (event) => { 
+    const file = event.target.files[0];
+    if (file) {
+      setPosterFile(file); // Lưu File object của ảnh MỚI
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPosterPreview(reader.result); // Hiển thị preview của ảnh MỚI (dataURL)
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+   const triggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!editedTitle.trim() || !editedYear.trim() || isNaN(parseInt(editedYear)) ||
-        !editedType.trim() || !editedCountry.trim() || 
-        !editedDuration.trim() || isNaN(parseInt(editedDuration)) || parseInt(editedDuration) <= 0
-    ) {
-        alert("Vui lòng điền đầy đủ các thông tin bắt buộc (Title, Year, Type, Country, Duration).");
-        return;
-    }
+    // ... (validation) ...
+
     const updatedMovieData = {
-      title: editedTitle.trim(), year: parseInt(editedYear, 10),
-      type: editedType.trim(), country: editedCountry.trim(),
-      duration: parseInt(editedDuration, 10),
-      director: editedDirector.trim(), language: editedLanguage.trim(),
-      description: editedDescription.trim(),
-      newPosterFile: posterFile, posterUrl: posterPreview,
+      // MAPHIM không cần gửi trong object này, nó đã là movie.id
+      TENPHIM: editedTitle.trim(),
+      NAMPH: editedYear.trim() ? parseInt(editedYear.trim(), 10) : null,
+      THELOAI: editedType.trim(),
+      DAODIEN: editedDirector.trim(),
+      THOILUONG: editedDuration.trim() ? parseInt(editedDuration.trim(), 10) : null,
+      MOTA: editedDescription.trim(),
+      QUOCGIA: editedCountry.trim(),
+      NGONNGU: editedLanguage.trim(),
+
+      // Thông tin ảnh để MoviesPage xử lý
+      newPosterFile: posterFile, // File object mới (nếu có)
+      currentPosterDisplayUrl: posterPreview, // URL đang hiển thị (dataURL mới, URL gốc cũ, hoặc null)
     };
-    onUpdateMovie(movie.id, updatedMovieData);
+
+    console.log('EditMovieModal - Submitting data:', JSON.stringify(updatedMovieData, null, 2));
+    onUpdateMovie(movie.id, updatedMovieData); // movie.id là MAPHIM
   };
 
   if (!isOpen || !movie) return null;
