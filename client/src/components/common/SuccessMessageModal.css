@@ -1,0 +1,65 @@
+/* client/src/components/common/SuccessMessageModal.css */
+.success-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Nền mờ hơn một chút so với lỗi */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.success-modal-content {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 380px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border-top: 5px solid #28a745; /* Viền xanh lá cây cho thành công */
+}
+
+.success-modal-header {
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.success-modal-title {
+  margin: 0;
+  font-size: 1.25em;
+  color: #28a745; /* Màu xanh cho tiêu đề thành công */
+  font-weight: 600;
+}
+
+.success-modal-body {
+  padding: 20px;
+  font-size: 1em;
+  line-height: 1.5;
+  color: #495057;
+}
+
+.success-modal-footer {
+  padding: 15px 20px;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  justify-content: flex-end;
+  background-color: #f8f9fa;
+}
+
+.success-modal-ok-button.btn-success { /* Nếu Button có class .btn-success */
+    background-color: #28a745 !important; /* Quan trọng nếu Button chung có style mạnh hơn */
+    border-color: #28a745 !important;
+    color: white !important;
+}
+.success-modal-ok-button.btn-success:hover {
+    background-color: #218838 !important;
+    border-color: #1e7e34 !important;
+}

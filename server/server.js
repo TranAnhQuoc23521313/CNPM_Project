@@ -62,7 +62,7 @@ app.get('/api', (req, res) => {
 
 // 8. Middleware xử lý lỗi tập trung (nên đặt ở cuối cùng, sau tất cả các routes)
 // Middleware này sẽ bắt các lỗi được truyền qua `next(error)` từ các controllers.
-/* app.use((err, req, res, next) => {
+app.use((err, req, res, next) => {
     console.error("---------------------------------------");
     console.error("ERROR MIDDLEWARE CAUGHT AN ERROR:");
     console.error("Timestamp:", new Date().toISOString());
@@ -90,7 +90,7 @@ app.get('/api', (req, res) => {
         // Có thể thêm các trường lỗi cụ thể nếu cần
         ...(err.errors && { errors: err.errors })
     });
-}); */
+}); 
 
 // Middleware xử lý route không tìm thấy (404 Not Found - đặt ngay trước error handler)
 /* app.use((req, res, next) => {

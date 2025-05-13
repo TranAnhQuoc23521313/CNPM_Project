@@ -156,6 +156,57 @@ class MovieRepository {
             throw new Error(`Database query failed: Could not delete movie ${maPhim}.`);
         }
     }
+
+    async findExactDuplicate(movieDetails) {
+        // Danh sách các trường sẽ được dùng để so sánh
+        const fieldsToCompare = [
+            'TENPHIM', 'THELOAI', 'NAMPH', 'DAODIEN',
+            'QUOCGIA', 'NGONNGU', 'THOILUONG'
+        ];
+
+        const conditions = [];
+        const params = [];
+
+        fieldsToCompare.forEach(field => {
+            if (movieDetails.hasOwnProperty(field) && movieDetails[field] !== null && movieDetails[field] !== undefined) {
+                // Xử lý cho trường NAMPH và THOILUONG nếu chúng là số
+                if (field === 'NAMPH' || field === 'THOILUONG') {
+                    const numericValue = parseInt(movieDetails[field], 10);
+                    if (!isNaN(numericValue)) {
+                        conditions.push(`${field} = ?`);
+                        params.push(numericValue);
+                    } else {
+                        // Nếu không phải số hợp lệ, có thể coi là so sánh với NULL hoặc bỏ qua
+                        conditions.push(`${field} IS NULL`);
+                    }
+                } else {
+                    conditions.push(`${field} = ?`);
+                    params.push(movieDetails[field]);
+                }
+            } else {
+                // Nếu trường không có trong movieDetails hoặc là null/undefined,
+                // chúng ta sẽ so sánh với cột tương ứng trong DB là NULL
+                conditions.push(`${field} IS NULL`);
+            }
+        });
+
+        if (conditions.length === 0) {
+            // Không có trường nào để so sánh, không thể coi là trùng lặp
+            console.warn('MovieRepository.findExactDuplicate: No fields provided for comparison.');
+            return false;
+        }
+
+        let sql = `SELECT COUNT(*) as count FROM PHIM WHERE ${conditions.join(' AND ')}`;
+
+        console.log(`MovieRepository: Checking exact duplicate with SQL: ${sql}`, params);
+        try {
+            const [rows] = await pool.query(sql, params);
+            return rows[0].count > 0;
+        } catch (error) {
+            console.error('Error in MovieRepository.findExactDuplicate:', error);
+            throw new Error('Database query failed while checking for exact duplicate movie.');
+        }
+    }
     // ... các hàm khác (findById, create, update, delete) ...
 }
 module.exports = new MovieRepository();

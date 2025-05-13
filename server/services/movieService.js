@@ -33,11 +33,32 @@ class MovieService {
 
     async createMovie(movieData) {
         try {
-            return await movieRepository.create(movieData);
+            const detailsToCheck = {
+                TENPHIM: movieData.TENPHIM,
+                THELOAI: movieData.THELOAI,
+                NAMPH: movieData.NAMPH, // Repository sẽ parse
+                DAODIEN: movieData.DAODIEN,
+                QUOCGIA: movieData.QUOCGIA,
+                NGONNGU: movieData.NGONNGU,
+                THOILUONG: movieData.THOILUONG // Repository sẽ parse
+            };
+            const isExactDuplicate = await movieRepository.findExactDuplicate(detailsToCheck);
+            if (isExactDuplicate) {
+                const error = new Error('An identical movie (based on all provided details) already exists.');
+                error.statusCode = 409; // Conflict
+                throw error;
+            }
+
+            // 2. Nếu không trùng, tiến hành tạo phim
+            // MAPHIM đã được sinh bởi controller và có trong movieData
+            const newMovie = await movieRepository.create(movieData);
+            return newMovie;
         } catch (error) {
-            // Log lỗi ở đây nếu cần, hoặc chỉ ném lại để controller xử lý
             console.error('Error in MovieService.createMovie:', error);
-            throw error; // Ném lại lỗi
+            if (error.message && error.message.toLowerCase().includes('duplicate entry') && error.message.includes(movieData.MAPHIM)) {
+                error.statusCode = 409;
+            }
+            throw error;
         }
     }
 
@@ -67,7 +88,7 @@ class MovieService {
             if (affectedRows > 0) {
                 if (movieToDelete.HINHANH && typeof movieToDelete.HINHANH === 'string' && movieToDelete.HINHANH.trim() !== '') {
                     // Dòng 70 của bạn có thể là dòng này hoặc gần đây, nơi bạn dùng path.join
-                    const imagePathOnServer = path.join(__dirname,'../public', movieToDelete.HINHANH);
+                    const imagePathOnServer = path.join(__dirname, '../public', movieToDelete.HINHANH);
                     console.log(`MovieService: Attempting to delete image file at: ${imagePathOnServer}`);
                     try {
                         if (fs.existsSync(imagePathOnServer)) {

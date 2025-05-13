@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios'; // Thêm dòng này
 import Button from '../../components/common/Button.jsx';
 import './MoviesPage.css'; // CSS riêng của MoviesPage
@@ -7,7 +7,8 @@ import EditMovieModal from './EditMovieModal.jsx';
 import MovieDetailModal from './MovieDetailModal.jsx';
 import DeleteMovieModal from './DeleteMovieModal.jsx'; // Giả sử bạn có component DeleteMovieModal
 import { getAllMoviesApi, createMovieApi, updateMovieApi, deleteMovieApi } from '../../services/movieApiService.js';
-
+import ErrorMessageModal from '../../components/common/ErrorMessageModal.jsx';
+import SuccessMessageModal from '../../components/common/SuccessMessageModal.jsx'; // Giả sử bạn có component SuccessMessageModal
 // --- DỮ LIỆU GIẢ LẬP BAN ĐẦU (Bao gồm các trường mới) ---
 /* const initialMoviesData = [
   { 
@@ -91,23 +92,30 @@ const MoviesPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // State cho Modal thông báo lỗi
+  const [errorToDisplay, setErrorToDisplay] = useState(null); // null khi không có lỗi, string khi có lỗi
+
+  // State cho Modal thông báo thành công
+  const [successMessage, setSuccessMessage] = useState(null);
+
   // --- LẤY DỮ LIỆU PHIM TỪ API ---
   // Sử dụng useEffect để lấy dữ liệu phim từ API
   const fetchMoviesFromApi = async () => {
     console.log('MoviesPage: Attempting to fetch movies...');
     setIsLoading(true);
-    setError(null);
+    //setError(null);
     try {
       const response = await getAllMoviesApi();
       console.log('MoviesPage: Movies fetched successfully:', response);
       const mappedMovies = response.map(mapApiToClient); // Chuyển đổi dữ liệu từ API
       setMovies(mappedMovies);
       console.log('MoviesPage: Movies fetched and set to state', mappedMovies);
-      console.log("Orginal API Movie Data:", mappedMovies.HINHANH);
       setFilteredMovies(mappedMovies);
     } catch (err) {
       console.error("MoviesPage: Error fetching movies", err);
-      setError(err.message || "An error occurred while fetching movies.");
+      const displayError = err.message || "An error occurred while fetching movies.";
+      setErrorToDisplay(displayError);
+      //setError(err.message || "An error occurred while fetching movies.");
     } finally {
       setIsLoading(false);
     }
@@ -116,8 +124,8 @@ const MoviesPage = () => {
   // Lấy dữ liệu phim từ API khi component mount
   useEffect(() => {
     fetchMoviesFromApi();
-}, []);
- 
+  }, []);
+
   // --- HÀM HANDLER ---
   const handleSearchChange = (event) => {
     const query = event.target.value.toLowerCase();
@@ -131,51 +139,59 @@ const MoviesPage = () => {
   const handleOpenAddMovieModal = () => { setIsAddMovieModalOpen(true); };
   const handleCloseAddMovieModal = () => { setIsAddMovieModalOpen(false); };
   const handleAddMovieSubmit = useCallback(async (formDataFromModal) => {
-        console.log('MoviesPage: handleAddMovieSubmit called with:', formDataFromModal);
-        setIsLoading(true);
-        setError(null);
+    console.log('MoviesPage: handleAddMovieSubmit called with:', formDataFromModal);
+    setIsLoading(true);
+    setError(null);
 
-        const dataPayload = new FormData();
-        // Server sẽ tự sinh MAPHIM
-        dataPayload.append('TENPHIM', formDataFromModal.TENPHIM); // Sử dụng tên trường từ AddMovieModal
-        dataPayload.append('NAMPH', formDataFromModal.NAMPH);
-        dataPayload.append('THELOAI', formDataFromModal.THELOAI);
-        dataPayload.append('QUOCGIA', formDataFromModal.QUOCGIA || '');
-        dataPayload.append('THOILUONG', formDataFromModal.THOILUONG || 0);
-        dataPayload.append('DAODIEN', formDataFromModal.DAODIEN || '');
-        dataPayload.append('NGONNGU', formDataFromModal.NGONNGU || '');
-        dataPayload.append('MOTA', formDataFromModal.MOTA || '');
+    const dataPayload = new FormData();
+    // Server sẽ tự sinh MAPHIM
+    dataPayload.append('TENPHIM', formDataFromModal.TENPHIM); // Sử dụng tên trường từ AddMovieModal
+    dataPayload.append('NAMPH', formDataFromModal.NAMPH);
+    dataPayload.append('THELOAI', formDataFromModal.THELOAI);
+    dataPayload.append('QUOCGIA', formDataFromModal.QUOCGIA || '');
+    dataPayload.append('THOILUONG', formDataFromModal.THOILUONG || 0);
+    dataPayload.append('DAODIEN', formDataFromModal.DAODIEN || '');
+    dataPayload.append('NGONNGU', formDataFromModal.NGONNGU || '');
+    dataPayload.append('MOTA', formDataFromModal.MOTA || '');
 
-        // Trong AddMovieModal, bạn đặt tên là HINHANH cho file
-        if (formDataFromModal.HINHANH) { // Kiểm tra HINHANH (là posterFile)
-            dataPayload.append('HINHANH_FILE', formDataFromModal.HINHANH, formDataFromModal.HINHANH.name);
-            console.log('MoviesPage: Appended HINHANH_FILE to FormData');
-        } else {
-            console.log('MoviesPage: No posterFile (HINHANH) to append.');
-        }
+    // Trong AddMovieModal, bạn đặt tên là HINHANH cho file
+    if (formDataFromModal.HINHANH) { // Kiểm tra HINHANH (là posterFile)
+      dataPayload.append('HINHANH_FILE', formDataFromModal.HINHANH, formDataFromModal.HINHANH.name);
+      console.log('MoviesPage: Appended HINHANH_FILE to FormData');
+    } else {
+      console.log('MoviesPage: No posterFile (HINHANH) to append.');
+    }
 
-        try {
-            const newMovie = await createMovieApi(dataPayload);
-            console.log('MoviesPage: Movie added successfully via API', newMovie);
-            alert(`Movie "${newMovie.TENPHIM || formDataFromModal.TENPHIM}" (ID: ${newMovie.MAPHIM}) added successfully!`);
-            // handleCloseAddMovieModal đã được useCallback, gọi trực tiếp
-            handleCloseAddMovieModal();
-            // fetchMoviesFromApi đã được useCallback, gọi trực tiếp
-            fetchMoviesFromApi();
-        } catch (err) {
-            console.error("MoviesPage: Failed to add movie via API", err);
-            const apiError = err.message || "Could not add movie. Please check data and try again.";
-            setError(apiError);
-            alert(apiError);
-        } finally {
-            setIsLoading(false);
-        }
-    }, [fetchMoviesFromApi, handleCloseAddMovieModal]); // Dependencies cho useCallback
+    try {
+      const newMovie = await createMovieApi(dataPayload);
+      console.log('MoviesPage: Movie added successfully via API', newMovie);
+      setSuccessMessage(`Phim "${newMovie.TENPHIM}" được thêm thành công!`);
+      // handleCloseAddMovieModal đã được useCallback, gọi trực tiếp
+      handleCloseAddMovieModal();
+      // fetchMoviesFromApi đã được useCallback, gọi trực tiếp
+      fetchMoviesFromApi();
+    } catch (err) {
+      console.error("MoviesPage: Failed to add movie via API", err);
+      let displayErrorMessage = "Có lỗi xảy ra: Không thể thêm phim.";
+      if (err.response?.data?.message) {
+        displayErrorMessage = err.response.data.message;
+      } else if (err.message) {
+        displayErrorMessage = err.message;
+      }
+      // Tùy chỉnh thông báo nếu là lỗi trùng lặp cụ thể
+      if (displayErrorMessage.toLowerCase().includes("already exists") || displayErrorMessage.toLowerCase().includes("duplicate")) {
+        displayErrorMessage = "Phim bạn vừa nhập đã tồn tại trong hệ thống.";
+      }
+      setErrorToDisplay(displayErrorMessage); // HIỂN THỊ LỖI QUA MODAL
+    } finally {
+      setIsLoading(false);
+    }
+  }, [fetchMoviesFromApi, handleCloseAddMovieModal]); // Dependencies cho useCallback
 
   // Edit Modal
   const handleOpenEditMovieModal = (movie) => { setMovieToEdit(movie); setIsEditMovieModalOpen(true); };
   const handleCloseEditMovieModal = () => { setIsEditMovieModalOpen(false); setMovieToEdit(null); };
- const handleUpdateMovieSubmit = useCallback(async (movieId, updatedDataFromModal) => {
+  const handleUpdateMovieSubmit = useCallback(async (movieId, updatedDataFromModal) => {
     console.log(`MoviesPage: handleUpdateMovieSubmit for ID ${movieId} with data from modal:`, JSON.stringify(updatedDataFromModal, null, 2));
     setIsLoading(true);
     setError(null);
@@ -185,12 +201,12 @@ const MoviesPage = () => {
     // Đọc trực tiếp các key đã là tên trường server từ updatedDataFromModal
     if (updatedDataFromModal.TENPHIM !== undefined) dataPayload.append('TENPHIM', updatedDataFromModal.TENPHIM);
     if (updatedDataFromModal.NAMPH !== undefined) {
-        dataPayload.append('NAMPH', updatedDataFromModal.NAMPH === null ? '' : updatedDataFromModal.NAMPH.toString());
+      dataPayload.append('NAMPH', updatedDataFromModal.NAMPH === null ? '' : updatedDataFromModal.NAMPH.toString());
     }
     if (updatedDataFromModal.THELOAI !== undefined) dataPayload.append('THELOAI', updatedDataFromModal.THELOAI);
     if (updatedDataFromModal.QUOCGIA !== undefined) dataPayload.append('QUOCGIA', updatedDataFromModal.QUOCGIA);
     if (updatedDataFromModal.THOILUONG !== undefined) {
-        dataPayload.append('THOILUONG', updatedDataFromModal.THOILUONG === null ? '' : updatedDataFromModal.THOILUONG.toString());
+      dataPayload.append('THOILUONG', updatedDataFromModal.THOILUONG === null ? '' : updatedDataFromModal.THOILUONG.toString());
     }
     if (updatedDataFromModal.DAODIEN !== undefined) dataPayload.append('DAODIEN', updatedDataFromModal.DAODIEN);
     if (updatedDataFromModal.NGONNGU !== undefined) dataPayload.append('NGONNGU', updatedDataFromModal.NGONNGU);
@@ -199,80 +215,104 @@ const MoviesPage = () => {
 
     // Xử lý file ảnh (logic này có vẻ ổn từ trước, dựa trên newPosterFile và currentPosterDisplayUrl)
     if (updatedDataFromModal.newPosterFile) {
-        dataPayload.append('HINHANH_FILE', updatedDataFromModal.newPosterFile, updatedDataFromModal.newPosterFile.name);
-        console.log('MoviesPage: Appended NEW HINHANH_FILE to FormData for update');
+      dataPayload.append('HINHANH_FILE', updatedDataFromModal.newPosterFile, updatedDataFromModal.newPosterFile.name);
+      console.log('MoviesPage: Appended NEW HINHANH_FILE to FormData for update');
     } else if (updatedDataFromModal.currentPosterDisplayUrl === null) {
-        // Người dùng muốn xóa ảnh (ví dụ: đã nhấn "Remove Poster" trong EditModal)
-        dataPayload.append('HINHANH', ''); // Gửi chuỗi rỗng để server hiểu là xóa
-        console.log('MoviesPage: Sending empty HINHANH to delete poster');
+      // Người dùng muốn xóa ảnh (ví dụ: đã nhấn "Remove Poster" trong EditModal)
+      dataPayload.append('HINHANH', ''); // Gửi chuỗi rỗng để server hiểu là xóa
+      console.log('MoviesPage: Sending empty HINHANH to delete poster');
     } else {
-        // Không có file mới, và currentPosterDisplayUrl không phải null
-        // => Có thể là giữ lại ảnh cũ. Server không nên cập nhật HINHANH nếu không có HINHANH_FILE
-        // và HINHANH không phải là chuỗi rỗng.
-        // Nếu bạn muốn server *luôn* nhận được giá trị HINHANH (dù là giữ cũ), bạn có thể gửi lại HINHANH gốc.
-        const originalMovie = movies.find(m => m.id === movieId);
-        if (originalMovie && updatedDataFromModal.currentPosterDisplayUrl === originalMovie.posterUrl && originalMovie.HINHANH) {
-            // dataPayload.append('HINHANH', originalMovie.HINHANH); // Gửi lại đường dẫn ảnh gốc từ DB
-            console.log('MoviesPage: Keeping existing image. HINHANH field for update will rely on server logic if not explicitly sent or cleared.');
-        }
+      // Không có file mới, và currentPosterDisplayUrl không phải null
+      // => Có thể là giữ lại ảnh cũ. Server không nên cập nhật HINHANH nếu không có HINHANH_FILE
+      // và HINHANH không phải là chuỗi rỗng.
+      // Nếu bạn muốn server *luôn* nhận được giá trị HINHANH (dù là giữ cũ), bạn có thể gửi lại HINHANH gốc.
+      const originalMovie = movies.find(m => m.id === movieId);
+      if (originalMovie && updatedDataFromModal.currentPosterDisplayUrl === originalMovie.posterUrl && originalMovie.HINHANH) {
+        // dataPayload.append('HINHANH', originalMovie.HINHANH); // Gửi lại đường dẫn ảnh gốc từ DB
+        console.log('MoviesPage: Keeping existing image. HINHANH field for update will rely on server logic if not explicitly sent or cleared.');
+      }
     }
 
     console.log('MoviesPage: FormData entries being sent for update:');
     for (let pair of dataPayload.entries()) {
-        console.log(pair[0], '=', pair[1] instanceof File ? pair[1].name : pair[1]);
+      console.log(pair[0], '=', pair[1] instanceof File ? pair[1].name : pair[1]);
     }
 
     try {
-        const updatedMovieResult = await updateMovieApi(movieId, dataPayload); // Gọi API service
-        console.log('MoviesPage: Movie updated successfully via API', updatedMovieResult);
-        alert('Movie updated successfully!');
-        handleCloseEditMovieModal();
-        fetchMoviesFromApi(); // Tải lại danh sách
+      const updatedMovieResult = await updateMovieApi(movieId, dataPayload); // Gọi API service
+      console.log('MoviesPage: Movie updated successfully via API', updatedMovieResult);
+      //setSuccessMessage('Movie updated successfully!');
+      //setSuccessMessage(`Phim "${updatedMovieResult.TENPHIM}" được chỉnh sửa thành công!`);
+      setSuccessMessage(`Phim "${updatedDataFromModal.TENPHIM}" được thêm thành công!`);
+      handleCloseEditMovieModal();
+      fetchMoviesFromApi(); // Tải lại danh sách
     } catch (err) {
-        console.error("MoviesPage: Failed to update movie via API", err);
-        const apiError = err.message || "Could not update movie. Please try again.";
-        setError(apiError);
-        alert(apiError);
+      console.error("MoviesPage: Failed to update movie. Full error object:", err);
+      let displayErrorMessage = "Có lỗi xảy ra: Thay đổi thất bại.";
+      if (err.response?.data?.message) {
+        displayErrorMessage = err.response.data.message;
+      } else if (err.message) {
+        displayErrorMessage = err.message;
+      }
+      if (displayErrorMessage.toLowerCase().includes("already exists") || displayErrorMessage.toLowerCase().includes("duplicate")) {
+        displayErrorMessage = "Cập nhật sẽ tạo ra phim trùng lặp với một phim khác đã tồn tại.";
+      }
+      setErrorToDisplay(displayErrorMessage);
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
-}, [movies, fetchMoviesFromApi, handleCloseEditMovieModal]); // Dependencies
+  }, [movies, fetchMoviesFromApi, handleCloseEditMovieModal]); // Dependencies
 
   // Detail Modal
   const handleOpenMovieDetailModal = (movie) => { setSelectedMovieForDetails(movie); setIsMovieDetailModalOpen(true); };
   const handleCloseMovieDetailModal = () => { setIsMovieDetailModalOpen(false); setSelectedMovieForDetails(null); };
 
   // Delete Confirmation Modal
-   const handleDeleteClick = useCallback((movie) => {
-        console.log('MoviesPage: handleDeleteClick for movie:', movie);
-        setMovieToDelete(movie);
-    }, []);
+  const handleDeleteClick = useCallback((movie) => {
+    console.log('MoviesPage: handleDeleteClick for movie:', movie);
+    setMovieToDelete(movie);
+  }, []);
 
   const confirmDelete = useCallback(async () => {
-        if (!movieToDelete) return;
+    if (!movieToDelete) return;
 
-        console.log(`MoviesPage: Confirming deletion for movie ID: ${movieToDelete.id}`);
-        setIsLoading(true);
-        setError(null);
-        try {
-            await deleteMovieApi(movieToDelete.id); // Gọi API service
-            alert(`Movie "${movieToDelete.title}" deleted successfully.`);
-            setMovieToDelete(null); // Đóng modal xác nhận
-            fetchMoviesFromApi(); // Tải lại danh sách phim
-        } catch (err) {
-            console.error("MoviesPage: Failed to delete movie via API", err);
-            const apiError = err.message || "Could not delete movie. Please try again.";
-            setError(apiError);
-            alert(apiError); // Hiển thị lỗi cho người dùng
-        } finally {
-            setIsLoading(false);
-        }
-    }, [movieToDelete, fetchMoviesFromApi]); // Dependencies
-    
+    console.log(`MoviesPage: Confirming deletion for movie ID: ${movieToDelete.id}`);
+    setIsLoading(true);
+    setError(null);
+    try {
+      await deleteMovieApi(movieToDelete.id); // Gọi API service
+      setSuccessMessage(`Phim "${movieToDelete.title}" đã được xóa thành công.`);
+      setMovieToDelete(null); // Đóng modal xác nhận
+      fetchMoviesFromApi(); // Tải lại danh sách phim
+    } catch (err) {
+      console.error("MoviesPage: Failed to delete movie. Full error object:", err);
+      let displayErrorMessage = "Could not delete movie. An unknown error occurred.";
+      if (err.response?.data?.message) {
+        displayErrorMessage = err.response.data.message;
+      } else if (err.message) {
+        displayErrorMessage = err.message;
+      }
+      setErrorToDisplay(displayErrorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [movieToDelete, fetchMoviesFromApi]); // Dependencies
+
   const cancelDelete = useCallback(() => {
-        console.log('MoviesPage: Deletion cancelled.');
-        setMovieToDelete(null);
-    }, []);
+    console.log('MoviesPage: Deletion cancelled.');
+    setMovieToDelete(null);
+  }, []);
+
+
+  // Error Modal
+  const handleCloseErrorModal = useCallback(() => {
+    setErrorToDisplay(null);
+  }, []);
+
+  // Success Modal
+  const handleCloseSuccessModal = useCallback(() => {
+    setSuccessMessage(null);
+  }, []);
 
   // Flip Card
   const handleCardFlip = (movieId) => { setFlippedStates(prev => ({ ...prev, [movieId]: !prev[movieId] })); };
@@ -342,7 +382,8 @@ const MoviesPage = () => {
       <AddMovieModal isOpen={isAddMovieModalOpen} onClose={handleCloseAddMovieModal} onAddMovie={handleAddMovieSubmit} />
       <EditMovieModal isOpen={isEditMovieModalOpen} onClose={handleCloseEditMovieModal} movie={movieToEdit} onUpdateMovie={handleUpdateMovieSubmit} />
       <MovieDetailModal isOpen={isMovieDetailModalOpen} onClose={handleCloseMovieDetailModal} movie={selectedMovieForDetails} />
-
+      <ErrorMessageModal isOpen={!!errorToDisplay} onClose={handleCloseErrorModal} errorMessage={errorToDisplay} />
+      <SuccessMessageModal isOpen={!!successMessage} onClose={handleCloseSuccessModal} successMessage={successMessage} />
       {/* Modal Xác Nhận Xóa */}
       {/*movieToDelete && (
         <div className="modal-overlay confirmation-overlay" onClick={cancelDelete}>
