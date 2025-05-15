@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { login } from '../userSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
-import LoginForm from '../LoginForm';
+import LoginForm from '../../components/common/LoginForm';
 import { useSnackbar } from 'notistack';
 //import { useNavigate } from 'react-router-dom';
 

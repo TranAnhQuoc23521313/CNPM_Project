@@ -9,10 +9,10 @@ import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import MovieIcon from '@mui/icons-material/Movie';
-import Login from '../../features/Auth/components/Login';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
+import Login from '../../../pages/Login';
 
 export default function Header() {
   const [open, setOpen] = useState(false);

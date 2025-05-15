@@ -1,18 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import InputField from '../../../../components/form-controls/InputField';
 import { useForm } from 'react-hook-form';
-import { Avatar, Typography, Button, Box , LinearProgress } from '@mui/material';
+import { Avatar, Typography, Button, Box, LinearProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import PasswordField from '../../../../components/form-controls/passwordfield';
-
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-
+import InputField from '../InputField';
+import PasswordField from '../passwordfield';
 
 // Styled components
 const Root = styled(Box)(({ theme }) => ({
-  position: 'relative',
+  position : 'relative',
   paddingTop: theme.spacing(4),
 }));
 
@@ -37,44 +35,24 @@ const Progress = styled(LinearProgress)(({ theme }) => ({
   right: 0,
 }));
 
-
-const RegisterForm = (props) => {
+const LoginForm = (props) => {
 
   // validation
   const schema = yup.object().shape({
-    fullname: yup
-      .string()
-      .required('Please enter your full name')
-      .test(
-        'should-have-two-words',
-        'Please enter at least two words.',
-        (value) => value && value.trim().split(' ').filter(word => word).length >= 2
-      ),
-  
     email: yup
       .string()
       .email('Invalid email')
       .required('Email is required'),
-  
     password: yup
       .string()
-      .min(6, 'At least 6 characters')
       .required('Password is required'),
-  
-      retypepassword: yup
-      .string()
-      .required('Retype your password')
-      .oneOf([yup.ref('password')], 'Passwords must match'),
-      
   });
   const form = useForm({
     defaultValues: {
-      fullname: '',
-      email: '',
+        email: '',
       password: '',
-      retypepassword: '',
     },
-    resolver: yupResolver(schema), // tích hợp yup
+    resolver: yupResolver(schema), 
   });
 
   const onSubmit = async (values) => {
@@ -82,37 +60,31 @@ const RegisterForm = (props) => {
     if (onSubmit) {
       await onSubmit(values);
     }
-    form.reset();
   };
   const {isSubmitting} = form.formState;
   return (
     <Root>
-
       {isSubmitting && <Progress /> }
       <StyledAvatar />
+
       <Title component="h3" variant="h5">
-        Create An Account
+        Sign In
       </Title>
 
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <InputField name="fullname" label="Full Name" form={form} />
         <InputField name="email" label="Email" form={form} />
         <PasswordField name="password" label="Password" form={form} />
-        <PasswordField name="retypepassword" label="Retype Password" form={form} />
 
-        <SubmitButton disabled = {isSubmitting}  variant="contained" color="primary" type="submit" fullWidth>
-            Sign Up
+        <SubmitButton disabled = {isSubmitting} variant="contained" color="primary" type="submit" fullWidth>
+          Sign In 
         </SubmitButton>
-      
       </form>
     </Root>
   );
 };
 
-RegisterForm.propTypes = {
+LoginForm.propTypes = {
   onSubmit: PropTypes.func,
 };
 
-export default RegisterForm;
-
-
+export default LoginForm;

@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import FilmList from '../components/ListFilm'
 import { Typography, Box } from '@mui/material'
+import FilmList from '../../components/common/ListFilm'
 
 const ListFilmFeature = props => {
   const ListFilmHot = [
