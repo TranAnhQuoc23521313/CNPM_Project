@@ -2,13 +2,13 @@ import './App.css';
 import Header from './components/Header';
 import Footer from './components/footer';
 import { Toolbar } from '@mui/material';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import {  Routes, Route } from 'react-router-dom';
 import ListFilmFeature from './features/FilmFeature/page';
 //import CinemaManagementPage from './pages/CinemaManagementPage';
 
 function App() {
   return (
-    <BrowserRouter>
+
       <div className="App">
         <Header />
         <Toolbar />
@@ -32,7 +32,7 @@ function App() {
           <Footer />
         </div>
       </div>
-    </BrowserRouter>
+    
   );
 }
 
