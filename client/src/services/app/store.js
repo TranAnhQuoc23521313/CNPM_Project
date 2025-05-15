@@ -1,5 +1,5 @@
 
-import userReducer from '../pages/userSlice';
+import userReducer from '../../pages/userSlice'
 const { configureStore } = require('@reduxjs/toolkit');
 
 const rootReducer = {
