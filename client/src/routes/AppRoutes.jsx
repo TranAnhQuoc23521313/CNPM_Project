@@ -1,17 +1,10 @@
-// src/routes/AppRoutes.jsx
-
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-
-// Import your page components
-//import Dashboard from '../pages/Dashboard';
-import MoviesPage from '../pages/Movies/MoviesPage.jsx'; // Using the simplified version for now
+import { Routes, Route , Navigate } from 'react-router-dom';
+import MoviesPage from '../pages/Movies/MoviesPage.jsx';
 import ShowtimesPage from '../pages/Showtimes/Showtimes.jsx';
 import ItemsPage from '../pages/Items/Items.jsx';
-// import Tickets from '../pages/Tickets';
-// import Users from '../pages/Users';
+import HomeDefault from '../pages/Home';
 
-// A simple component to display for pages not yet created
 const PlaceholderPage = ({ title = "Page" }) => (
   <div style={{ padding: '2rem', border: '1px dashed #ccc', textAlign: 'center' }}>
     <h2>{title}</h2>
@@ -19,7 +12,7 @@ const PlaceholderPage = ({ title = "Page" }) => (
   </div>
 );
 
-// A simple component for 404 Not Found
+
 const NotFound = () => (
   <div style={{ padding: '2rem', textAlign: 'center' }}>
     <h2>404 - Page Not Found</h2>
@@ -27,25 +20,18 @@ const NotFound = () => (
   </div>
 );
 
-
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Default route */}
-      {/* <Route path="/" element={<Dashboard />} /> */}
-
-      {/* Route for the Movies page */}
-      {/* This currently points to the simplified MoviesPage */}
+      
+      {/*<Route path="/" element={<Navigate to="/home" replace />} />
+      <Route path="/home" element={<HomeDefault />} />*/}
+    
       <Route path="/movies" element={<MoviesPage />} />
-
-      {/* Placeholder routes for other pages */}
-      {/* Replace PlaceholderPage with actual components when ready */}
-      { <Route path="/showtimes" element={<ShowtimesPage />} />
-      /*<Route path="/tickets" element={<PlaceholderPage title="Tickets" />} />
-      <Route path="/users" element={<PlaceholderPage title="Users" />} /> */}
+      <Route path="/showtimes" element={<ShowtimesPage />} />
       <Route path="/items" element={<ItemsPage />} />
-      {/* Catch-all route for any paths not matched above */}
       <Route path="*" element={<NotFound />} />
+      
     </Routes>
   );
 };

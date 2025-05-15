@@ -1,18 +1,23 @@
-// src/App.jsx
 import React from 'react';
+import { useSelector } from 'react-redux';
+import HomeDefault from './pages/Home';
 import Layout from './components/layout/Layout';
 import AppRoutes from './routes/AppRoutes';
-import './App.css';
 
 function App() {
+  const isLoggedIn = useSelector(state => !!state.user.current);
+
   return (
-    // NO BrowserRouter HERE
-    <div className="App">
-      <Layout headerTitle="Cinema Management">
-        <AppRoutes /> {/* This renders the page */}
-      </Layout>
-    </div>
-    // NO BrowserRouter HERE
+     <div>
+      {!isLoggedIn ? (
+        <HomeDefault />  
+      ) : (
+        <Layout headerTitle="Cinema Management">
+          <AppRoutes />  
+        </Layout>
+      )}
+     </div>
   );
 }
+
 export default App;
