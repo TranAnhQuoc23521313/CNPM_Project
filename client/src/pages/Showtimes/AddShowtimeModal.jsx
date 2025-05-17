@@ -20,6 +20,7 @@ const AddShowtimeModal = ({ isOpen, onClose, movies, screens, onAddShowtime }) =
     }
   }, [isOpen, movies, screens]);
 
+
   const handleSubmit = (e) => {
     // ... (logic handleSubmit giữ nguyên) ...
     e.preventDefault();
@@ -29,12 +30,13 @@ const AddShowtimeModal = ({ isOpen, onClose, movies, screens, onAddShowtime }) =
     }
     const selectedMovie = movies.find(m => m.id.toString() === selectedMovieId);
     const selectedScreen = screens.find(s => s.id === selectedScreenId);
+    console.log('ShowtimeTime:', showtimeTime);
     if (!selectedMovie || !selectedScreen) {
       alert('Phim hoặc phòng chiếu không hợp lệ.');
       return;
     }
     const newShowtimeData = {
-      movieId: parseInt(selectedMovieId, 10), movieTitle: selectedMovie.title,
+      movieId: selectedMovieId, movieTitle: selectedMovie.title,
       time: showtimeTime, date: showtimeDate,
       screenId: selectedScreenId, screenName: selectedScreen.name,
       price: parseInt(price, 10),

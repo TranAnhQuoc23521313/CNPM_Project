@@ -75,7 +75,7 @@ const mapApiToClient = (apiMovie) => ({
 });
 
 const MoviesPage = () => {
-  const pageTitle = 'Movies';
+  const pageTitle = 'Quản lý phim';
   const [movies, setMovies] = useState([]);
   const [filteredMovies, setFilteredMovies] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
