@@ -1,0 +1,156 @@
+/* CustomerModal.css - Dựa trên AddEmployeeModal.css */
+
+.customer-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050; /* Ensure it's above other content */
+  padding: 20px;
+}
+
+.customer-modal-content {
+  background-color: #fff;
+  padding: 25px 30px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 600px; /* Điều chỉnh nếu cần cho Customer */
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.customer-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.customer-modal-header h3 {
+  margin: 0;
+  font-size: 1.5em;
+  color: #343a40;
+}
+
+.customer-modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.8em;
+  font-weight: bold;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 0 5px;
+  line-height: 1;
+}
+.customer-modal-close-btn:hover {
+  color: #343a40;
+}
+
+/* Đổi .employee-form thành .customer-form */
+.customer-form .form-group {
+  margin-bottom: 18px;
+}
+
+.customer-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.95em;
+}
+
+.customer-form input[type="text"],
+.customer-form input[type="tel"],
+.customer-form input[type="email"],
+.customer-form input[type="number"], /* Giữ lại nếu Customer có trường number */
+.customer-form input[type="date"],
+.customer-form select,
+.customer-form textarea { /* Giữ lại nếu Customer có trường textarea */
+  width: calc(100% - 24px); /* Account for padding */
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 1em;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+.customer-form input:focus,
+.customer-form select:focus,
+.customer-form textarea:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.customer-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+
+.customer-modal-actions {
+  margin-top: 25px;
+  text-align: right;
+  padding-top: 15px;
+  border-top: 1px solid #e9ecef;
+}
+
+.customer-modal-actions .btn {
+  padding: 10px 18px;
+  font-size: 1em;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 10px;
+  border: none;
+}
+
+.customer-modal-actions .btn-submit {
+  background-color: #28a745;
+  color: white;
+}
+.customer-modal-actions .btn-submit:hover {
+  background-color: #218838;
+}
+
+.customer-modal-actions .btn-cancel {
+  background-color: #6c757d;
+  color: white;
+}
+.customer-modal-actions .btn-cancel:hover {
+  background-color: #5a6268;
+}
+
+/* Specific for CustomerDetailModal if needed - Đổi .employee-detail-content thành .customer-detail-content */
+.customer-detail-content .details-body { /* Thêm class này nếu bạn dùng nó trong CustomerDetailModal.jsx */
+  padding-top: 10px; 
+}
+
+.customer-detail-content .detail-item {
+  margin-bottom: 12px;
+  font-size: 1.05em;
+  line-height: 1.6;
+  display: flex;
+  flex-wrap: wrap;
+}
+.customer-detail-content .detail-item strong {
+  color: #333;
+  min-width: 150px; /* Điều chỉnh nếu cần cho Customer */
+  display: inline-block;
+  margin-right: 8px;
+  font-weight: 600;
+}
+
+/* Thêm style cho .error-message nếu chưa có */
+.customer-form .error-message {
+  color: red;
+  font-size: 0.85em;
+  margin-top: 4px;
+}
