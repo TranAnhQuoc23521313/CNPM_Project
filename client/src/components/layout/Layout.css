@@ -1,18 +1,17 @@
-/* src/components/Layout.css */
+
 .layout-container {
     display: flex;
-    min-height: 100vh; /* Full height */
-    background-color: #f9fafb; /* Light background like example */
+    min-height: 100vh;
+    background-color: #f9fafb;
   }
   
   .main-content-area {
-    flex-grow: 1; /* Takes remaining width */
+    flex-grow: 1; 
     display: flex;
     flex-direction: column;
   }
   
   .page-content {
-    padding: 20px 30px; /* Add padding around page content */
+    padding: 20px 30px; 
     flex-grow: 1;
-    /* Add more styles as needed */
   }
