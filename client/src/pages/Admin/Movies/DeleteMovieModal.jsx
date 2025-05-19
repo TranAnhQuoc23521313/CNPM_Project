@@ -1,6 +1,6 @@
 // client/src/pages/Movies/DeleteConfirmationModal.jsx
 import React from 'react';
-import Button from '../../components/common/Button'; // Giả sử bạn có component Button chung
+import Button from '../../../components/common/Button'; // Giả sử bạn có component Button chung
 import './MovieDetailModal'; // File CSS riêng cho modal này
 
 const DeleteMovieModal = ({ isOpen, onClose, onConfirm, movieName, isLoading }) => {

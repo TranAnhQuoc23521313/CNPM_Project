@@ -1,6 +1,6 @@
 // client/src/pages/Movies/ShowtimeListModal.jsx
 import React from 'react';
-import Button from '../../components/common/Button'; // Giả sử bạn có component Button
+import Button from '../../../components/common/Button'; // Giả sử bạn có component Button
 // import './ShowtimeListModal.css'; // Đảm bảo CSS được import đúng nếu có file riêng
 
 const ShowtimeListModal = ({

@@ -1,15 +1,15 @@
 // client/src/pages/Showtimes/ShowtimesPage.jsx
 import React, { useState, useEffect, useCallback, useMemo } from 'react'; // Thêm useCallback, useMemo
-import Button from '../../components/common/Button.jsx';
+import Button from '../../../components/common/Button.jsx';
 import './Showtimes.css';
 import ShowtimeListModal from './ShowtimeListModal.jsx';
 import ShowtimeDetailModal from './ShowtimeDetailModal.jsx';
 import AddShowtimeModal from './AddShowtimeModal.jsx';
-import { getAllMoviesApi } from '../../services/movieApiService.js';
-import { createShowtimeApi,getShowtimesByMovieApi } from '../../services/showtimeApiService.js'; // Giả sử bạn đã tạo hàm này trong showtimeApiService.js
-import { getAllScreensApi } from '../../services/screenApiService.js'; // Giả sử bạn đã tạo hàm này trong screenApiService.js
-import ErrorMessageModal from '../../components/common/ErrorMessageModal.jsx'; // Nếu bạn có modal này
-import SuccessMessageModal from '../../components/common/SuccessMessageModal.jsx';
+import { getAllMoviesApi } from '../../../services/movieApiService.js';
+import { createShowtimeApi,getShowtimesByMovieApi } from '../../../services/showtimeApiService.js'; // Giả sử bạn đã tạo hàm này trong showtimeApiService.js
+import { getAllScreensApi } from '../../../services/screenApiService.js'; // Giả sử bạn đã tạo hàm này trong screenApiService.js
+import ErrorMessageModal from '../../../components/common/ErrorMessageModal.jsx'; // Nếu bạn có modal này
+import SuccessMessageModal from '../../../components/common/SuccessMessageModal.jsx';
 // Bạn sẽ cần import service cho showtimes và screens
 // import { getAllShowtimesForMovieApi } from '../../services/showtimeApiService.js'; // Ví dụ
 // import { getAllScreensApi } from '../../services/screenApiService.js'; // Ví dụ
@@ -53,7 +53,7 @@ const ShowtimesPage = () => {
 
     const [movies, setMovies] = useState([]); // Danh sách phim từ API
     const [screens, setScreens] = useState([]); // State cho danh sách phòng chiếu
-    const [showtimes, setShowtimes] = useState([]); // Danh sách suất chiếu từ API
+    //const [showtimes, setShowtimes] = useState([]); // Danh sách suất chiếu từ API
     //const [isLoadingMovies, setIsLoadingMovies] = useState(true); // Loading riêng cho phim
     const [isLoadingScreens, setIsLoadingScreens] = useState(true); // Loading riêng cho phòng
     const [searchQuery, setSearchQuery] = useState('');
