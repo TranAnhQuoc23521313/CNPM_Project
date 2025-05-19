@@ -1,7 +1,7 @@
 // src/pages/Showtimes/ShowtimesPage.jsx
 
 import React, { useState } from 'react';
-import Button from '../../components/common/Button.jsx'; // Đảm bảo đường dẫn đúng
+import Button from '../../../components/common/Button.jsx'; // Đảm bảo đường dẫn đúng
 import './Showtimes.css'; // CSS riêng cho trang này
 import ShowtimeListModal from './ShowtimeListModal.jsx'; 
 import ShowtimeDetailModal from './ShowtimeDetailModal.jsx'; 

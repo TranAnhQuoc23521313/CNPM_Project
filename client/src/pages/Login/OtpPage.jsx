@@ -1,13 +1,22 @@
-// src/pages/Auth/OtpPage.jsx
+// --- START OF FILE OtpPage.jsx ---
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import './OtpPage.css'; // Đảm bảo file CSS này tồn tại
+import './OtpPage.css';
 
-const OtpPage = ({ onLoginSuccess }) => { // onLoginSuccess có thể cần đổi tên nếu OTP dùng cho mục đích khác
+// --- GIẢ LẬP USER SAU KHI XÁC THỰC OTP THÀNH CÔNG ---
+// Giả sử OTP này là để admin "admin" lấy lại quyền truy cập
+const MOCK_OTP_USER_DATA = {
+    username: "admin", // Username này có thể không cần thiết nếu OTP là chung
+    role: "admin",
+    token: "adminOtpVerifiedToken"
+};
+// -------------------------------------------------
+
+const OtpPage = ({ onLoginSuccess }) => {
   const [otpInput, setOtpInput] = useState('');
-  const [currentPassword, setCurrentPassword] = useState(''); // <<--- THÊM STATE CHO MẬT KHẨU CŨ
+  const [currentPassword, setCurrentPassword] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate();
+  // const navigate = useNavigate(); // Không cần navigate trực tiếp ở đây nữa
   const location = useLocation();
 
   const usernameFromLogin = location.state?.username || '';
@@ -16,28 +25,26 @@ const OtpPage = ({ onLoginSuccess }) => { // onLoginSuccess có thể cần đ�
     event.preventDefault();
     setError('');
 
-    if (!otpInput.trim() || !currentPassword.trim()) { // <<--- KIỂM TRA CẢ MẬT KHẨU CŨ
+    if (!otpInput.trim() || !currentPassword.trim()) {
       setError('Vui lòng nhập mã OTP và mật khẩu hiện tại của bạn.');
       return;
     }
 
-    // --- THAY THẾ BẰNG LOGIC GỌI API BACKEND ĐỂ XÁC MINH OTP VÀ MẬT KHẨU CŨ ---
-    const MOCK_OTP = "123456"; 
-    const MOCK_CURRENT_PASSWORD_FOR_USER = "password123"; // Mật khẩu cũ giả lập cho user này
+    const MOCK_OTP = "123456";
+    // Mật khẩu cũ của user mà OTP này dành cho (trong trường hợp này là user "admin" từ mockUsers)
+    const MOCK_CURRENT_PASSWORD_FOR_USER = "password123"; 
 
     console.log('Verifying OTP:', otpInput, 'and current password for username:', usernameFromLogin);
 
-    // Trong thực tế, backend sẽ kiểm tra cả OTP và mật khẩu cũ của user (usernameFromLogin)
     if (otpInput === MOCK_OTP && currentPassword === MOCK_CURRENT_PASSWORD_FOR_USER) {
       console.log('OTP and current password verification successful (mock)!');
-      
       if (typeof onLoginSuccess === 'function') {
-        onLoginSuccess(); // Gọi callback để cập nhật trạng thái đăng nhập/xác thực
+        // Gọi callback với thông tin người dùng giả lập sau khi OTP thành công
+        onLoginSuccess(MOCK_OTP_USER_DATA);
       } else {
         console.error("onLoginSuccess prop is not a function or not provided to OtpPage.");
       }
-      // Chuyển hướng đến trang tiếp theo (ví dụ: trang chính, hoặc trang đổi mật khẩu mới nếu đây là luồng reset)
-      navigate('/movies'); 
+      // Không navigate ở đây, AppRoutes sẽ xử lý
     } else {
       let errorMessage = '';
       if (otpInput !== MOCK_OTP) {
@@ -48,20 +55,18 @@ const OtpPage = ({ onLoginSuccess }) => { // onLoginSuccess có thể cần đ�
       }
       setError(errorMessage.trim() || 'Thông tin xác thực không chính xác.');
     }
-    // -----------------------------------------------------------
   };
 
   return (
     <div className="otp-page-full-container">
       <div className="otp-form-wrapper">
-        <h2>Verify Your Action</h2> {/* Tiêu đề có thể chung chung hơn */}
+        <h2>Verify Your Action</h2>
         <p className="otp-instruction-page">
           Để hoàn tất, vui lòng nhập lại mật khẩu hiện tại và mã OTP đã được gửi đến email liên kết với tài khoản <strong>{usernameFromLogin || 'của bạn'}</strong>.
-          (OTP giả lập: 123456)
+          (OTP giả lập: 123456, Mật khẩu hiện tại giả lập cho user 'admin': password123)
         </p>
         <form onSubmit={handleOtpVerify} className="otp-form-fields">
           {error && <p className="otp-error-message">{error}</p>}
-
           <div className="form-field-group">
             <label htmlFor="otp-code">Mã OTP:</label>
             <input
@@ -74,9 +79,7 @@ const OtpPage = ({ onLoginSuccess }) => { // onLoginSuccess có thể cần đ�
               autoFocus
               required
             />
-          </div>          
-          
-          {/* ---- THÊM TRƯỜNG NHẬP MẬT KHẨU CŨ ---- */}
+          </div>
           <div className="form-field-group">
             <label htmlFor="current-password">Mật khẩu hiện tại:</label>
             <input
@@ -85,13 +88,10 @@ const OtpPage = ({ onLoginSuccess }) => { // onLoginSuccess có thể cần đ�
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               placeholder="Nhập mật khẩu hiện tại"
-              autoComplete="current-password" // Giúp trình duyệt gợi ý
+              autoComplete="current-password"
               required
             />
           </div>
-          {/* ------------------------------------ */}
-
-          
           <button type="submit" className="otp-submit-button">Xác nhận</button>
         </form>
       </div>
@@ -100,3 +100,4 @@ const OtpPage = ({ onLoginSuccess }) => { // onLoginSuccess có thể cần đ�
 };
 
 export default OtpPage;
+// --- END OF FILE OtpPage.jsx ---

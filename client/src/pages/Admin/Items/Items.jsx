@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Button from '../../components/common/Button.jsx'; // Đảm bảo đường dẫn đúng
+import Button from '../../../components/common/Button.jsx'; // Đảm bảo đường dẫn đúng
 import './Items.css'; // Import CSS cho trang này
 import EditItemModal from './EditItemModal.jsx'; // Import Edit Modal
 import AddItemModal from './AddItemModal.jsx'; // Import Add Modal (nếu bạn đã tạo)

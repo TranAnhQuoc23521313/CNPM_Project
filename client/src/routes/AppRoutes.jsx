@@ -1,18 +1,28 @@
-import React, { useState, useEffect } from 'react'; // Thêm useEffect nếu cần logic phức tạp cho isLoggedIn
-import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+// src/routes/AppRoutes.jsx
+import React, { useState } from 'react'; // Bỏ useEffect nếu không dùng trực tiếp
+import { Routes, Route, Navigate, Outlet, useNavigate } from 'react-router-dom';
+import ConfirmationDialog from '../components/common/ConfirmationDialog'; // <<--- IMPORT DIALOG XÁC NHẬN
 
-// Import Layout component
-import Layout from '../components/layout/Layout'; // Đảm bảo đường dẫn này đúng
+// --- IMPORT LAYOUT COMPONENTS ---
+import AdminLayout from '../components/layout/Admin/Layout';
+import StaffLayout from '../components/layout/Staff/Layout';
 
-// Import các trang
+// --- IMPORT PAGE COMPONENTS ---
+// Auth Pages
 import LoginPage from '../pages/Login/Login.jsx';
-import OtpPage from '../pages/Login/OtpPage.jsx'; // Import trang OTP
-import MoviesPage from '../pages/Movies/MoviesPage.jsx'; 
-import ShowtimesPage from '../pages/Showtimes/Showtimes.jsx'; // Giả sử tên file là Showtimes.jsx
-import ItemsPage from '../pages/Items/Items.jsx';       // Giả sử tên file là Items.jsx
-// import Dashboard from '../pages/Dashboard/Dashboard.jsx'; // Ví dụ
+import OtpPage from '../pages/Login/OtpPage.jsx';
 
-// Component NotFound
+// Admin Pages
+import AdminMoviesPage from '../pages/Admin/Movies/MoviesPage.jsx';
+import AdminShowtimesPage from '../pages/Admin/Showtimes/Showtimes.jsx';
+import AdminItemsPage from '../pages/Admin/Items/Items.jsx';
+// Ví dụ, nếu bạn đã tạo AdminDashboardPage:
+// import AdminDashboardPage from '../pages/Admin/Dashboard/AdminDashboardPage';
+
+// Staff Pages
+// import StaffTicketSalesPage from '../pages/Staff/Tickets/TicketSalesPage.jsx';
+
+// Common Pages
 const NotFound = () => (
   <div style={{ padding: '2rem', textAlign: 'center', height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
     <h2>404 - Page Not Found</h2>
@@ -20,88 +30,173 @@ const NotFound = () => (
   </div>
 );
 
-// Component ProtectedRoutes
-const ProtectedRoutes = ({ isLoggedIn }) => {
-  if (!isLoggedIn) {
-    return <Navigate to="/login" replace />;
+const AccessDenied = () => (
+  <div style={{ padding: '2rem', textAlign: 'center', height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+    <h2>403 - Access Denied</h2>
+    <p>You do not have permission to view this page.</p>
+  </div>
+);
+
+// --- ROUTE CONSTANTS ---
+const LOGIN_PATH = "/dang-nhap"; // Đảm bảo khớp với những nơi khác
+const OTP_PATH = "/xac-minh-otp";
+const ADMIN_BASE_PATH = "/admin";
+const STAFF_BASE_PATH = "/staff";
+
+// --- PROTECTED ROUTE WRAPPER ---
+const ProtectedWrapper = ({ currentUser, allowedRoles, children }) => {
+  if (!currentUser) {
+    return <Navigate to={LOGIN_PATH} replace />;
   }
-  return (
-    <Layout headerTitle="Cinema Management">
-      <Outlet />
-    </Layout>
-  );
+  if (allowedRoles && !allowedRoles.includes(currentUser.role)) {
+    if (currentUser.role === 'admin') return <Navigate to={ADMIN_BASE_PATH} replace />;
+    if (currentUser.role === 'staff') return <Navigate to={STAFF_BASE_PATH} replace />;
+    return <Navigate to="/403" replace />;
+  }
+  return children;
 };
 
 const AppRoutes = () => {
-  // Quản lý trạng thái đăng nhập
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    // Ví dụ: kiểm tra token khi ứng dụng khởi chạy
-    // const token = localStorage.getItem('authToken');
-    // return !!token; // true nếu có token, false nếu không
-    return false; // Mặc định là chưa đăng nhập
+  const navigate = useNavigate(); // KHỞI TẠO useNavigate
+  const [currentUser, setCurrentUser] = useState(() => {
+    const token = localStorage.getItem('authToken');
+    const role = localStorage.getItem('userRole');
+    if (token && role) {
+      return { token, role };
+    }
+    return null;
   });
 
-  // Hàm được gọi từ LoginPage hoặc OtpPage khi đăng nhập/xác minh thành công
-  const handleLoginSuccess = () => {
-    console.log("Login successful, updating isLoggedIn state.");
-    setIsLoggedIn(true);
-    // Trong thực tế, bạn có thể lưu token vào localStorage ở đây
-    // localStorage.setItem('authToken', 'your_actual_token_from_server');
+  // State cho modal xác nhận đăng xuất
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
+
+  const handleLoginSuccess = (userData) => {
+    console.log("Login successful, updating currentUser state:", userData);
+    setCurrentUser(userData);
+    localStorage.setItem('authToken', userData.token);
+    localStorage.setItem('userRole', userData.role);
   };
 
-  // (Tùy chọn) Hàm logout
-  // const handleLogout = () => {
-  //   setIsLoggedIn(false);
-  //   localStorage.removeItem('authToken');
-  //   // Có thể cần navigate('/login') ở đây nếu đang ở trang được bảo vệ
-  // };
+  // Hàm này sẽ được gọi khi người dùng nhấn nút "Đăng xuất" trên Header
+  // Nó sẽ mở modal xác nhận.
+  const requestLogout = () => {
+    console.log("Logout requested, opening confirmation dialog.");
+    setIsLogoutConfirmOpen(true);
+  };
+
+  // Hàm này sẽ được gọi khi người dùng XÁC NHẬN muốn đăng xuất từ modal
+  const confirmLogout = () => {
+    console.log("User confirmed logout. Logging out...");
+    setCurrentUser(null);
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userRole');
+    setIsLogoutConfirmOpen(false); // Đóng modal
+    navigate(LOGIN_PATH, { replace: true }); // Điều hướng về trang login
+  };
+
+  // Hàm này sẽ được gọi khi người dùng HỦY đăng xuất từ modal
+  const cancelLogout = () => {
+    console.log("User cancelled logout.");
+    setIsLogoutConfirmOpen(false); // Chỉ cần đóng modal
+  };
 
   return (
-    <Routes>
-      {/* Route cho trang Login */}
-      <Route 
-        path="/login" 
-        element={
-          isLoggedIn ? (
-            <Navigate to="/movies" replace /> 
-          ) : (
-            <LoginPage onLoginSuccess={handleLoginSuccess} /> 
-          )
-        } 
-      />
+    <> {/* Bọc trong Fragment để có thể render Routes và Modal cùng cấp */}
+      <Routes>
+        {/* --- AUTH ROUTES --- */}
+        <Route
+          path={LOGIN_PATH}
+          element={
+            currentUser ? (
+              currentUser.role === 'admin' ? <Navigate to={ADMIN_BASE_PATH} replace /> :
+              currentUser.role === 'staff' ? <Navigate to={STAFF_BASE_PATH} replace /> :
+              <Navigate to="/" replace />
+            ) : (
+              <LoginPage onLoginSuccess={handleLoginSuccess} />
+            )
+          }
+        />
+        <Route
+          path={OTP_PATH}
+          element={
+            currentUser ? (
+              currentUser.role === 'admin' ? <Navigate to={ADMIN_BASE_PATH} replace /> :
+              currentUser.role === 'staff' ? <Navigate to={STAFF_BASE_PATH} replace /> :
+              <Navigate to="/" replace />
+            ) : (
+              <OtpPage onLoginSuccess={handleLoginSuccess} />
+            )
+          }
+        />
 
-      {/* Route cho trang nhập OTP */}
-      <Route 
-        path="/verify-otp" 
-        element={
-          isLoggedIn ? ( 
-            <Navigate to="/movies" replace /> 
-          ) : (
-            <OtpPage onLoginSuccess={handleLoginSuccess} /> 
-          )
-        } 
-      />
+        {/* --- ADMIN PROTECTED ROUTES --- */}
+        <Route
+          path={`${ADMIN_BASE_PATH}/*`}
+          element={
+            <ProtectedWrapper currentUser={currentUser} allowedRoles={['admin']}>
+              {/* Truyền requestLogout vào prop onLogout của AdminLayout */}
+              <AdminLayout headerTitle="Trang Quản Lý" onLogout={requestLogout}>
+                <Outlet />
+              </AdminLayout>
+            </ProtectedWrapper>
+          }
+        >
+          {/* Trang mặc định của Admin */}
+          {/* Nếu bạn có AdminDashboardPage: <Route index element={<AdminDashboardPage />} /> */}
+          {/* Hoặc điều hướng đến trang movies: */}
+          <Route index element={<Navigate to="movies" replace />} />
+          {/* <Route path="dashboard" element={<AdminDashboardPage />} /> */}
+          <Route path="movies" element={<AdminMoviesPage />} />
+          <Route path="showtimes" element={<AdminShowtimesPage />} />
+          <Route path="items" element={<AdminItemsPage />} />
+          {/* Thêm các route Admin khác */}
+        </Route>
 
-      {/* Route mặc định (/) */}
-      <Route 
-        path="/" 
-        element={
-          isLoggedIn ? <Navigate to="/movies" replace /> : <Navigate to="/login" replace />
-        } 
-      />
-      
-      {/* Các Route được bảo vệ (sẽ sử dụng Layout chung) */}
-      <Route element={<ProtectedRoutes isLoggedIn={isLoggedIn} />}>
-        {/* <Route path="/dashboard" element={<Dashboard />} /> */}
-        <Route path="/movies" element={<MoviesPage />} />
-        <Route path="/showtimes" element={<ShowtimesPage />} />
-        <Route path="/items" element={<ItemsPage />} />
-        {/* Thêm các trang khác cần Layout ở đây */}
-      </Route>
+        {/* --- STAFF PROTECTED ROUTES --- */}
+        <Route
+          path={`${STAFF_BASE_PATH}/*`}
+          element={
+            <ProtectedWrapper currentUser={currentUser} allowedRoles={['staff']}>
+              {/* Truyền requestLogout vào prop onLogout của StaffLayout */}
+              <StaffLayout headerTitle="Cổng Nhân Viên" onLogout={requestLogout}>
+                <Outlet />
+              </StaffLayout>
+            </ProtectedWrapper>
+          }
+        >
+          <Route index element={<Navigate to="tickets" replace />} />
+          {/* Ví dụ: <Route path="tickets" element={<StaffTicketSalesPage />} /> */}
+          <Route path="tickets" element={<div>Trang Bán Vé Nhân Viên (Placeholder)</div>} />
+          {/* Thêm các route Staff khác */}
+        </Route>
 
-      {/* Route 404 */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+        {/* --- DEFAULT ROUTE & FALLBACKS --- */}
+        <Route
+          path="/"
+          element={
+            !currentUser ? <Navigate to={LOGIN_PATH} replace /> :
+            currentUser.role === 'admin' ? <Navigate to={ADMIN_BASE_PATH} replace /> :
+            currentUser.role === 'staff' ? <Navigate to={STAFF_BASE_PATH} replace /> :
+            <Navigate to={LOGIN_PATH} replace />
+          }
+        />
+        <Route path="/403" element={<AccessDenied />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+
+      {/* MODAL XÁC NHẬN ĐĂNG XUẤT */}
+      { <ConfirmationDialog
+        isOpen={isLogoutConfirmOpen}
+        onClose={cancelLogout}      // Khi nhấn "Ở lại" hoặc click ra ngoài
+        onConfirm={confirmLogout}   // Khi nhấn "Đăng xuất" trên modal
+        title="Xác nhận Đăng xuất"
+        message="Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?"
+        confirmButtonText="Đăng xuất" // Text cho nút màu đỏ/xác nhận
+        cancelButtonText="Ở lại"    // Text cho nút hủy/phụ
+        confirmButtonVariant="danger" // Để nút "Đăng xuất" có style của btn-danger
+        cancelButtonVariant="secondary"// Để nút "Ở lại" có style của btn-secondary
+      /> }
+    </>
   );
 };
 
