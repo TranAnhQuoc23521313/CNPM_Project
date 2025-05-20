@@ -5,6 +5,8 @@ const EditItemModal = ({ isOpen, onClose, item, onUpdateItem }) => {
   const [editedName, setEditedName] = useState('');
   const [editedPrice, setEditedPrice] = useState('');
   // Giữ nguyên editedStatus, nó sẽ khớp với giá trị của option trong select
+  const [editedQuantity, setEditedQuantity] = useState(''); // Số lượng
+  const [editedType, setEditedType] = useState(''); // Loại sản phẩm
   const [editedStatus, setEditedStatus] = useState(''); 
   const [posterPreview, setPosterPreview] = useState(null);
   const [posterFile, setPosterFile] = useState(null);
@@ -20,16 +22,20 @@ const EditItemModal = ({ isOpen, onClose, item, onUpdateItem }) => {
       setEditedPrice(item.price?.toString() || '');
       // Đảm bảo giá trị ban đầu của status có trong danh sách availableStatuses
       // Nếu không, có thể đặt một giá trị mặc định
+      setEditedQuantity(item.quantity?.toString() || ''); // Số lượng
+      setEditedType(item.type || ''); // Loại sản phẩm
       setEditedStatus(item.status && availableStatuses.includes(item.status) ? item.status : availableStatuses[0]);
       setPosterPreview(item.posterUrl || null);
       setPosterFile(null);
-    } else {
+    } /* else {
       setEditedName(''); 
       setEditedPrice(''); 
+      setEditedQuantity(''); // Reset số lượng
+      setEditedType(''); // Reset loại sản phẩm
       setEditedStatus(availableStatuses[0]); // Giá trị mặc định khi không có item
       setPosterPreview(null); 
       setPosterFile(null);
-    }
+    } */
   }, [item, isOpen]); // Thêm isOpen vào dependency array để reset khi mở lại
 
   const handlePosterChange = (event) => {
@@ -59,6 +65,8 @@ const EditItemModal = ({ isOpen, onClose, item, onUpdateItem }) => {
       name: editedName.trim(),
       price: parseFloat(editedPrice),
       status: editedStatus, // Giá trị đã được chọn từ select
+      quantity: parseInt(editedQuantity, 10) || 0, // Số lượng
+      type: editedType, // Loại sản phẩm
       newPosterFile: posterFile, 
       posterUrl: posterPreview 
     };
@@ -98,6 +106,10 @@ const EditItemModal = ({ isOpen, onClose, item, onUpdateItem }) => {
               <div className="form-group edit-form-group">
                 <label htmlFor={`edit-item-price-${item.id}`}>Giá:</label>
                 <input type="number" id={`edit-item-price-${item.id}`} className="edit-input" value={editedPrice} onChange={(e) => setEditedPrice(e.target.value)} placeholder="Nhập giá" min="0" required />
+              </div>
+              <div className="form-group edit-form-group">
+                <label htmlFor={`edit-item-quantity-${item.id}`}>Số lượng:</label>
+                <input type="number" id={`edit-item-quantity-${item.id}`} className="edit-input" value={editedQuantity} onChange={(e) => setEditedQuantity(e.target.value)} placeholder="Nhập số lượng" min="0" required />
               </div>
               {/* ---- THAY ĐỔI TRƯỜNG TRẠNG THÁI SANG SELECT ---- */}
               <div className="form-group edit-form-group">

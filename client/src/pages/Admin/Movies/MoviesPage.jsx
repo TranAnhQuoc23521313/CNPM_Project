@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios'; // Thêm dòng này
-import Button from '../../components/common/Button.jsx';
+import Button from '../../../components/common/Button.jsx';
 import './MoviesPage.css'; // CSS riêng của MoviesPage
 import AddMovieModal from './AddMovieModal.jsx';
 import EditMovieModal from './EditMovieModal.jsx';
 import MovieDetailModal from './MovieDetailModal.jsx';
 import DeleteMovieModal from './DeleteMovieModal.jsx'; // Giả sử bạn có component DeleteMovieModal
-import { getAllMoviesApi, createMovieApi, updateMovieApi, deleteMovieApi } from '../../services/movieApiService.js';
-import ErrorMessageModal from '../../components/common/ErrorMessageModal.jsx';
-import SuccessMessageModal from '../../components/common/SuccessMessageModal.jsx'; // Giả sử bạn có component SuccessMessageModal
+import { getAllMoviesApi, createMovieApi, updateMovieApi, deleteMovieApi } from '../../../services/movieApiService.js';
+import ErrorMessageModal from '../../../components/common/ErrorMessageModal.jsx';
+import SuccessMessageModal from '../../../components/common/SuccessMessageModal.jsx'; // Giả sử bạn có component SuccessMessageModal
 // --- DỮ LIỆU GIẢ LẬP BAN ĐẦU (Bao gồm các trường mới) ---
 /* const initialMoviesData = [
   { 
@@ -75,7 +75,7 @@ const mapApiToClient = (apiMovie) => ({
 });
 
 const MoviesPage = () => {
-  const pageTitle = 'Movies';
+  const pageTitle = 'Quản lý phim';
   const [movies, setMovies] = useState([]);
   const [filteredMovies, setFilteredMovies] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');

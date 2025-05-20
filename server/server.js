@@ -8,6 +8,9 @@ const path = require('path'); // Module 'path' của Node.js để làm việc v
 
 // 2. Import các routes của bạn
 const movieRoutes = require('./routes/movieRoutes');
+const showtimeRoutes = require('./routes/showtimeRoutes'); // IMPORT ROUTE MỚI
+const screenRoutes = require('./routes/screenRoutes');// IMPORT ROUTE MỚI
+const productRoutes = require('./routes/productRoutes');
 // Ví dụ:
 // const showtimeRoutes = require('./routes/showtimeRoutes');
 // const userRoutes = require('./routes/userRoutes');
@@ -50,7 +53,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 // 7. Định nghĩa các API Routes
 // Gắn movieRoutes vào đường dẫn /api/movies
 app.use('/api/movies', movieRoutes);
-
+app.use('/api/showtimes', showtimeRoutes); 
+app.use('/api/screens', screenRoutes); // Gắn screenRoutes vào đường dẫn /api/screens
+app.use('/api/products', productRoutes);
 // Ví dụ gắn các routes khác:
 // app.use('/api/showtimes', showtimeRoutes);
 // app.use('/api/auth', userRoutes); // Cho đăng nhập, đăng ký
@@ -110,3 +115,5 @@ app.listen(PORT, () => {
     //    .then(() => console.log('Test query to DB successful after server start.'))
     //    .catch(err => console.error('Test query to DB FAILED after server start:', err));
 });
+
+

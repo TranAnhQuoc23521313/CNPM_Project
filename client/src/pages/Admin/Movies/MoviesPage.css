@@ -19,7 +19,7 @@
 }
 
 .movies-page-header h1 { 
-  margin: 0;
+  /* margin: 0; */
   font-size: 1.5em; /* Kích thước giống ItemsPage */
   color: #1f2937;   /* Màu chữ giống ItemsPage */
   font-weight: 600;
