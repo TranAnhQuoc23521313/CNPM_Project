@@ -124,9 +124,9 @@ const ItemsPage = () => {
     try {
       const newItem = await createProductApi(dataPayload);
       console.log('New item created:', newItem);
-      fetchProductsFromApi(); // Fetch lại danh sách sản phẩm sau khi thêm mới
       setSuccessMessage('Thêm sản phẩm thành công!');
       handleCloseAddItemModal();
+      fetchProductsFromApi(); // Fetch lại danh sách sản phẩm sau khi thêm mới
     } catch (error) {
       console.error('Error adding new item:', error);
       setErrorToDisplay(error.message || 'Failed to add new item');
@@ -171,7 +171,7 @@ const ItemsPage = () => {
 
     console.log('Deleting item:', itemToDelete);
     setIsLoading(true);
-    setErrorToDisplay(null);  
+    setErrorToDisplay(null);
     try {
       await deleteProductApi(itemToDelete.id);
       console.log('Item deleted:', itemToDelete.id);
@@ -184,8 +184,18 @@ const ItemsPage = () => {
       setIsLoading(false);
       setItemToDelete(null); // Đóng modal xác nhận xóa
     }
-  },[itemToDelete, fetchProductsFromApi]);
+  }, [itemToDelete, fetchProductsFromApi]);
   const cancelDelete = () => { setItemToDelete(null); };
+
+  // Error Modal
+    const handleCloseErrorModal = useCallback(() => {
+      setErrorToDisplay(null);
+    }, []);
+  
+    // Success Modal
+    const handleCloseSuccessModal = useCallback(() => {
+      setSuccessMessage(null);
+    }, []);
   // --- KẾT THÚC HÀM HANDLER ---
 
   const itemsToDisplay = filteredItems;
@@ -277,6 +287,22 @@ const ItemsPage = () => {
         onAddItem={handleAddItemSubmit}
       // Không cần truyền movies/screens cho AddItemModal nếu nó không dùng
       />
+
+      {/* Modal Thông Báo Thành Công */}
+
+      <SuccessMessageModal
+        isOpen={!!successMessage}
+        onClose={handleCloseSuccessModal}
+        successMessage={successMessage}
+      />
+
+      <ErrorMessageModal
+        isOpen={!!errorToDisplay}
+        onClose={handleCloseErrorModal}
+        errorMessage={errorToDisplay}
+      />
+
+      {/* Modal Thông Báo Lỗi */}
     </div>
   );
 };
