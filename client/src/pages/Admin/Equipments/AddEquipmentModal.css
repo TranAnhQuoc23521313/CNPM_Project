@@ -1,0 +1,234 @@
+/* AddBusinessTransactionModal.css */
+
+/* --- Modal Overlay & Container (Style gốc, có thể bạn đã có ở common/Modal.css) --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.65); /* Tăng độ mờ của overlay */
+  display: flex;
+  align-items: center; /* Căn giữa theo chiều dọc */
+  justify-content: center; /* Căn giữa theo chiều ngang */
+  z-index: 1050;
+  padding: 20px; /* Padding để modal không chạm viền màn hình nhỏ */
+  overflow-y: auto; /* Cho phép cuộn nếu nội dung modal dài hơn màn hình */
+}
+
+.modal-container { /* Class chung cho tất cả modal container */
+  background-color: #fff;
+  border-radius: 8px; /* Bo góc chung */
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25); /* Shadow rõ hơn */
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh; /* Giới hạn chiều cao tối đa */
+  overflow: hidden; /* Quan trọng để bo góc hoạt động với content cuộn */
+}
+
+/* Style riêng cho modal thêm/sửa giao dịch doanh nghiệp */
+.modal-container.equipment-form-modal {
+  width: 100%; /* Chiếm toàn bộ chiều rộng overlay trên mobile */
+  max-width: 700px; /* Độ rộng tối đa cho desktop */
+}
+
+
+/* --- Modal Header --- */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 25px; /* Padding cho header */
+  border-bottom: 1px solid #e9ecef; /* Đường kẻ dưới header */
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.35em; /* Cỡ chữ tiêu đề modal */
+  font-weight: 600;
+  color: #343a40; /* Màu chữ tiêu đề */
+}
+
+.modal-close-button {
+  background: none;
+  border: none;
+  font-size: 1.7em; /* Cỡ chữ nút X */
+  font-weight: 400; /* Độ đậm vừa phải */
+  color: #868e96; /* Màu nút X */
+  cursor: pointer;
+  padding: 0; /* Reset padding */
+  line-height: 1; /* Căn chỉnh tốt hơn */
+  opacity: 0.8;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+.modal-close-button:hover {
+  color: #343a40; /* Màu khi hover nút X */
+  opacity: 1;
+}
+
+/* --- Modal Body (Chứa Form) --- */
+.modal-body {
+  padding: 20px 25px;
+  overflow-y: auto; /* Cho phép cuộn nội dung form nếu dài */
+  flex-grow: 1; /* Để body chiếm không gian còn lại */
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 18px;
+}
+.form-row .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #4a5568;
+  font-size: 0.9rem;
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group input[type="number"],
+.form-group input[type="file"],
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  box-sizing: border-box;
+  font-size: 0.95rem;
+  color: #2d3748;
+  background-color: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input[type="file"] {
+  padding-top: 8px; /* Điều chỉnh padding cho input file để căn giữa text */
+  padding-bottom: 8px;
+  background-color: #f8f9fa;
+  line-height: 1.5; /* Giúp text trong input file hiển thị tốt hơn */
+}
+/* Tùy chỉnh giao diện nút "Choose File" (phức tạp và khác nhau giữa các trình duyệt) */
+/* Có thể dùng label ẩn và style label đó như một button */
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #4299e1; /* Màu xanh dương khi focus */
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.25); /* Shadow mờ khi focus */
+  outline: none;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 75px; /* Giảm chiều cao textarea một chút */
+}
+
+.form-group .error-message {
+  color: #e53e3e; /* Màu đỏ cho lỗi */
+  font-size: 0.8rem;
+  margin-top: 5px;
+  display: block; /* Đảm bảo nó chiếm một dòng */
+}
+
+/* Image Preview */
+.image-preview-modal {
+  margin-top: 10px;
+  padding: 8px;
+  border: 1px dashed #d2d6dc;
+  border-radius: 6px;
+  background-color: #f9fafb;
+  display: inline-block; /* Hoặc block tùy theo layout bạn muốn */
+}
+.image-preview-modal img {
+  display: block;
+  max-width: 100%;
+  max-height: 150px; /* Giới hạn chiều cao ảnh preview */
+  border-radius: 4px;
+}
+
+/* Trường chỉ đọc (ví dụ ID trong Edit Modal) */
+.form-control-static {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #4a5568;
+  background-color: #e9ecef; /* Nền xám */
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  box-sizing: border-box;
+  min-height: calc(1.5em + 20px + 2px); /* Chiều cao bằng input */
+  line-height: 1.5; /* Căn giữa text */
+}
+
+
+/* --- Modal Footer --- */
+.modal-footer {
+  padding: 16px 25px; /* Padding cho footer */
+  border-top: 1px solid #e9ecef; /* Đường kẻ trên footer */
+  display: flex;
+  justify-content: flex-end; /* Căn nút sang phải */
+  gap: 12px;
+  background-color: #f8f9fa; /* Nền nhẹ cho footer */
+  border-bottom-left-radius: 8px; /* Bo góc dưới cho khớp với modal-container */
+  border-bottom-right-radius: 8px;
+}
+
+.btn-modal-cancel,
+.btn-modal-save,
+.btn-modal-close { /* Nút chung trong footer */
+  padding: 9px 18px; /* Padding nút */
+  font-size: 0.95em;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-weight: 500;
+  line-height: 1.5;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-modal-cancel:focus, .btn-modal-save:focus, .btn-modal-close:focus {
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.35); /* Shadow khi focus nút */
+    outline: none;
+}
+
+.btn-modal-cancel {
+  background-color: #6c757d; /* Nút Hủy màu xám */
+  color: white;
+  border-color: #6c757d;
+}
+.btn-modal-cancel:hover {
+  background-color: #5a6268;
+  border-color: #545b62;
+}
+
+.btn-modal-save {
+  background-color: #007bff; /* Nút Lưu/Thêm màu xanh dương */
+  color: white;
+  border-color: #007bff;
+}
+.btn-modal-save:hover {
+  background-color: #0069d9;
+  border-color: #0062cc;
+}
+
+/* Nút Đóng trong Detail Modal */
+.btn-modal-close {
+    background-color: #f8f9fa;
+    color: #343a40;
+    border: 1px solid #ced4da;
+}
+.btn-modal-close:hover {
+    background-color: #e9ecef;
+}

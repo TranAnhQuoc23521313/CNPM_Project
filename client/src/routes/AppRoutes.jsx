@@ -16,6 +16,11 @@ import OtpPage from '../pages/Login/OtpPage.jsx';
 import AdminMoviesPage from '../pages/Admin/Movies/MoviesPage.jsx';
 import AdminShowtimesPage from '../pages/Admin/Showtimes/Showtimes.jsx';
 import AdminItemsPage from '../pages/Admin/Items/Items.jsx';
+import Customers from '../pages/Admin/Customers/Customers.jsx';
+import Employees from '../pages/Admin/Employees/Employees.jsx';
+import Statistics from '../pages/Admin/Statistics/Statistics.jsx';
+import TransactionHistory from '../pages/Admin/Payments/TransactionHistory.jsx';
+import Equipments from '../pages/Admin/Equipments/Equipments.jsx';
 // Ví dụ, nếu bạn đã tạo AdminDashboardPage:
 // import AdminDashboardPage from '../pages/Admin/Dashboard/AdminDashboardPage';
 
@@ -149,6 +154,11 @@ const AppRoutes = () => {
           <Route path="movies" element={<AdminMoviesPage />} />
           <Route path="showtimes" element={<AdminShowtimesPage />} />
           <Route path="items" element={<AdminItemsPage />} />
+          <Route path="customers" element={<Customers />} />
+          <Route path="staffs" element={<Employees />} />
+          <Route path="statistics" element={<Statistics />} />
+          <Route path="payments" element={<TransactionHistory />} />
+          <Route path="facilities" element={<Equipments />} />
           {/* Thêm các route Admin khác */}
         </Route>
 

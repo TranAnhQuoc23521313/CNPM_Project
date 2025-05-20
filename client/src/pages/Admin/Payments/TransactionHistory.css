@@ -1,0 +1,169 @@
+/* TransactionHistory.css */
+
+.th-page.page-container { /* Áp dụng cho toàn trang này */
+  /* Các style chung như Employees.css */
+  padding: 20px;
+  background-color: #f0f2f5;
+  min-height: calc(100vh - 70px); /* Điều chỉnh nếu header app khác */
+}
+
+.th-page .content-card {
+  background-color: #ffffff;
+  padding: 25px 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.th-page .page-title {
+  color: #333;
+  font-size: 24px; /* Nhỏ hơn một chút so với trang Employee */
+  font-weight: 600;
+  margin-bottom: 20px; /* Giảm margin */
+  text-align: center;
+}
+
+/* Tab Navigation */
+.th-page .main-tabs-nav {
+  display: flex;
+  margin-bottom: 20px; /* Khoảng cách đến content */
+  border-bottom: 2px solid #dee2e6; /* Đường gạch dưới cho thanh tab */
+}
+
+.th-page .tab-nav-button {
+  padding: 10px 18px; /* Padding cho nút tab */
+  font-size: 1em; /* Cỡ chữ nút tab */
+  font-weight: 500;
+  color: #495057; /* Màu chữ tab thường */
+  background-color: transparent;
+  border: none;
+  border-bottom: 3px solid transparent; /* Gạch dưới khi active */
+  cursor: pointer;
+  margin-right: 4px; /* Khoảng cách nhẹ giữa các tab */
+  transition: color 0.2s, border-bottom-color 0.2s;
+}
+.th-page .tab-nav-button:hover {
+  color: #007bff;
+}
+.th-page .tab-nav-button.active {
+  color: #007bff;
+  font-weight: 600;
+  border-bottom-color: #007bff;
+}
+
+/* Controls bar (search, add button) - giống Employees.css */
+.th-page .page-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.th-page .search-input {
+  padding: 10px 15px;
+  border: 1px solid #d2d6dc; /* Border nhạt hơn */
+  border-radius: 6px;
+  width: 45%; /* Điều chỉnh độ rộng */
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.th-page .search-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+  outline: none;
+}
+
+.th-page .btn-add-new {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 18px; /* Điều chỉnh padding */
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.th-page .btn-add-new:hover {
+  background-color: #0056b3;
+}
+
+/* Data Table Styling - giống Employees.css */
+.th-page .data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 13.5px; /* Cỡ chữ trong bảng */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* Shadow nhẹ cho bảng */
+}
+.th-page .data-table th, 
+.th-page .data-table td {
+  border: 1px solid #e9ecef; /* Border nhạt hơn */
+  padding: 10px 12px; /* Padding ô */
+  text-align: left;
+  vertical-align: middle;
+}
+.th-page .data-table th {
+  background-color: #f8f9fa; /* Nền header bảng */
+  color: #495057; /* Màu chữ header */
+  font-weight: 600;
+  white-space: nowrap;
+}
+.th-page .data-table tbody tr:nth-child(even) {
+  background-color: #fdfdfe; /* Màu xen kẽ rất nhẹ */
+}
+.th-page .data-table tbody tr:hover {
+  background-color: #f0f4f8; /* Màu khi hover */
+}
+
+.th-page .data-table .description-cell {
+    max-width: 250px; /* Giới hạn chiều rộng cột mô tả */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+.th-page .actions-cell {
+  display: flex;
+  gap: 6px; /* Khoảng cách nút action */
+  white-space: nowrap;
+}
+.th-page .action-button {
+  padding: 5px 10px; /* Nút action nhỏ hơn */
+  font-size: 12.5px; /* Chữ nút action nhỏ hơn */
+  border-radius: 4px;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+.th-page .action-button:hover {
+  filter: brightness(90%);
+}
+.th-page .view-button { background-color: #17a2b8; } 
+.th-page .edit-button { background-color: #ffc107; color: #212529; }
+.th-page .delete-button { background-color: #dc3545; }
+
+.th-page .link-style {
+    color: #007bff; text-decoration: none; cursor: pointer;
+    background: none; border: none; padding: 0; font-size: inherit;
+}
+.th-page .link-style:hover { text-decoration: underline; }
+
+.th-page .status-badge {
+    padding: 3px 7px; border-radius: 10px; font-size: 0.75em;
+    font-weight: 600; color: #fff; white-space: nowrap;
+    text-transform: capitalize;
+}
+.th-page .status-badge.status-đã-thanh-toán { background-color: #28a745; }
+.th-page .status-badge.status-chờ-xử-lý { background-color: #ffc107; color: #212529;}
+.th-page .status-badge.status-đã-hủy { background-color: #dc3545; }
+.th-page .status-badge.status-hoàn-thành-voucher { background-color: #17a2b8;}
+.th-page .status-badge.status-đã-chi { background-color: #fd7e14;}
+.th-page .status-badge.status-đã-thu { background-color: #20c997;}
+
+
+.th-page .no-data-message {
+  text-align: center; padding: 25px; color: #6c757d; font-style: italic;
+  background-color: #f8f9fa; border-radius: 6px;
+}

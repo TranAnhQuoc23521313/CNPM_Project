@@ -1,0 +1,168 @@
+/* Customers.css */
+/* Styles copied and adapted from Employees.css */
+
+.customers-page-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 20px auto;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.customers-page-container h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 25px;
+  font-size: 1.8em;
+}
+
+.customer-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+.customer-controls .search-input { /* Shared class, style is the same */
+  padding: 10px 15px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 1em;
+  width: 60%; /* Or adjust as needed */
+}
+
+.customer-controls .btn-add-customer { /* Specific to customer add button */
+  padding: 10px 20px;
+  background-color: #007bff; /* Blue color like employees */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.customer-controls .btn-add-customer:hover {
+  background-color: #0056b3;
+}
+
+.customer-list-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 0.95em;
+}
+
+.customer-list-table th,
+.customer-list-table td {
+  border: 1px solid #dee2e6;
+  padding: 12px 15px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.customer-list-table thead th {
+  background-color: #e9ecef;
+  color: #495057;
+  font-weight: 600;
+  position: sticky;
+  top: 0; /* For sticky header if the table scrolls */
+}
+
+.customer-list-table tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.customer-list-table tbody tr:hover {
+  background-color: #e2e6ea;
+}
+
+/* Action buttons in the table */
+/* Assuming your common Button component takes these as className */
+.customer-actions .btn-details { /* Matches Employees.css */
+  /* background-color: #17a2b8; */ /* Defined by Button component with this class */
+  /* color: white; */
+  /* border-color: #17a2b8; */
+  margin-right: 8px; /* Added for spacing if not handled by Button's internal styles */
+}
+/* .customer-actions .btn-details:hover { background-color: #138496; } */
+
+.customer-actions .btn-edit { /* Matches Employees.css */
+  /* background-color: #ffc107; */
+  /* color: #212529; */
+  /* border-color: #ffc107; */
+  margin-right: 8px;
+}
+/* .customer-actions .btn-edit:hover { background-color: #e0a800; } */
+
+.customer-actions .btn-delete { /* Matches Employees.css */
+   background-color: #dc3545; 
+   color: white; 
+   border-color: #dc3545; 
+}
+/* .customer-actions .btn-delete:hover { background-color: #c82333; } */
+
+/* If your Button component doesn't take these classes for styling,
+   you might need to target its children or use more specific selectors,
+   or ensure Button is styled via props.
+   The Employees.css had direct styling for these button classes.
+   If your common Button component handles its own styling based on className (e.g. <Button className="btn-delete">),
+   then you only need to ensure those classes are defined for the Button component (perhaps globally or in common/Button.css).
+   The provided Employees.css styles these classes directly.
+   So, if your common/Button.jsx renders <button className={props.className}>...</button>,
+   the styles for .btn-details, .btn-edit, .btn-delete should be defined (either here or globally).
+   For clarity, I will re-add the explicit styles for action buttons here,
+   assuming the common Button component allows these classes to apply styling.
+*/
+
+.customer-actions .btn-edit {
+  background-color: #ffc107;
+  color: #212529;
+  border: 1px solid #ffc107; /* Added border to match employee style */
+  padding: 6px 12px; /* Added to match employee style */
+  font-size: 0.9em; /* Added to match employee style */
+  border-radius: 4px; /* Added to match employee style */
+  cursor: pointer; /* Added to match employee style */
+}
+.customer-actions .btn-edit:hover {
+  background-color: #e0a800;
+}
+
+.customer-actions .btn-delete {
+  background-color: #dc3545;
+  color: white;
+  border: 1px solid #dc3545; /* Added border to match employee style */
+  padding: 6px 12px;
+  font-size: 0.9em;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.customer-actions .btn-delete:hover {
+  background-color: #c82333;
+}
+
+.customer-actions .btn-details {
+  background-color: #17a2b8;
+  color: white;
+  border: 1px solid #17a2b8; /* Added border to match employee style */
+  padding: 6px 12px;
+  font-size: 0.9em;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.customer-actions .btn-details:hover {
+  background-color: #138496;
+}
+
+
+.no-customers-message {
+  text-align: center;
+  padding: 30px;
+  font-style: italic;
+  color: #6c757d;
+  font-size: 1.1em;
+}

@@ -1,0 +1,9 @@
+/* BusinessTransactionDetailModal.css */
+/* Import hoặc copy style từ CustomerInvoiceDetailModal.css hoặc common/Modal.css */
+/* Ví dụ: @import './CustomerInvoiceDetailModal.css'; */
+
+/* Thêm style riêng cho Detail modal của Business Transaction nếu cần */
+.modal-container.transaction-detail-modal {
+    max-width: 750px; /* Có thể rộng hơn một chút */
+}
+/* Các style cho .detail-grid, .detail-item đã có ở CustomerInvoiceDetailModal.css có thể dùng lại */

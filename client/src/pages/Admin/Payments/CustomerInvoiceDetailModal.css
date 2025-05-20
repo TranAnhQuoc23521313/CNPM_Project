@@ -1,0 +1,48 @@
+/* CustomerInvoiceDetailModal.css */
+.modal-overlay 
+.modal-container.detail-modal {
+    background-color: #fff; border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    width: 100%; max-width: 700px; /* Có thể rộng hơn để hiển thị chi tiết */
+    max-height: 85vh; display: flex; flex-direction: column; overflow: hidden;
+}
+.modal-header 
+.modal-title 
+.modal-close-button 
+
+.modal-body { padding: 20px 25px; overflow-y: auto; flex-grow: 1; }
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* 2 cột responsive */
+    gap: 15px 20px;
+}
+.detail-item {
+    padding-bottom: 8px;
+    /* border-bottom: 1px dashed #eee; */ /* Bỏ border nếu dùng grid */
+}
+.detail-item.full-width {
+    grid-column: 1 / -1; /* Chiếm toàn bộ chiều rộng grid */
+}
+.detail-item strong {
+    display: block;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 4px;
+    font-size: 0.9em;
+}
+.detail-item p {
+    margin: 0;
+    color: #212529;
+    font-size: 0.95em;
+    word-break: break-word;
+}
+
+
+
+
+.btn-modal-close { /* ... style nút đóng ... */ 
+  padding: 8px 16px; font-size: 0.95em; border-radius: 5px;
+  border: 1px solid #6c757d; cursor: pointer; font-weight: 500;
+  background-color: #6c757d; color: white;
+}
+.btn-modal-close:hover { background-color: #5a6268; }

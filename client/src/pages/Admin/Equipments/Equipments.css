@@ -1,0 +1,128 @@
+/* pages/Equipments/Equipments.css */
+
+.equipments-page.page-container {
+  padding: 20px;
+  background-color: #f0f2f5;
+  min-height: calc(100vh - 70px); /* Giả sử header app cao 70px */
+}
+
+.equipments-page .content-card {
+  background-color: #ffffff;
+  padding: 25px 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.equipments-page .page-title {
+  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+/* Controls bar */
+.equipments-page .equipments-controls { /* Class riêng để tránh xung đột */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 15px; /* Thêm gap cho các control items */
+}
+
+.equipments-page .search-input {
+  padding: 10px 15px;
+  border: 1px solid #d2d6dc;
+  border-radius: 6px;
+  flex-grow: 1; /* Cho phép search input co giãn */
+  min-width: 250px; /* Độ rộng tối thiểu */
+  font-size: 14px;
+}
+.equipments-page .search-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+  outline: none;
+}
+
+.equipments-page .filter-group {
+    display: flex;
+    gap: 10px;
+}
+.equipments-page .filter-select {
+    padding: 10px 12px;
+    border: 1px solid #d2d6dc;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: #fff;
+    min-width: 150px;
+}
+
+.equipments-page .btn-add-new {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap; /* Không xuống dòng text của nút */
+}
+.equipments-page .btn-add-new:hover {
+  background-color: #0056b3;
+}
+
+/* Table Styling */
+.equipments-page .table-responsive-wrapper {
+    overflow-x: auto; /* Cho phép cuộn ngang nếu bảng quá rộng */
+    margin-bottom: 20px;
+}
+.equipments-page .equipments-table { /* Class riêng cho bảng */
+  width: 100%;
+  min-width: 1000px; /* Đảm bảo bảng có độ rộng tối thiểu để các cột không bị quá hẹp */
+  border-collapse: collapse;
+  font-size: 13.5px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+/* ... (style cho th, td, thead, tbody, actions-cell, action-button giống TransactionHistory.css) ... */
+.equipments-page .equipments-table th, 
+.equipments-page .equipments-table td {
+  border: 1px solid #e9ecef;
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: middle;
+}
+.equipments-page .equipments-table th {
+  background-color: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.equipments-page .equipments-table tbody tr:hover {
+  background-color: #f0f4f8;
+}
+
+.equipments-page .equipment-name-cell,
+.equipments-page .notes-cell {
+    max-width: 200px; /* Giới hạn chiều rộng */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* Status Badges cho Thiết bị */
+.equipments-page .status-badge.status-equipment-đang-hoạt-động { background-color: #28a745; color: white; }
+.equipments-page .status-badge.status-equipment-cần-bảo-trì { background-color: #ffc107; color: #212529;}
+.equipments-page .status-badge.status-equipment-đang-sửa-chữa { background-color: #17a2b8; color: white;}
+.equipments-page .status-badge.status-equipment-hỏng-hóc { background-color: #dc3545; color: white;}
+.equipments-page .status-badge.status-equipment-không-sử-dụng { background-color: #6c757d; color: white;}
+/* ... (style cho .no-data-message, .action-button (view, edit, delete) giống TransactionHistory.css) ... */
+.equipments-page .actions-cell { display: flex; gap: 6px; white-space: nowrap; }
+.equipments-page .action-button { padding: 5px 10px; font-size: 12.5px; border-radius: 4px; color: white; border: none; cursor: pointer; transition: filter 0.15s ease; }
+.equipments-page .action-button:hover { filter: brightness(90%); }
+.equipments-page .view-button { background-color: #17a2b8; } 
+.equipments-page .edit-button { background-color: #ffc107; color: #212529; }
+.equipments-page .delete-button { background-color: #dc3545; }
+.equipments-page .no-data-message { text-align: center; padding: 25px; color: #6c757d; font-style: italic; background-color: #f8f9fa; border-radius: 6px; }
