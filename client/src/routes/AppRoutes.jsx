@@ -7,13 +7,6 @@ import ConfirmationDialog from '../components/common/ConfirmationDialog'; // <<-
 import AdminLayout from '../components/layout/Admin/Layout';
 import StaffLayout from '../components/layout/Staff/Layout';
 
-// Import your page components
-//import Dashboard from '../pages/Dashboard';
-import MoviesPage from '../pages/Admin/Movies/MoviesPage.jsx'; // Using the simplified version for now
-import ShowtimesPage from '../pages/Admin/Showtimes/Showtimes.jsx';
-import ItemsPage from '../pages/Admin/Items/Items.jsx';
-// import Tickets from '../pages/Tickets';
-// import Users from '../pages/Users';
 // --- IMPORT PAGE COMPONENTS ---
 // Auth Pages
 import LoginPage from '../pages/Login/Login.jsx';
