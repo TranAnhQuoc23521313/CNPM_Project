@@ -9,14 +9,8 @@ const IconPlaceholder = ({ name }) => <span className="icon-placeholder">{/* {na
 const Sidebar = () => {
   // Define navigation items for Cinema Management
   const navItems = [
-    { path: '/movies', icon: 'movie', label: 'Quản lý phim' },
-    { path: '/showtimes', icon: 'Showtimes', label: 'Quản lý suất chiếu' },
-    { path: '/items', icon: 'Items', label: 'Quản lý sản phẩm' },
-    { path: '/staffs', icon: 'Staffs', label: 'Quản lý nhân viên' },
-    { path: '/customers', icon: 'Customers', label: 'Quản lý khách hàng' },
-    { path: '/payments', icon: 'Payments', label: 'Quản lý lịch sử giao dịch' },
-    { path: '/statistics', icon: 'Statistics', label: 'Thống kê' },
-    { path: '/facilities', icon: 'Facilities', label: 'Quản lý thiết bị' },
+    { path: '/staff/tickets', icon: 'ticket', label: 'Quản lý vé phim' },
+    { path: '/staff/facilities', icon: 'facilities', label: 'Quản lý thiết bị' },
     // Add more relevant items here
   ];
 

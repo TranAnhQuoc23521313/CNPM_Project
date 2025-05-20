@@ -1,0 +1,69 @@
+/* src/components/layout/Admin/Layout.css */
+
+/* Container chính của toàn bộ layout Admin */
+.admin-layout-container {
+  display: flex; /* BẮT BUỘC: Để Sidebar và main-content-area nằm cạnh nhau */
+  min-height: 100vh; /* Chiều cao tối thiểu bằng chiều cao màn hình */
+  background-color: #f9fafb; /* Màu nền chung cho trang (tùy chọn) */
+}
+
+/* Định nghĩa cho Sidebar */
+/* Giả sử component AdminSidebar của bạn có thẻ <aside className="admin-sidebar"> */
+.admin-sidebar { /* Hoặc tên class bạn đặt cho thẻ <aside> của Sidebar */
+  width: 260px;    /* Quan trọng: Chiều rộng cố định cho Sidebar */
+  flex-shrink: 0;  /* Quan trọng: Ngăn Sidebar bị co lại khi không đủ không gian */
+  background-color: #ffffff; /* Màu nền cho Sidebar */
+  border-right: 1px solid #e5e7eb; /* Đường viền phân cách */
+  display: flex; /* Để các thành phần bên trong Sidebar (logo, nav, footer) xếp chồng lên nhau */
+  flex-direction: column;
+  height: 100vh; /* Để Sidebar cao bằng màn hình */
+  position: sticky; /* Để Sidebar đứng yên khi cuộn trang (nếu muốn) */
+  top: 0;          /* Đi kèm với position: sticky */
+}
+/* Bạn nên có các style chi tiết hơn cho .sidebar-header, .sidebar-nav, .nav-link, .sidebar-footer */
+/* trong file Sidebar.css và import nó vào Sidebar.jsx */
+
+
+/* Khu vực nội dung chính, nằm bên phải Sidebar */
+.admin-main-content-area {
+  flex-grow: 1; /* Quan trọng: Cho phép khu vực này chiếm hết không gian còn lại */
+  display: flex;
+  flex-direction: column; /* Để Header ở trên và page-content ở dưới */
+  /* overflow-y: auto; */ /* Cân nhắc: Nếu muốn chỉ cuộn phần này, không phải toàn bộ trang */
+}
+
+/* Định nghĩa cho Header */
+/* Giả sử component AdminHeader của bạn có thẻ <header className="admin-header"> */
+.admin-header { /* Hoặc tên class bạn đặt cho thẻ <header> của Header */
+  /* height: 60px; */ /* Hoặc sử dụng padding để xác định chiều cao */
+  padding: 15px 30px; /* Quan trọng: Tạo không gian cho nội dung Header */
+  background-color: #ffffff; /* Màu nền cho Header */
+  border-bottom: 1px solid #e5e7eb; /* Đường viền phân cách */
+  display: flex; /* Để title và actions trong header xếp ngang */
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0; /* Quan trọng: Ngăn Header bị co lại */
+}
+/* Bạn nên có các style chi tiết hơn cho .header-text, .header-title, .header-actions */
+/* trong file Header.css và import nó vào Header.jsx */
+
+
+/* Khu vực chứa nội dung của từng trang con (Outlet) */
+.admin-page-content {
+  padding: 25px 30px; /* Không gian xung quanh nội dung trang */
+  flex-grow: 1; /* Quan trọng: Cho phép khu vực này mở rộng để lấp đầy không gian còn lại trong main-content-area */
+  overflow-y: auto; /* Cho phép cuộn nếu nội dung trang dài hơn chiều cao màn hình */
+  background-color: transparent; /* Hoặc màu nền khác nếu muốn */
+}
+
+/* --- Các style bổ sung để đảm bảo không có lỗi từ CSS reset hoặc global --- */
+/* Đảm bảo các khối chính không bị ẩn */
+.admin-layout-container,
+.admin-main-content-area,
+.admin-page-content,
+.admin-sidebar, /* Thêm class của Sidebar thực tế */
+.admin-header {  /* Thêm class của Header thực tế */
+  visibility: visible !important;
+  opacity: 1 !important;
+  /* Tránh các giá trị height/width bằng 0 trừ khi đó là ý đồ */
+}
