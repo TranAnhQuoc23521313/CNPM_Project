@@ -5,7 +5,9 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
   // State cho các trường trong form, khởi tạo rỗng
   const [itemName, setItemName] = useState('');
   const [itemPrice, setItemPrice] = useState('');
-  // Không còn state itemStatus
+  const [itemQuantity, setItemQuantity] = useState(''); // State cho số lượng
+  const [itemStatus, setItemStatus] = useState('Còn hàng'); // Trạng thái mặc định là "Còn hàng"
+  const [itemType, setItemType] = useState(''); // State cho loại sản phẩm
   const [posterPreview, setPosterPreview] = useState(null);
   const [posterFile, setPosterFile] = useState(null);
 
@@ -16,9 +18,14 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
     if (isOpen) {
       setItemName('');
       setItemPrice('');
-      // Không cần reset itemStatus nữa
+      setItemQuantity(''); // Reset số lượng
+      setItemStatus('Còn hàng'); // Reset trạng thái về mặc định
+      setItemType(''); // Reset loại sản phẩm
       setPosterPreview(null);
       setPosterFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""; // Reset giá trị của input file
+      }
     }
   }, [isOpen]);
 
@@ -30,6 +37,15 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
       const reader = new FileReader();
       reader.onloadend = () => { setPosterPreview(reader.result); };
       reader.readAsDataURL(file);
+    } else {
+      setPosterFile(null);
+      setPosterPreview(null);
+      // Nếu người dùng hủy chọn file (ví dụ, nhấn "Cancel" trong dialog chọn file)
+      // setPosterFile(null); // Giữ file cũ nếu có, hoặc để trống
+      // setPosterPreview(null); // Giữ preview cũ nếu có, hoặc để trống
+      // Hoặc reset hoàn toàn nếu muốn:
+      // setPosterFile(null);
+      // setPosterPreview(null);
     }
   };
 
@@ -43,22 +59,32 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
   // Xử lý khi nhấn nút Thêm (submit form)
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Validation cơ bản, bỏ kiểm tra itemStatus
-    if (!itemName.trim() || isNaN(parseFloat(itemPrice)) || parseFloat(itemPrice) < 0) {
-        alert("Vui lòng nhập Tên và Giá sản phẩm hợp lệ.");
-        return;
+    // Validation cơ bản (ví dụ: tên và giá không được rỗng)
+    if (!itemName.trim() || !itemPrice.trim()) { // Thêm .trim() cho price nếu nó là string
+      alert('Tên sản phẩm và Giá là bắt buộc.');
+      return;
+    }
+    // Chuyển đổi giá và số lượng sang số nếu cần, hoặc để server làm
+    const priceValue = parseInt(itemPrice, 10);
+    const quantityValue = itemQuantity.trim() === '' ? null : parseInt(itemQuantity, 10); // Cho phép số lượng rỗng -> null
+    const itemTypeValue = itemType.trim();
+    if (isNaN(priceValue) || (itemQuantity.trim() !== '' && isNaN(quantityValue))) {
+      alert('Giá và Số lượng (nếu có) phải là số.');
+      return;
     }
 
-    // Tạo object chứa dữ liệu sản phẩm mới
+
     const newItemData = {
       name: itemName.trim(),
-      price: parseFloat(itemPrice),
-      status: 'Còn hàng', // Mặc định là "Còn hàng"
-      newPosterFile: posterFile, // Gửi file object
+      type: itemType.trim(),
+      price: priceValue, // Đã parseInt
+      quantity: quantityValue, // Đã parseInt hoặc null
+      status: itemStatus.trim(),
+      imageFile: posterFile, // posterFile phải là File object
     };
-
-    onAddItem(newItemData); // Gọi callback để thêm item ở component cha
-    // onClose(); // Component cha sẽ đóng modal sau khi xử lý
+    console.log("AddItemModal - Submitting with newItemData:", newItemData); // LOG ĐỂ XEM
+    console.log("AddItemModal - posterFile state is:", posterFile); // LOG ĐỂ XEM
+    onAddItem(newItemData);
   };
 
   if (!isOpen) {
@@ -73,7 +99,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
           <button className="modal-close-button add-item-close-button" onClick={onClose}>×</button>
         </div>
         <form onSubmit={handleSubmit} className="add-item-form">
-          <div className="modal-body add-item-modal-body">
+          <div className="modal-body add-item-modal-body"> {/* Đây là phần sẽ có thanh cuộn */}
             {/* Trường Tên */}
             <div className="form-group add-form-group">
               <label htmlFor="add-item-name">Tên:</label>
@@ -98,12 +124,51 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                 onChange={(e) => setItemPrice(e.target.value)}
                 placeholder="Nhập giá"
                 min="0"
+                step="any" // Cho phép số thập phân
                 required
               />
             </div>
-            
-            {/* ---- TRƯỜNG TRẠNG THÁI ĐÃ BỊ LOẠI BỎ ---- */}
 
+            {/* Khu vực số lượng */}
+            <div className="form-group add-form-group">
+              <label htmlFor="add-item-quantity">Số lượng:</label>
+              <input
+                type="number"
+                id="add-item-quantity"
+                className="add-item-input"
+                value={itemQuantity}
+                onChange={(e) => setItemQuantity(e.target.value)}
+                placeholder="Nhập số lượng"
+                min="0"
+                required
+              />
+            </div>
+
+            {/* Khu vực Trạng thái */}
+            <div className="form-group add-form-group">
+              <label htmlFor="add-item-status">Trạng thái:</label>
+              <select
+                id="add-item-status"
+                className="add-item-input"
+                value={itemStatus}
+                onChange={(e) => setItemStatus(e.target.value)}
+              >
+                <option value="Còn hàng">Còn hàng</option>
+                <option value="Hết hàng">Hết hàng</option>
+              </select>
+            </div>
+            {/* Khu vực Loại sản phẩm */}
+            <div className="form-group add-form-group">
+              <label htmlFor="add-item-type">Loại sản phẩm:</label>
+              <input
+                type="text"
+                id="add-item-type"
+                className="add-item-input"
+                value={itemType}
+                onChange={(e) => setItemType(e.target.value)}
+                placeholder="Nhập loại sản phẩm"
+              />
+            </div>
             {/* Khu vực Poster */}
             <div className="form-group add-form-group poster-group">
               <label>Poster (Tùy chọn):</label>
@@ -111,7 +176,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                 {posterPreview ? (
                   <img src={posterPreview} alt="Poster Preview" className="add-poster-preview-img" />
                 ) : (
-                  <span className="add-poster-placeholder">Chọn ảnh</span> 
+                  <span className="add-poster-placeholder">Chọn ảnh</span>
                 )}
                 <input
                   type="file"
@@ -125,12 +190,11 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
 
             {/* Nút Done được đặt ở đây, bên trong modal-body */}
             <div className="form-actions-within-body">
-                 <button type="submit" className="submit-done-button" title="Thêm sản phẩm">
-                    Done
-                 </button>
+              <button type="submit" className="submit-done-button" title="Thêm sản phẩm">
+                Done
+              </button>
             </div>
           </div> {/* End modal-body */}
-          {/* Không còn modal-footer */}
         </form>
       </div>
     </div>
