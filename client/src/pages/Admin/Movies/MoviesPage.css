@@ -1,86 +1,93 @@
-/* src/pages/Movies/Movies.css (hoặc MoviesPage.css) */
+/* Movies.css (hoặc file CSS chung cho các trang quản lý) */
 
-/* --- PAGE CONTAINER --- */
-.movies-page-container { /* Sử dụng class cụ thể của trang Movies */
-  padding: 25px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  background-color: #fff;
-  position: relative;
+/* --- PAGE CONTAINER & CONTENT CARD (Giống như đã làm) --- */
+.page-container {
+  padding: 20px;
+  background-color: #f0f2f5; /* Nền xám nhạt cho toàn trang */
+  min-height: calc(100vh - 60px); /* Giả sử header app cao 60px */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-/* --- HEADER STYLE (Phong cách nhẹ nhàng giống ItemsPage) --- */
-.movies-page-header { /* Sử dụng class cụ thể của trang Movies */
-  display: flex;
-  justify-content: space-between; 
-  align-items: center;
-  margin-bottom: 30px; 
-  padding-bottom: 20px;
-  border-bottom: 1px solid #f1f3f5; /* Viền dưới rất nhạt */
+.content-card {
+  background-color: #ffffff;
+  padding: 25px 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Shadow mềm mại hơn */
 }
 
-.movies-page-header h1 { 
-  /* margin: 0; */
-  font-size: 1.5em; /* Kích thước giống ItemsPage */
-  color: #1f2937;   /* Màu chữ giống ItemsPage */
+/* --- TIÊU ĐỀ TRANG CHÍNH --- */
+.page-main-title {
+  color: #2c3e50; /* Màu chữ tiêu đề đậm hơn */
+  font-size: 28px; /* Cỡ chữ lớn hơn cho tiêu đề chính */
   font-weight: 600;
-  white-space: nowrap;
-  flex-shrink: 0;
+  margin-bottom: 25px; /* Khoảng cách với thanh controls bên dưới */
+  text-align: center; /* Căn giữa tiêu đề */
 }
 
-/* Style cho Search Bar (có thể dùng class chung page-header-search-input nếu muốn) */
-.movies-page-header input[type="text"] { /* Target trực tiếp input trong header này */
-  flex-grow: 1; 
-  padding: 10px 20px; 
-  border: 1px solid #e9ecef; 
-  border-radius: 999px; /* Bo tròn */
-  font-size: 0.95em;
-  max-width: 600px; 
-  margin: 0 20px; 
-  background-color: #f8f9fa; 
-  color: #495057; 
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.03); 
+/* --- THANH CONTROLS (Search bar và nút Add) --- */
+.page-controls-bar {
+  display: flex;
+  justify-content: space-between; /* Đẩy ô search và nút Add về 2 phía */
+  align-items: center;
+  margin-bottom: 25px; /* Khoảng cách với nội dung chính bên dưới */
+  padding: 15px; /* Padding bên trong thanh controls */
+  background-color: #f8f9fa; /* Nền xám rất nhạt, hoặc để transparent nếu muốn nó nằm trên nền của content-card */
+  border-radius: 6px;
+  /* box-shadow: 0 1px 3px rgba(0,0,0,0.05); */ /* Shadow nhẹ nếu có nền riêng */
+}
+
+/* Container cho ô tìm kiếm */
+.search-input-container {
+  flex-grow: 1; /* Cho phép container này chiếm không gian */
+  max-width: 60%; /* Hoặc một giá trị cố định như 500px */
+  /* Không cần margin ở đây nếu .page-controls-bar đã có padding */
+}
+
+/* Ô tìm kiếm */
+.search-input-field {
+  width: 100%; /* Chiếm toàn bộ .search-input-container */
+  padding: 10px 15px; 
+  border: 1px solid #d1d5db; /* Border màu xám nhạt */
+  border-radius: 6px; 
+  font-size: 14px; 
+  color: #374151; /* Màu chữ input */
+  background-color: #ffffff; /* Nền trắng cho input */
   transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
-.movies-page-header input[type="text"]::placeholder {
-    color: #adb5bd; 
-    font-style: normal;
+.search-input-field::placeholder {
+  color: #9ca3af; /* Màu placeholder */
 }
-.movies-page-header input[type="text"]:focus {
-    outline: none;
-    border-color: #a5b4fc; 
-    box-shadow: 0 0 0 3px rgba(165, 180, 252, 0.3), inset 0 1px 2px rgba(0,0,0,0.03); 
+.search-input-field:focus {
+  outline: none;
+  border-color: #007bff; /* Màu border khi focus (xanh dương) */
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2); /* Shadow nhẹ khi focus */
 }
 
-/* Style cho nút "+ Add New Movie" (sử dụng variant="secondary" hoặc class override) */
-.movies-page-header .common-button.btn-secondary, /* Target variant secondary */
-.movies-page-header .add-new-movie-button-override /* Hoặc target class bạn tự thêm */
-{
-  flex-shrink: 0;
-  background-color: #fff !important; 
-  color: #374151 !important; 
-  border: 1px solid #d1d5db !important; 
-  padding: 8px 16px !important; 
-  font-weight: 500 !important; 
-  border-radius: 6px !important; 
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important; 
-  transition: background-color 0.2s, border-color 0.2s !important;
+/* Nút Thêm Mới */
+.btn-add-new-item {
+  flex-shrink: 0; /* Ngăn nút co lại */
+  background-color: #007bff; 
+  color: white; 
+  border: none; 
+  padding: 10px 20px; 
+  font-size: 14px;
+  font-weight: 500; 
+  border-radius: 6px; 
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex; /* Để căn chỉnh icon nếu có */
+  align-items: center;
+  gap: 6px; /* Khoảng cách giữa icon và text nếu có */
 }
-.movies-page-header .common-button.btn-secondary:hover,
-.movies-page-header .add-new-movie-button-override:hover
-{
-  background-color: #f9fafb !important; 
-  border-color: #adb5bd !important; 
-  color: #1f2937 !important;
+.btn-add-new-item:hover {
+  background-color: #0056b3; 
 }
-/* Nếu bạn muốn nút Add New Movie màu xanh (primary), 
-   thì xóa hoặc comment lại khối CSS ghi đè trên và đảm bảo 
-   Button trong JSX có variant="primary". 
-   Trong trường hợp đó, chỉ cần:
-.movies-page-header .common-button { 
-    flex-shrink: 0;
+.btn-add-new-item svg { /* Style cho icon nếu bạn dùng SVG icon */
+    width: 16px;
+    height: 16px;
 }
-*/
-/* --- KẾT THÚC HEADER STYLE --- */
+
+
 
 
 /* --- STYLE CHO PHẦN THẺ FLIP CARD (Từ code cũ của bạn) --- */

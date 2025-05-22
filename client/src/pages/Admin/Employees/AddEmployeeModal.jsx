@@ -4,17 +4,22 @@ import './AddEmployeeModal.css'; // Hoặc file CSS chung cho modal
 const INITIAL_FORM_STATE = {
   name: '',
   position: '',
-  department: 'Bán vé', // Default
+  department: 'Bán vé',
   phone: '',
   email: '',
-  startDate: new Date().toISOString().split('T')[0], // Default to today
+  startDate: new Date().toISOString().split('T')[0],
   salary: '',
-  // Thêm các trường khác nếu cần
+  username: '', // Thêm trường tên đăng nhập
+  password: '', // Thêm trường mật khẩu
+  confirmPassword: '', // Thêm trường xác nhận mật khẩu
 };
 
 function AddEmployeeModal({ onClose, onAddEmployee }) {
   const [formData, setFormData] = useState(INITIAL_FORM_STATE);
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
 
   const validateForm = () => {
     const newErrors = {};
@@ -28,6 +33,13 @@ function AddEmployeeModal({ onClose, onAddEmployee }) {
     if (formData.salary && (isNaN(formData.salary) || Number(formData.salary) <= 0)) {
         newErrors.salary = "Lương phải là một số dương.";
     }
+    // Validation cho tài khoản và mật khẩu
+    if (!formData.username.trim()) newErrors.username = "Tên đăng nhập không được để trống.";
+    // Nên có validation cho username (ví dụ: không chứa ký tự đặc biệt, độ dài)
+    if (!formData.password) newErrors.password = "Mật khẩu không được để trống.";
+    else if (formData.password.length < 6) newErrors.password = "Mật khẩu phải có ít nhất 6 ký tự."; // Ví dụ validation độ dài
+    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Mật khẩu xác nhận không khớp.";
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -43,8 +55,10 @@ function AddEmployeeModal({ onClose, onAddEmployee }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
-      onAddEmployee(formData);
-      setFormData(INITIAL_FORM_STATE); // Reset form for next time (optional)
+      // Không gửi confirmPassword lên server
+      const { confirmPassword, ...employeeDataToSend } = formData;
+      onAddEmployee(employeeDataToSend);
+      // setFormData(INITIAL_FORM_STATE); // Parent component sẽ đóng modal nên không cần reset ở đây
     }
   };
 
@@ -56,49 +70,84 @@ function AddEmployeeModal({ onClose, onAddEmployee }) {
           <button onClick={onClose} className="employee-modal-close-btn">×</button>
         </div>
         <form onSubmit={handleSubmit} className="employee-form">
-          <div className="form-group">
-            <label htmlFor="name">Họ và Tên:</label>
-            <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} />
-            {errors.name && <p className="error-message" style={{color: 'red', fontSize: '0.8em'}}>{errors.name}</p>}
+          {/* Các trường thông tin cá nhân */}
+          <div className="form-row"> {/* Sử dụng form-row nếu muốn 2 cột */}
+            <div className="form-group">
+                <label htmlFor="name">Họ và Tên:</label>
+                <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} />
+                {errors.name && <p className="error-message">{errors.name}</p>}
+            </div>
+            <div className="form-group">
+                <label htmlFor="position">Chức Vụ:</label>
+                <input type="text" id="position" name="position" value={formData.position} onChange={handleChange} />
+                {errors.position && <p className="error-message">{errors.position}</p>}
+            </div>
           </div>
-          <div className="form-group">
-            <label htmlFor="position">Chức Vụ:</label>
-            <input type="text" id="position" name="position" value={formData.position} onChange={handleChange} />
-             {errors.position && <p className="error-message" style={{color: 'red', fontSize: '0.8em'}}>{errors.position}</p>}
+          
+          <div className="form-row">
+            <div className="form-group">
+                <label htmlFor="department">Bộ Phận:</label>
+                <select id="department" name="department" value={formData.department} onChange={handleChange}>
+                {/* ... options ... */}
+                </select>
+            </div>
+            <div className="form-group">
+                <label htmlFor="phone">Số Điện Thoại:</label>
+                <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} />
+                {errors.phone && <p className="error-message">{errors.phone}</p>}
+            </div>
           </div>
-          <div className="form-group">
-            <label htmlFor="department">Bộ Phận:</label>
-            <select id="department" name="department" value={formData.department} onChange={handleChange}>
-              <option value="Bán vé">Bán vé</option>
-              <option value="Soát vé">Soát vé</option>
-              <option value="Kỹ thuật">Kỹ thuật</option>
-              <option value="Vệ sinh">Vệ sinh</option>
-              <option value="Marketing">Marketing</option>
-              <option value="Quản lý">Quản lý</option>
-              <option value="Khác">Khác</option>
-            </select>
-          </div>
-          <div className="form-group">
-            <label htmlFor="phone">Số Điện Thoại:</label>
-            <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} />
-            {errors.phone && <p className="error-message" style={{color: 'red', fontSize: '0.8em'}}>{errors.phone}</p>}
-          </div>
+
           <div className="form-group">
             <label htmlFor="email">Email:</label>
             <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} />
-            {errors.email && <p className="error-message" style={{color: 'red', fontSize: '0.8em'}}>{errors.email}</p>}
+            {errors.email && <p className="error-message">{errors.email}</p>}
           </div>
+
+         <div className="form-row">
+            <div className="form-group">
+                <label htmlFor="startDate">Ngày Vào Làm:</label>
+                <input type="date" id="startDate" name="startDate" value={formData.startDate} onChange={handleChange} />
+                {errors.startDate && <p className="error-message">{errors.startDate}</p>}
+            </div>
+            <div className="form-group">
+                <label htmlFor="salary">Lương (VNĐ):</label>
+                <input type="number" id="salary" name="salary" value={formData.salary} onChange={handleChange} placeholder="Ví dụ: 7000000" />
+                {errors.salary && <p className="error-message">{errors.salary}</p>}
+            </div>
+         </div>
+
+          {/* Trường Tài khoản và Mật khẩu */}
+          <h4 className="form-section-title">Thông Tin Tài Khoản</h4>
           <div className="form-group">
-            <label htmlFor="startDate">Ngày Vào Làm:</label>
-            <input type="date" id="startDate" name="startDate" value={formData.startDate} onChange={handleChange} />
-            {errors.startDate && <p className="error-message" style={{color: 'red', fontSize: '0.8em'}}>{errors.startDate}</p>}
+            <label htmlFor="username">Tên Đăng Nhập:</label>
+            <input type="text" id="username" name="username" value={formData.username} onChange={handleChange} autoComplete="off" />
+            {errors.username && <p className="error-message">{errors.username}</p>}
           </div>
-           <div className="form-group">
-            <label htmlFor="salary">Lương (VNĐ):</label>
-            <input type="number" id="salary" name="salary" value={formData.salary} onChange={handleChange} placeholder="Ví dụ: 7000000" />
-            {errors.salary && <p className="error-message" style={{color: 'red', fontSize: '0.8em'}}>{errors.salary}</p>}
+
+          <div className="form-row">
+            <div className="form-group password-group">
+                <label htmlFor="password">Mật Khẩu:</label>
+                <div className="password-input-wrapper">
+                    <input type={showPassword ? "text" : "password"} id="password" name="password" value={formData.password} onChange={handleChange} autoComplete="new-password" />
+                    <button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)}>
+                        {showPassword ? 'Ẩn' : 'Hiện'}
+                    </button>
+                </div>
+                {errors.password && <p className="error-message">{errors.password}</p>}
+            </div>
+            <div className="form-group password-group">
+                <label htmlFor="confirmPassword">Xác Nhận Mật Khẩu:</label>
+                 <div className="password-input-wrapper">
+                    <input type={showConfirmPassword ? "text" : "password"} id="confirmPassword" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} autoComplete="new-password" />
+                    <button type="button" className="toggle-password" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                        {showConfirmPassword ? 'Ẩn' : 'Hiện'}
+                    </button>
+                </div>
+                {errors.confirmPassword && <p className="error-message">{errors.confirmPassword}</p>}
+            </div>
           </div>
-          {/* Thêm các trường khác tại đây */}
+          
           <div className="employee-modal-actions">
             <button type="submit" className="btn btn-submit">Thêm Nhân Viên</button>
             <button type="button" onClick={onClose} className="btn btn-cancel">Hủy</button>

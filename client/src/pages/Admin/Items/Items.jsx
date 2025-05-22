@@ -188,37 +188,52 @@ const ItemsPage = () => {
   const cancelDelete = () => { setItemToDelete(null); };
 
   // Error Modal
-    const handleCloseErrorModal = useCallback(() => {
-      setErrorToDisplay(null);
-    }, []);
-  
-    // Success Modal
-    const handleCloseSuccessModal = useCallback(() => {
-      setSuccessMessage(null);
-    }, []);
+  const handleCloseErrorModal = useCallback(() => {
+    setErrorToDisplay(null);
+  }, []);
+
+  // Success Modal
+  const handleCloseSuccessModal = useCallback(() => {
+    setSuccessMessage(null);
+  }, []);
   // --- KẾT THÚC HÀM HANDLER ---
 
   const itemsToDisplay = filteredItems;
 
   return (
-    <div className="items-page"> {/* Sử dụng class cụ thể cho trang */}
-      {/* Header */}
-      <div className="items-page-header"> {/* Class cụ thể cho header của trang này */}
-        <h1>{pageTitle}</h1>
-        <div className="header-actions"> {/* Container cho actions nếu cần nhóm */}
-          <input
-            type="text"
-            placeholder="Search items by name..."
-            className="items-search-input" // Class cụ thể cho search bar của trang này
-            value={searchQuery}
-            onChange={handleSearchChange}
-          />
-          {/* Sử dụng variant="primary" để có màu xanh */}
-          <Button variant="primary" size="medium" onClick={handleAddItemClick}>
-            + Add Item
-          </Button>
+    <div className="items-page page-container"> {/* Thêm page-container */}
+      <div className="content-card"> {/* Card trắng bao ngoài */}
+
+        <h1 className="page-main-title">Quản Lý Sản Phẩm</h1> {/* Tiêu đề chính của trang */}
+
+        <div className="items-page-header"> {/* Thanh controls */}
+          <div className="search-input-container"> {/* Bọc ô tìm kiếm */}
+            <input
+              type="text"
+              placeholder="Tìm kiếm sản phẩm (tên, mã, loại...)"
+              className="items-search-input" // Class cho input
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
+          </div>
+
+          <button
+            className="btn-add-new-item" // Class mới cho nút
+            onClick={handleAddItemClick}
+          >
+            + Add New Item
+          </button>
         </div>
-      </div>
+
+        {/* Khu vực hiển thị danh sách sản phẩm */}
+        <div className="items-list-container item-row-layout">
+          {/* ... các item sản phẩm ... */}
+        </div>
+
+        {/* Thông báo không có sản phẩm */}
+        {/* ... */}
+
+      </div> {/* Đóng content-card */}
 
       {/* Item List Container */}
       <div className="items-list-container item-row-layout">

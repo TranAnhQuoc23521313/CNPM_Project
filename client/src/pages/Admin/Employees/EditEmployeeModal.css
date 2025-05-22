@@ -136,3 +136,80 @@
   min-width: 120px; /* Adjust as needed */
   display: inline-block;
 }
+
+/* ... style cho form-section-title, password-group đã có từ trước ... */
+
+.employee-form .change-password-trigger {
+  margin-top: 10px; /* Khoảng cách với trường username */
+  margin-bottom: 20px;
+  text-align: left; /* Hoặc right tùy bạn muốn */
+}
+
+.btn-link-style { /* Style cho nút "Đổi Mật Khẩu" và "Hủy Đổi Mật Khẩu" */
+  background: none;
+  border: none;
+  color: #007bff; /* Màu link */
+  cursor: pointer;
+  padding: 5px 0; /* Padding nhỏ */
+  text-decoration: underline;
+  font-size: 0.9em;
+  font-weight: 500;
+}
+.btn-link-style:hover {
+  color: #0056b3;
+}
+
+.change-password-section {
+  border: 1px solid #e9ecef; /* Viền bao quanh phần đổi MK */
+  padding: 15px 20px;
+  border-radius: 6px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  background-color: #f8f9fa; /* Nền nhẹ */
+}
+
+.change-password-section .form-subsection-title { /* Tiêu đề nhỏ "Đặt Mật Khẩu Mới" */
+  font-size: 1em;
+  font-weight: 600;
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.change-password-section .form-row { /* Đảm bảo form-row trong section này cũng có style */
+  display: flex;
+  gap: 20px;
+  margin-bottom: 15px; /* Giảm margin bottom trong section này */
+}
+.change-password-section .form-row .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.btn-cancel-change-password { /* Nút "Hủy Đổi Mật Khẩu" */
+  margin-top: 10px;
+  display: inline-block; /* Để không chiếm toàn bộ chiều rộng */
+  color: #6c757d !important; /* Màu xám hơn */
+}
+.btn-cancel-change-password:hover {
+  color: #495057 !important;
+}
+
+/* Đảm bảo .modal-body và .modal-footer có style đúng nếu bạn vừa thêm class */
+.employee-modal-content .modal-body {
+  padding: 20px 25px;
+  overflow-y: auto; 
+  flex-grow: 1;
+}
+
+.employee-modal-content .modal-footer {
+  padding: 16px 25px; 
+  border-top: 1px solid #e9ecef; 
+  display: flex;
+  justify-content: flex-end; 
+  gap: 12px;
+  background-color: #f8f9fa; 
+  border-bottom-left-radius: 8px; 
+  border-bottom-right-radius: 8px;
+}
+

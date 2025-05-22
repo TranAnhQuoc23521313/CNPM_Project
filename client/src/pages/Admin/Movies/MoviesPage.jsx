@@ -322,13 +322,43 @@ const MoviesPage = () => {
 
   return (
     <>
-      <div className="page-container movies-page-container">
-        {/* Header */}
-        <div className="page-header movies-page-header">
-          <h1>{pageTitle}</h1>
-          <input type="text" placeholder="Search movies by title..." className="page-header-search-input" value={searchQuery} onChange={handleSearchChange} />
-          <Button variant="primary" size="medium" onClick={handleOpenAddMovieModal}> + Add New Movie</Button>
+      <div className="page-container movies-page-container"> {/* Class chung của trang */}
+        <div className="content-card"> {/* Card trắng bao ngoài nội dung chính */}
+
+          {/* TIÊU ĐỀ TRANG - Nằm ở giữa, phía trên thanh controls */}
+          <h1 className="page-main-title">Quản Lý Phim</h1> {/* Hoặc "Quản Lý Nhân Viên", "Quản Lý Khách Hàng", v.v. */}
+
+          {/* THANH CONTROLS - Chứa ô tìm kiếm và nút thêm mới */}
+          <div className="page-controls-bar"> {/* Class mới cho thanh này */}
+            <div className="search-input-container"> {/* Container cho ô tìm kiếm */}
+              <input
+                type="text" placeholder="Tìm kiếm phim (tên, đạo diễn, diễn viên...)" // Thay đổi placeholder tương ứng
+                className="search-input-field" // Class mới cho ô input
+                value={searchQuery}
+                onChange={handleSearchChange}
+              />
+            </div>
+
+            <button
+              className="btn-add-new-item" // Class mới cho nút thêm mới
+              onClick={handleOpenAddMovieModal}
+            >
+              + Add New Movie {/* Hoặc "+ Add Staff", "+ Thêm Khách Hàng", v.v. */}
+            </button>
+          </div>
+
+          {/* Khu vực hiển thị danh sách (ví dụ: bảng hoặc thẻ phim) */}
+          <div className="main-content-area">
+            {/* Ví dụ:
+        <div className="movies-list-cards">
+          // ... các thẻ phim ...
         </div>
+        // Hoặc:
+        // <table className="data-table"> ... </table>
+        */}
+          </div>
+
+        </div> {/* Đóng content-card */}
 
         {/* Movie Cards */}
         <div className="movies-list-cards">

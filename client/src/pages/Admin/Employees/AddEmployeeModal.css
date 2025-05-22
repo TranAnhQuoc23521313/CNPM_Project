@@ -136,3 +136,47 @@
   min-width: 120px; /* Adjust as needed */
   display: inline-block;
 }
+
+.employee-form .form-section-title {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #333;
+  margin-top: 25px;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.password-group .password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-group .password-input-wrapper input[type="password"],
+.password-group .password-input-wrapper input[type="text"] {
+  padding-right: 60px; /* Tạo không gian cho nút toggle */
+}
+
+.password-group .toggle-password {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 0.85em;
+  padding: 5px;
+}
+.password-group .toggle-password:hover {
+  text-decoration: underline;
+}
+
+/* Style cho error message (nếu bạn chưa có hoặc muốn ghi đè) */
+.error-message {
+  color: red;
+  font-size: 0.8em;
+  margin-top: 4px;
+}

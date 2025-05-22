@@ -355,3 +355,36 @@
   font-size: 1.1em;
   color: #555;
 }
+
+.card-header-with-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px; /* Giữ lại margin nếu cần */
+}
+.card-header-with-actions h4 {
+  margin: 0; /* Loại bỏ margin mặc định của h4 */
+}
+
+.btn-export-csv, .btn-export-report {
+  padding: 6px 12px;
+  font-size: 0.85em;
+  font-weight: 500;
+  color: #fff;
+  background-color: #198754; /* Màu xanh lá cây cho export */
+  border: 1px solid #198754;
+  border-radius: 4px;
+  text-decoration: none; /* Cho CSVLink */
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.btn-export-csv:hover, .btn-export-report:hover {
+  background-color: #157347;
+  border-color: #146c43;
+  color: #fff;
+}
+
+.report-export-section {
+  margin-top: 20px; /* Khoảng cách với bảng phía trên */
+  text-align: right; /* Căn phải nút xuất báo cáo */
+}

@@ -128,7 +128,6 @@ function Equipments() {
                   <th>Trạng Thái</th>
                   <th>Bảo trì cuối</th>
                   <th>Ghi Chú</th>
-                
                 </tr>
               </thead>
               <tbody>

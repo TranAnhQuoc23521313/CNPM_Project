@@ -6,7 +6,7 @@ import ShowtimeListModal from './ShowtimeListModal.jsx';
 import ShowtimeDetailModal from './ShowtimeDetailModal.jsx';
 import AddShowtimeModal from './AddShowtimeModal.jsx';
 import { getAllMoviesApi } from '../../../services/movieApiService.js';
-import { createShowtimeApi,getShowtimesByMovieApi } from '../../../services/showtimeApiService.js'; // Giả sử bạn đã tạo hàm này trong showtimeApiService.js
+import { createShowtimeApi, getShowtimesByMovieApi } from '../../../services/showtimeApiService.js'; // Giả sử bạn đã tạo hàm này trong showtimeApiService.js
 import { getAllScreensApi } from '../../../services/screenApiService.js'; // Giả sử bạn đã tạo hàm này trong screenApiService.js
 import ErrorMessageModal from '../../../components/common/ErrorMessageModal.jsx'; // Nếu bạn có modal này
 import SuccessMessageModal from '../../../components/common/SuccessMessageModal.jsx';
@@ -233,7 +233,7 @@ const ShowtimesPage = () => {
         setSuccessMessage(null);
     }, []);
 
-    
+
 
 
     // --- RENDER ---
@@ -245,21 +245,40 @@ const ShowtimesPage = () => {
     }
 
     return (
-        <div className="page-container showtimes-management-page">
-            <div className="page-header showtimes-page-header">
-                <h1>{pageTitle}</h1>
-                <input
-                    type="text"
-                    placeholder="Search movies by title..."
-                    className="page-header-search-input"
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    disabled={isLoading && movies.length > 0}
-                />
-                <Button variant="primary" size="medium" onClick={handleOpenAddShowtimeOverallModal} disabled={isLoading}>
-                    + Add Showtime
-                </Button>
-            </div>
+        <div className="showtimes-management-page page-container"> {/* Thêm page-container */}
+            <div className="content-card"> {/* Card trắng bao ngoài */}
+
+                <h1 className="page-main-title">Quản Lý Suất Chiếu</h1> {/* Tiêu đề chính của trang */}
+
+                <div className="showtimes-page-header"> {/* Thanh controls */}
+                    <div className="search-input-container"> {/* Bọc ô tìm kiếm */}
+                        <input
+                            type="text"
+                            placeholder="Tìm kiếm suất chiếu (theo phim, phòng, ngày...)"
+                            className="showtime-search-input" // Class mới cho input
+                         value={searchQuery}
+                         onChange={handleSearchChange}
+                         disabled={isLoading&&movies.length > 0}
+                        />
+                    </div>
+                    <button
+                        className="btn-add-new-showtime" // Class mới cho nút
+                     onClick={handleOpenAddShowtimeForSpecificMovie}
+                    >
+                        + Add Showtiem
+                    </button>
+                </div>
+
+                {/* Khu vực hiển thị danh sách thẻ phim và suất chiếu */}
+                <div className="movie-cards-container">
+                    {/* ... các thẻ phim ... */}
+                </div>
+
+                {/* Thông báo không có dữ liệu */}
+                {/* ... */}
+
+            </div> {/* Đóng content-card */}
+
 
             {error && movies.length > 0 && <p className="error-message inline-error">{error}</p>}
             {isLoading && movies.length > 0 && <div className="inline-loading">Updating...</div>}
@@ -292,7 +311,7 @@ const ShowtimesPage = () => {
 
             {/* Modals */}
             {isMovieListModalOpen && selectedMovieForShowtimes && (
-               <ShowtimeListModal
+                <ShowtimeListModal
                     isOpen={isMovieListModalOpen}
                     movie={selectedMovieForShowtimes}
                     showtimes={currentMovieShowtimes} // Truyền suất chiếu đã fetch
