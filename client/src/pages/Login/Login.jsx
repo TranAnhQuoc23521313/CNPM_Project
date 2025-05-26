@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
+import { loginApi } from '../../services/authApiService';
 
 const moviePosters = [
   'https://image.tmdb.org/t/p/w342/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg',
@@ -41,43 +42,51 @@ const LoginPage = ({ onLoginSuccess }) => {
   const handleLogin = async (event) => {
     event.preventDefault();
     setError('');
+    //setIsLoading(true); // Bắt đầu loading
 
     const enteredUsername = usernameInput.trim();
     const enteredPassword = password;
 
     if (!enteredUsername || !enteredPassword) {
       setError("Vui lòng nhập username và password.");
+      //setIsLoading(false);
       return;
     }
 
     console.log('Attempting login with:', { username: enteredUsername, password: enteredPassword });
 
-    // Tìm người dùng trong danh sách mockUsers
-    const foundUser = mockUsers.find(
-      user => user.username === enteredUsername && user.password === enteredPassword
-    );
+    try {
+      const responseData = await loginApi({ username: enteredUsername, password: enteredPassword });
+      // responseData.user chứa { username, role, manv }
+      // responseData.token chứa TOKEN_MOCK từ CSDL
 
-    if (foundUser) {
-      console.log(`Mock login successful for user: ${foundUser.username}, role: ${foundUser.role}`);
-      setLoginAttempts(0);
+      console.log(`Login successful for user: ${responseData.user.username}, role: ${responseData.user.role}`);
+      setLoginAttempts(0); // Reset số lần thử sai
       if (typeof onLoginSuccess === 'function') {
-        // Truyền thông tin người dùng (bao gồm token và role) lên AppRoutes
-        onLoginSuccess({ token: foundUser.token, role: foundUser.role });
+        onLoginSuccess({ token: responseData.token, role: responseData.user.role, username: responseData.user.username, manv: responseData.user.manv });
       } else {
         console.error("onLoginSuccess prop is not a function or not provided to LoginPage.");
       }
-      // Không navigate ở đây, AppRoutes sẽ xử lý dựa trên state mới
-    } else {
+      // Điều hướng sẽ do AppRoutes xử lý dựa trên currentUser state mới
+    } catch (apiError) {
+      console.error("Login API call failed:", apiError);
       const newAttemptCount = loginAttempts + 1;
       setLoginAttempts(newAttemptCount);
 
-      if (newAttemptCount >= LOGIN_ATTEMPTS_LIMIT) {
-        setError('');
-        console.log(`Login attempts exceeded for ${enteredUsername}. Simulating OTP request and navigating to OTP page.`);
-        navigate('/xac-minh-otp', { state: { username: enteredUsername } }); // Sử dụng OTP_PATH từ AppRoutes
+      if (apiError.message && apiError.message.toLowerCase().includes("invalid username or password")) {
+        if (newAttemptCount >= LOGIN_ATTEMPTS_LIMIT) {
+          setError(''); // Xóa lỗi trước khi chuyển trang
+          console.log(`Login attempts exceeded for ${enteredUsername}. Simulating OTP request and navigating to OTP page.`);
+          navigate('/xac-minh-otp', { state: { username: enteredUsername } });
+        } else {
+          setError(`Tên đăng nhập hoặc mật khẩu không đúng. Bạn còn ${LOGIN_ATTEMPTS_LIMIT - newAttemptCount} lần thử.`);
+        }
       } else {
-        setError(`Tên đăng nhập hoặc mật khẩu không đúng. Bạn còn ${LOGIN_ATTEMPTS_LIMIT - newAttemptCount} lần thử.`);
+        // Lỗi khác từ server hoặc lỗi mạng
+        setError(apiError.message || "Đã có lỗi xảy ra. Vui lòng thử lại.");
       }
+    } finally {
+      //setIsLoading(false); // Kết thúc loading
     }
   };
 

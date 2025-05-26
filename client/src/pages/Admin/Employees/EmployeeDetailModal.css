@@ -137,3 +137,88 @@
   display: inline-block;
 }
 
+.detail-item {
+  flex: 1 1 50%; /* Mặc định mỗi item chiếm 50% trên một hàng */
+  padding-right: 15px; /* Khoảng cách giữa các item trên cùng hàng */
+  margin-bottom: 10px; /* Khoảng cách nếu các item xuống hàng */
+  box-sizing: border-box;
+}
+
+.detail-item.full-width {
+  flex-basis: 100%; /* Chiếm toàn bộ chiều rộng */
+  padding-right: 0;
+}
+
+.detail-item strong {
+  color: #333;
+  margin-right: 8px;
+}
+
+/* CSS cho phần hiển thị mật khẩu */
+.password-display-item {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Khoảng cách giữa text và nút */
+}
+
+.password-text {
+  font-family: monospace; /* Giúp các dấu chấm đều nhau hơn */
+  letter-spacing: 1.5px; /* Tăng khoảng cách giữa các ký tự */
+  color: #555;
+}
+
+.btn-toggle-password-visibility {
+  padding: 5px 10px;
+  font-size: 0.9em;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  color: #333;
+  margin-left: auto; /* Đẩy nút về bên phải nếu có không gian */
+}
+.btn-toggle-password-visibility:hover {
+  background-color: #e2e6ea;
+}
+
+/* CSS cho token (nếu muốn nó có thể ngắt dòng) */
+.token-display span {
+  word-break: break-all; /* Cho phép ngắt dòng token dài */
+  font-family: monospace;
+  background-color: #f0f0f0;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+
+/* Actions ở cuối modal */
+.employee-modal-actions {
+  margin-top: 25px;
+  text-align: right; /* Căn các nút về bên phải */
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.btn-toggle-password-visibility.svg-eye-button {
+  background: none;
+  border: none;
+  padding: 0; /* SVG đã có kích thước */
+  cursor: pointer;
+  color: #555; /* Màu fill mặc định cho SVG */
+  display: inline-flex; /* Giúp căn chỉnh SVG tốt hơn */
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+  vertical-align: middle; /* Căn chỉnh với text */
+}
+
+.btn-toggle-password-visibility.svg-eye-button:hover svg {
+  fill: #007bff; /* Thay đổi màu fill của SVG khi hover */
+}
+
+.btn-toggle-password-visibility.svg-eye-button svg {
+  width: 18px; /* Điều chỉnh kích thước SVG nếu cần */
+  height: 18px;
+  /* fill: currentColor; // Cho phép SVG thừa hưởng màu từ parent nếu không set trực tiếp */
+}
