@@ -1,0 +1,173 @@
+/* src/pages/Staff/Tickets/CreateTicket/AddConcessionsPage.css */
+
+.add-concessions-page-list-view {
+  background-color: #f7f7f8; /* Màu nền trang nhạt */
+  display: flex;
+  flex-direction: column;
+  /* height: 100%; */ /* Bỏ height: 100% để co giãn theo nội dung */
+  min-height: calc(100vh - var(--staff-header-height, 60px)); /* Chiều cao tối thiểu trừ đi chiều cao header của StaffLayout */
+  box-sizing: border-box;
+}
+
+.page-step-title-main {
+  font-size: 1.5rem; /* Giảm nhẹ kích thước tiêu đề */
+  font-weight: 600;
+  color: #343a40; /* Màu tiêu đề */
+  margin: 20px 25px 15px 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e9ecef; /* Viền dưới nhạt hơn */
+}
+
+.concessions-list-rows-wrapper {
+  flex-grow: 1; /* Cho phép wrapper này chiếm không gian còn lại */
+  overflow-y: auto; /* Cho phép cuộn nếu danh sách sản phẩm dài */
+  padding: 0 25px 20px 25px; /* Padding xung quanh danh sách, chừa khoảng trống với footer */
+}
+
+.concession-category-group {
+  margin-bottom: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+}
+
+.concession-category-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #495057; /* Màu tiêu đề category */
+  padding: 12px 15px;
+  margin: 0;
+  border-bottom: 1px solid #f1f3f5;
+  background-color: #f8f9fa; /* Nền nhẹ cho tiêu đề category */
+  border-top-left-radius: 8px; /* Bo góc cho khớp với card */
+  border-top-right-radius: 8px;
+}
+
+.concession-row-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  border-bottom: 1px solid #f1f3f5;
+}
+.concession-category-group .concession-row-item:last-child {
+  border-bottom: none; /* Bỏ viền cho item cuối cùng trong nhóm */
+}
+
+.concession-row-image {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-right: 15px;
+  background-color: #e9ecef;
+  border: 1px solid #dee2e6;
+}
+
+.concession-row-details {
+  flex-grow: 1;
+  margin-right: 10px; /* Tạo khoảng cách với bộ chọn số lượng */
+}
+
+.concession-row-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #212529; /* Màu tên sản phẩm đậm hơn */
+  margin: 0 0 3px 0;
+  line-height: 1.3;
+}
+
+.concession-row-price {
+  font-size: 0.85rem;
+  color: #6c757d; /* Màu giá */
+  font-weight: 400;
+  margin: 0;
+}
+
+.concession-row-quantity-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.concession-row-quantity-selector .quantity-btn {
+  background-color: #fff;
+  border: 1px solid #ced4da; /* Viền rõ hơn một chút */
+  color: #495057;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  line-height: 0.8;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.concession-row-quantity-selector .quantity-btn:hover:not(:disabled) {
+  background-color: #f1f3f5;
+  border-color: #adb5bd;
+}
+.concession-row-quantity-selector .quantity-btn:disabled {
+  border-color: #e9ecef;
+  color: #adb5bd;
+  background-color: #f8f9fa;
+  opacity: 0.7;
+}
+
+.concession-row-quantity-selector .quantity-btn.quantity-btn-plus:not(:disabled) {
+  border-color: #007bff;
+  color: #007bff;
+  /* background-color: #e7f3ff; */ /* Có thể bỏ nền riêng cho nút + nếu muốn đơn giản */
+}
+.concession-row-quantity-selector .quantity-btn.quantity-btn-plus:hover:not(:disabled) {
+  background-color: #cfe2ff; /* Nền đậm hơn khi hover nút + */
+  border-color: #0056b3;
+  color: #0056b3;
+}
+
+.concession-quantity-value {
+  font-size: 0.95rem;
+  font-weight: 500;
+  min-width: 20px;
+  text-align: center;
+  color: #343a40;
+}
+
+/* Footer KHÔNG CÒN CỐ ĐỊNH NỮA */
+.workflow-actions-footer {
+  background-color: #ffffff;
+  padding: 15px 25px;
+  border-top: 1px solid #dee2e6;
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.04); /* Vẫn có thể giữ shadow nhẹ nếu muốn */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  margin-top: auto; /* Quan trọng: Đẩy footer xuống dưới cùng của flex container cha */
+  width: 100%; /* Đảm bảo footer chiếm toàn bộ chiều rộng của cha */
+}
+
+
+.workflow-actions-footer .footer-main-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.total-concessions-price {
+  font-size: 0.9rem;
+  color: #495057;
+  white-space: nowrap; /* Tránh xuống dòng nếu không gian hẹp */
+}
+.total-concessions-price strong {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #0d6efd; /* Đồng bộ màu với nút primary */
+}
+
+.workflow-actions-footer .footer-continue-button {
+  min-width: 160px; /* Điều chỉnh chiều rộng nút nếu cần */
+  /* Button component sẽ tự xử lý style dựa trên variant="primary" */
+}

@@ -1,0 +1,88 @@
+/* src/pages/Staff/Tickets/ManageTicketsPage.css */
+
+.tickets-management-page {
+  /* Style chung cho container trang nếu cần */
+  padding: 20px; /* Hoặc lấy từ StaffLayout.css .staff-page-content */
+}
+
+/* Style cho page-header đã có trong Common.css hoặc StaffLayout.css */
+/* Nếu bạn muốn tùy chỉnh thêm cho header của trang này: */
+/*
+.tickets-management-page .page-header {
+  margin-bottom: 25px;
+}
+*/
+
+.header-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Khoảng cách giữa ô tìm kiếm và nút */
+}
+
+/* Style cho page-header-search-input đã có trong Common.css */
+/* Nếu bạn muốn tùy chỉnh thêm: */
+
+.tickets-management-page .page-header-search-input {
+  min-width: 700px;
+}
+
+
+.table-responsive-container {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  overflow-x: auto; /* Cho phép cuộn ngang trên màn hình nhỏ */
+  padding: 15px;
+}
+
+.data-table.tickets-table {
+  width: 100%;
+  border-collapse: collapse; /* Gộp đường viền */
+}
+
+.data-table th,
+.data-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #e9ecef; /* Đường kẻ ngang giữa các hàng */
+  vertical-align: middle;
+}
+
+.data-table th {
+  background-color: #f8f9fa; /* Nền cho header của bảng */
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.9em;
+  text-transform: uppercase; /* Viết hoa chữ cái đầu (tùy chọn) */
+}
+
+.data-table tbody tr:hover {
+  background-color: #f1f3f5; /* Hiệu ứng hover trên hàng */
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px; /* Bo tròn nhiều */
+  font-size: 0.8em;
+  font-weight: 500;
+  color: #fff;
+  display: inline-block;
+}
+
+.status-green { background-color: #28a745; } /* Đã thanh toán */
+.status-orange { background-color: #fd7e14; } /* Chưa thanh toán */
+.status-red { background-color: #dc3545; } /* Đã hủy */
+/* Thêm các màu khác nếu cần */
+
+.actions-cell .btn { /* Style cho các nút trong cột hành động */
+  margin-right: 5px; /* Khoảng cách giữa các nút */
+}
+.actions-cell .btn:last-child {
+  margin-right: 0;
+}
+
+.no-data-message {
+  text-align: center;
+  padding: 20px;
+  color: #6c757d;
+}

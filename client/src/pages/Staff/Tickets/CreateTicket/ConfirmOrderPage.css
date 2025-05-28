@@ -1,0 +1,127 @@
+/* src/pages/Staff/Tickets/CreateTicket/ConfirmOrderPage.css */
+
+.confirm-order-step {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 30px 15px;
+  background-color: #f4f6f9;
+  min-height: calc(100vh - var(--header-height, 60px) - var(--footer-height, 0px));
+}
+
+.confirm-order-card {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 700px; /* Card có thể rộng hơn một chút */
+  overflow: hidden;
+}
+
+.confirm-order-card .card-header {
+  padding: 20px 25px;
+  border-bottom: 1px solid #e9ecef;
+  background-color: #f8f9fa;
+  text-align: center;
+}
+
+.confirm-order-card .page-main-title { /* Ghi đè hoặc dùng class riêng */
+  font-size: 1.6rem; /* To hơn */
+  color: #343a40;
+  margin: 0;
+  font-weight: 600;
+}
+
+.confirm-order-card .card-body {
+  padding: 25px;
+}
+
+.order-summary-section {
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px dashed #e0e0e0;
+}
+.order-summary-section:last-of-type { /* Bỏ border cho section cuối */
+  border-bottom: none;
+  margin-bottom: 20px;
+}
+
+.order-summary-section h3 {
+  font-size: 1.1rem;
+  color: #007bff; /* Màu nhấn cho tiêu đề section */
+  margin-top: 0;
+  margin-bottom: 12px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+.order-summary-section p,
+.order-summary-section li {
+  font-size: 0.95rem;
+  color: #495057;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+.order-summary-section p strong,
+.order-summary-section li strong {
+  color: #212529;
+}
+.order-summary-section ul {
+  list-style: none;
+  padding-left: 0;
+}
+.order-summary-section ul li::before {
+  content: "•";
+  color: #007bff;
+  font-weight: bold;
+  display: inline-block;
+  width: 1em;
+  margin-left: -1em;
+}
+
+
+.final-total-section {
+  margin-top: 20px;
+  margin-bottom: 25px;
+  padding: 15px;
+  background-color: #e7f3ff; /* Nền highlight cho tổng tiền */
+  border-radius: 6px;
+  text-align: center;
+}
+
+.final-total-section h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #0a58ca; /* Màu tổng tiền đậm */
+}
+.final-total-section h3 strong {
+    font-weight: 700;
+}
+
+.payment-methods-section {
+  margin-top: 20px;
+}
+.payment-methods-section h4 {
+  font-size: 1rem;
+  color: #343a40;
+  margin-bottom: 15px;
+}
+.payment-placeholder {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap; /* Cho phép xuống dòng nếu nhiều nút */
+}
+
+
+.confirm-order-card .card-footer.workflow-actions {
+  padding: 20px 25px;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.confirm-order-card .confirm-pay-btn {
+  min-width: 200px; /* Nút Hoàn tất to hơn */
+  font-size: 1rem;
+}
