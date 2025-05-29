@@ -1,0 +1,198 @@
+/* src/pages/Staff/Tickets/CreateTicket/SeatMap.css */
+
+/* Style cho trang chọn ghế chung */
+.select-seats-page-workflow {
+  padding: 25px;
+  background-color: #f8f9fa; /* Nền sáng hơn một chút cho toàn trang */
+}
+
+.page-main-title-workflow { /* Tiêu đề chính của trang */
+  font-size: 1.7rem;
+  font-weight: 600;
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.showtime-details-text { /* Thông tin suất chiếu */
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 0.95rem;
+  color: #495057;
+}
+
+/* Container chính cho sơ đồ ghế và legend */
+.seat-selection-area {
+  background-color: #ffffff; /* Nền trắng cho khu vực sơ đồ */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+  margin-bottom: 25px;
+  max-width: fit-content; /* Để co lại theo nội dung ghế */
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid #e9ecef;
+}
+
+.screen-indicator-seats { /* Thanh MÀN HÌNH */
+  width: 70%;
+  max-width: 350px;
+  margin: 0 auto 25px auto;
+  padding: 10px;
+  text-align: center;
+  background-image: linear-gradient(to bottom, #525f7f, #32325d);
+  color: white;
+  border-radius: 4px 4px 20px 20px / 4px 4px 10px 10px;
+  font-weight: 500;
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  border-bottom: 2px solid #23272b;
+}
+
+.seat-map-grid-with-labels { /* Container cho tất cả các hàng ghế */
+  display: flex;
+  flex-direction: column; /* Các hàng xếp dọc */
+  gap: 8px; /* Khoảng cách giữa các hàng */
+  align-items: center; /* Căn giữa toàn bộ khối ghế */
+}
+
+.seat-row-layout { /* Một hàng ghế (bao gồm nhãn và các ô ghế) */
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: center;
+}
+
+.seat-row-label { /* Nhãn hàng ghế (A, B, C...) */
+  width: 30px;
+  font-weight: 600;
+  text-align: center;
+  margin-right: 10px;
+  color: #5a6268;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.seats-in-row { /* Container cho các ô ghế trong một hàng */
+  display: flex;
+  gap: 6px; /* Khoảng cách giữa các ô ghế */
+}
+
+/* Style cho từng ô ghế */
+.seat-box {
+  width: 32px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1.5px solid #bcc3ca; /* Viền mặc định */
+  border-radius: 6px 6px 3px 3px; /* Bo góc giống ghế rạp */
+  cursor: pointer;
+  font-size: 0.8rem; /* Tăng nhẹ font số ghế */
+  font-weight: 500;
+  color: #495057; /* Màu số ghế mặc định */
+  background-color: #f1f3f5; /* Màu nền mặc định (có thể coi là không khả dụng nếu không có class .available) */
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  user-select: none; /* Ngăn chọn text bên trong ghế */
+}
+
+/* Trạng thái ghế CÒN TRỐNG */
+.seat-box.available {
+  background-color: #d1e7dd; /* Xanh lá nhạt */
+  border-color: #a3cfbb;
+  color: #0f5132; /* Chữ xanh lá đậm */
+}
+.seat-box.available:hover {
+  background-color: #b8dfc6; /* Đậm hơn khi hover */
+  border-color: #82c59d;
+  transform: scale(1.05); /* Hiệu ứng nổi nhẹ */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* Trạng thái ghế ĐANG CHỌN */
+.seat-box.selected {
+  background-color: #0d6efd; /* Xanh dương primary */
+  color: white;
+  border-color: #0a58ca; /* Viền xanh đậm hơn */
+  font-weight: bold;
+  transform: scale(1.05);
+  box-shadow: 0 0 8px rgba(13, 110, 253, 0.4); /* Đổ bóng khi chọn */
+}
+
+/* Trạng thái ghế ĐÃ BÁN */
+.seat-box.sold {
+  background-color: #6c757d; /* Xám đậm */
+  color: #e9ecef; /* Chữ màu sáng trên nền tối */
+  cursor: not-allowed;
+  border-color: #5a6268; /* Viền xám đậm hơn */
+  opacity: 0.9; /* Hơi mờ đi một chút */
+}
+
+/* Seat Legend - Chú thích ghế */
+.seat-legend-select {
+  display: flex;
+  flex-wrap: wrap; /* Cho phép xuống dòng nếu không đủ chỗ */
+  justify-content: center; /* Căn giữa các mục chú thích */
+  gap: 10px 20px; /* Khoảng cách dọc và ngang giữa các mục */
+  margin-top: 25px; /* Khoảng cách với sơ đồ ghế */
+  font-size: 0.8rem;
+  padding: 10px 15px; /* Padding cho khu vực legend */
+  background-color: #f8f9fa; /* Nền nhẹ cho legend */
+  border-radius: 6px;
+}
+
+.legend-item { /* Mỗi mục trong legend (VD: ô màu + chữ) */
+  display: flex;
+  align-items: center;
+  gap: 7px; /* Khoảng cách giữa ô màu và chữ */
+  color: #495057;
+}
+
+.seat-example { /* Ô màu ví dụ trong legend */
+  width: 18px;
+  height: 18px;
+  border-radius: 4px 4px 2px 2px; /* Bo góc giống ghế */
+  border: 1px solid #868e96; /* Viền cho rõ */
+}
+
+/* Áp dụng màu cho các ô ví dụ trong legend để khớp với trạng thái ghế */
+.seat-example.available {
+  background-color: #d1e7dd;
+  border-color: #a3cfbb;
+}
+.seat-example.selected {
+  background-color: #0d6efd;
+  border-color: #0a58ca;
+}
+.seat-example.sold {
+  background-color: #6c757d;
+  border-color: #5a6268;
+}
+
+
+/* CSS cho workflow-summary và workflow-actions có thể tham khảo từ CreateTicketWorkflow.css */
+/* hoặc tùy chỉnh riêng nếu muốn */
+.select-seats-page-workflow .workflow-summary.seats-summary {
+  margin-top: 25px;
+  padding: 15px 20px;
+  background-color: #e9ecef; /* Nền khác một chút cho phần tóm tắt */
+  border-radius: 6px;
+  text-align: left;
+}
+.select-seats-page-workflow .workflow-summary.seats-summary p {
+  margin: 6px 0;
+  font-size: 0.9rem;
+}
+.select-seats-page-workflow .workflow-summary.seats-summary p strong {
+  font-weight: 600;
+}
+
+.select-seats-page-workflow .workflow-actions {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #dee2e6; /* Viền nhạt hơn */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

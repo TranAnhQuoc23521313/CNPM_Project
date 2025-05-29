@@ -1,0 +1,240 @@
+/* src/pages/Staff/ManageBookings/BookingDetailModal.css */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(33, 37, 41, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
+  padding: 20px;
+}
+
+.modal-content.booking-detail-modal-content {
+  background-color: #ffffff;
+  padding: 0;
+  border-radius: 8px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  width: 100%;
+  /* --- THAY ĐỔI CHÍNH ĐỂ MODAL RỘNG HƠN --- */
+  max-width: 1000px; /* << TĂNG GIÁ TRỊ NÀY LÊN (ví dụ từ 850px) */
+  /* HOẶC CÂN NHẮC SỬ DỤNG vw KẾT HỢP VỚI max-width cố định: */
+  /* max-width: min(1100px, 90vw); */
+  /* ------------------------------------------ */
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+
+.booking-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e9ecef;
+  padding: 18px 25px;
+  flex-shrink: 0;
+}
+
+.booking-detail-header .modal-main-title {
+  margin: 0;
+  font-size: 1.6rem;
+  flex-grow: 1;
+  text-align: center;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.modal-close-icon-btn {
+  padding: 5px 10px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #6c757d;
+}
+.modal-close-icon-btn:hover {
+  color: #343a40;
+}
+
+
+.booking-detail-body {
+  display: flex;
+  gap: 25px; /* Có thể giảm gap một chút nếu cần thêm không gian ngang */
+  flex-grow: 1;
+  min-height: 0; /* Cho phép co lại theo chiều dọc nếu cần */
+  overflow: hidden; /* Ngăn cuộn ở body, để các panel con tự cuộn */
+  padding: 20px 25px;
+}
+
+.booking-info-panel {
+  flex: 1; /* Cho phép cột này co giãn, nhưng seat-map-panel sẽ ưu tiên hơn */
+  /* HOẶC đặt một width cụ thể hơn nếu muốn: */
+  /* width: 380px; */ /* Ví dụ */
+  /* max-width: 40%; */ /* Giới hạn chiều rộng tối đa */
+  font-size: 0.95rem;
+  overflow-y: auto; /* Cho phép cuộn nếu thông tin dài */
+  padding-right: 15px;
+  border-right: 1px solid #e9ecef;
+  margin-right: -15px; /* Để bù padding, giúp border đẹp hơn */
+}
+
+.booking-info-panel .info-section-title {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+  color: #34495e;
+  border-bottom: 1px solid #e0e6ed;
+  padding-bottom: 8px;
+}
+.booking-info-panel > h4:first-child {
+    margin-top: 0;
+}
+
+
+.booking-info-panel .info-item {
+  text-align: left !important;
+  margin-bottom: 10px;
+  line-height: 1.6;
+  color: #525f7f;
+}
+.booking-info-panel .info-item strong {
+  color: #32325d;
+  font-weight: 500;
+  min-width: 140px;
+  display: inline-block;
+}
+
+.booking-info-panel hr.info-divider {
+  border: none;
+  border-top: 1px dashed #ddd;
+  margin: 20px 0;
+}
+.booking-info-panel .total-amount-display {
+    font-size: 1.1rem;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e9ecef;
+    font-weight: bold;
+}
+.booking-info-panel .total-amount-display strong {
+    color: #dc3545;
+}
+
+
+/* --- STYLES CHO SEAT MAP DISPLAY --- */
+.seat-map-panel {
+  /* --- THAY ĐỔI CHÍNH ĐỂ CÓ THÊM KHÔNG GIAN CHO SƠ ĐỒ GHẾ --- */
+  flex: 1.8; /* << TĂNG TỶ LỆ FLEX LÊN (ví dụ từ 1) để nó chiếm nhiều không gian hơn */
+  /* HOẶC đặt min-width cụ thể: */
+  min-width: 450px; /* << Đặt giá trị này đủ lớn để chứa sơ đồ ghế mà không cuộn ngang */
+                   /* Ví dụ: nếu mỗi ghế rộng 28px + margin 4px = 32px, 9 ghế là ~288px */
+                   /* cộng với row label và padding, có thể cần 350px-500px tùy số ghế ngang */
+  /* ------------------------------------------------------- */
+  padding-left: 25px; /* Có thể giảm padding-left một chút nếu cần */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Căn giữa màn hình và sơ đồ */
+  overflow-y: auto; /* Cho phép cuộn dọc nếu sơ đồ ghế quá cao */
+  /* overflow-x: hidden; */ /* << CÂN NHẮC THÊM DÒNG NÀY NẾU BẠN MUỐN CHẮC CHẮN KHÔNG CÓ CUỘN NGANG */
+}
+
+.seat-map-display-container h4 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  text-align: center;
+  color: #34495e;
+}
+
+.screen-indicator {
+    width: 80%;
+    max-width: 250px;
+    margin: 0 auto 20px auto;
+    padding: 8px;
+    text-align: center;
+    background-color: #495057;
+    color: white;
+    font-weight: bold;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.seat-row-display {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    justify-content: center; /* Giữ căn giữa các hàng ghế */
+}
+
+.row-label-display {
+    width: 25px; /* Giữ nguyên hoặc điều chỉnh nếu cần */
+    font-weight: bold;
+    margin-right: 10px;
+    text-align: center;
+    color: #495057;
+}
+
+.seat-box-display {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #ccc;
+    margin: 2px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.75em;
+    border-radius: 3px;
+    cursor: default;
+    color: #333;
+}
+
+/* Trạng thái ghế của khách hàng đã đặt */
+.seat-box-display.customer-selected-seat {
+    background-color: #28a745;
+    color: white;
+    border-color: #1e7e34;
+}
+
+/* Trạng thái cho các ghế khác */
+.seat-box-display.other-seat-gray {
+    background-color: #e9ecef;
+    color: #6c757d;
+    border-color: #ced4da;
+}
+
+.seat-legend {
+    margin-top: 20px;
+    font-size: 0.85em;
+    align-self: center;
+}
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    color: #495057;
+}
+.legend-item .seat-box-display {
+    margin-right: 8px;
+    width: 20px;
+    height: 20px;
+}
+/* --- KẾT THÚC STYLES CHO SEAT MAP DISPLAY --- */
+
+
+.booking-detail-footer {
+  border-top: 1px solid #e9ecef;
+  padding: 15px 25px;
+  margin-top: auto;
+  text-align: right;
+  flex-shrink: 0;
+}
+.booking-detail-footer .btn {
+  margin-left: 10px;
+}

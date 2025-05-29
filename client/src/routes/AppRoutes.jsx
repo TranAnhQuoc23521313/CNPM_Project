@@ -25,7 +25,13 @@ import Equipments from '../pages/Admin/Equipments/Equipments.jsx';
 // import AdminDashboardPage from '../pages/Admin/Dashboard/AdminDashboardPage';
 
 // Staff Pages
-// import StaffTicketSalesPage from '../pages/Staff/Tickets/TicketSalesPage.jsx';
+import ManageBookingsPage from '../pages/Staff/Tickets/ManageBookingsPage.jsx';
+import SelectMoviePage from '../pages/Staff/Tickets/CreateTicket/SelectMoviePage.jsx';
+import SelectShowtimePage from '../pages/Staff/Tickets/CreateTicket/SelectShowtimePage.jsx';
+import SelectSeatsPage from '../pages/Staff/Tickets/CreateTicket/SelectSeatsPage.jsx';
+import AddConcessionsPage from '../pages/Staff/Tickets/CreateTicket/AddConcessionsPage.jsx'; // Tùy chọn
+import CustomerInfoPage from '../pages/Staff/Tickets/CreateTicket/CustomerInfoPage.jsx';   // Tùy chọn
+import ConfirmOrderPage from '../pages/Staff/Tickets/CreateTicket/ConfirmOrderPage.jsx';
 
 // Common Pages
 const NotFound = () => (
@@ -184,8 +190,18 @@ const AppRoutes = () => {
         >
           <Route index element={<Navigate to="tickets" replace />} />
           {/* Ví dụ: <Route path="tickets" element={<StaffTicketSalesPage />} /> */}
-          <Route path="tickets" element={<div>Trang Bán Vé Nhân Viên (Placeholder)</div>} />
+          <Route path="tickets" element={<ManageBookingsPage/>} />
           {/* Thêm các route Staff khác */}
+          {/* Các route cho quy trình tạo vé mới, lồng trong "tickets/new/" */}
+          <Route path="tickets/new"> {/* Route cha cho quy trình tạo vé mới */}
+            <Route index element={<Navigate to="select-movie" replace />} /> {/* Mặc định chuyển đến chọn phim */}
+            <Route path="select-movie" element={<SelectMoviePage />} />
+            <Route path="select-showtime" element={<SelectShowtimePage />} />
+            <Route path="select-seats" element={<SelectSeatsPage />} />
+            <Route path="add-concessions" element={<AddConcessionsPage />} />
+            <Route path="customer-info" element={<CustomerInfoPage />} />
+            <Route path="confirm-order" element={<ConfirmOrderPage />} />
+          </Route>
         </Route>
 
         {/* --- DEFAULT ROUTE & FALLBACKS --- */}

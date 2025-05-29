@@ -1,172 +1,320 @@
-/* common.css - Hoặc file CSS chung khác của bạn */
+/* src/components/common/Common.css */
 
-/* --- COMMON HEADER STYLE --- */
-.page-header { /* Class chung duy nhất cho header */
-  display: flex;
-  justify-content: space-between; 
-  align-items: center;
-  margin-bottom: 30px; 
-  padding-bottom: 20px;
-  border-bottom: 1px solid #f1f3f5; /* Viền dưới rất nhạt */
+/* --- RESET CƠ BẢN & BODY (NẾU CHƯA CÓ Ở index.css)--- */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f8f9fa; /* Màu nền chung cho ứng dụng */
+  color: #212529;
 }
 
-.page-header h1 { /* Style cho h1 bên trong .page-header */
+/* --- COMMON PAGE CONTAINER --- */
+.page-container {
+  padding: 20px 25px; /* Padding chung cho các trang */
+}
+
+/* --- COMMON PAGE HEADER STYLE --- */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px; /* Giảm margin một chút */
+  padding-bottom: 18px;
+  border-bottom: 1px solid #dee2e6; /* Viền đậm hơn một chút */
+}
+
+.page-header h1 {
   margin: 0;
-  font-size: 1.75em; 
-  color: #212529; 
+  font-size: 1.6rem; /* Kích thước tiêu đề trang */
+  color: #343a40;
   font-weight: 600;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
-/* Style chung cho Search Bar trong header */
-.page-header-search-input { /* Class chung duy nhất cho search bar */
-  flex-grow: 1; 
-  padding: 10px 20px; 
-  border: 1px solid #e9ecef; 
-  border-radius: 999px; /* Bo tròn */
-  font-size: 0.95em;
-  max-width: 600px; 
-  margin: 0 20px; /* Khoảng cách ngang */
-  background-color: #f8f9fa; /* Nền sáng */
-  color: #495057; 
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.03); 
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+.page-header-search-input {
+  flex-grow: 1;
+  padding: 9px 18px; /* Đồng bộ padding với button medium */
+  border: 1px solid #ced4da; /* Viền đậm hơn */
+  border-radius: 20px; /* Bo tròn vừa phải */
+  font-size: 0.9rem;
+  max-width: 500px;
+  margin: 0 20px;
+  background-color: #fff; /* Nền trắng */
+  color: #495057;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 .page-header-search-input::placeholder {
-    color: #adb5bd; 
-    font-style: normal;
+    color: #6c757d;
+    font-style: italic;
 }
 .page-header-search-input:focus {
     outline: none;
-    border-color: #a5b4fc; 
-    box-shadow: 0 0 0 3px rgba(165, 180, 252, 0.3), inset 0 1px 2px rgba(0,0,0,0.03); 
+    border-color: #80bdff; /* Màu xanh dương khi focus */
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25), inset 0 1px 2px rgba(0,0,0,0.04);
 }
 
-/* Style cho nút Add - Chỉ cần đảm bảo nó không bị co lại */
-.page-header .common-button { /* Target nút Button bên trong .page-header */
-  flex-shrink: 0; 
+.page-header .btn { /* Target nút Button component bên trong .page-header */
+  flex-shrink: 0;
 }
 
-/* --- Button Styles (PHẦN BỊ THIẾU TRONG FILE BẠN GỬI) --- */
+/* --- BUTTON STYLES --- */
 .btn {
-    display: inline-block; /* Quan trọng để padding hoạt động đúng */
-    padding: 0.5em 1em;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 500; /* Thêm font-weight */
-    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-    margin: 0 0.25em; 
-    line-height: 1.5;
-    text-align: center;
-    vertical-align: middle;
-    white-space: nowrap;
-    text-decoration: none; /* Bỏ gạch chân nếu là link */
-  }
-  
-  .btn:disabled {
-    cursor: not-allowed;
-    opacity: 0.65;
-  }
-  
-  /* Variants */
-  .btn-primary {
-    color: #fff;
-    background-color: #0d6efd; /* Màu xanh dương bootstrap */
-    border-color: #0d6efd;
-  }
-  .btn-primary:hover:not(:disabled) {
-    background-color: #0b5ed7;
-    border-color: #0a58ca;
-  }
-  
-  .btn-secondary {
-    color: #fff;
-    background-color: #6c757d;
-    border-color: #6c757d;
-  }
-  .btn-secondary:hover:not(:disabled) {
-    background-color: #5a6268;
-    border-color: #545b62;
-  }
-  
-  .btn-danger {
-      color: #fff;
-      background-color: #dc3545;
-      border-color: #dc3545;
-  }
-  .btn-danger:hover:not(:disabled) {
-      background-color: #c82333;
-      border-color: #bd2130;
-  }
-  
-  .btn-light {
-      color: #212529;
-      background-color: #f8f9fa;
-      border-color: #f8f9fa;
-  }
-  .btn-light:hover:not(:disabled) {
-      background-color: #e2e6ea;
-      border-color: #dae0e5;
-  }
-  /* Thêm các variants khác nếu bạn dùng */
-  
-  /* Sizes */
-  .btn-small {
-    padding: 0.25em 0.5em;
-    font-size: 0.875rem;
-    border-radius: 0.2rem;
-  }
-  
-  .btn-medium {
-    /* Default size */
-    padding: 9px 18px; /* Điều chỉnh padding cho khớp header */
-    font-size: 0.95em; /* Điều chỉnh font size */
-  }
-  
-  .btn-large {
-    padding: 0.75em 1.5em;
-    font-size: 1.25rem;
-    border-radius: 0.3rem;
-  }
-  
-  
-  /* --- Modal Styles (PHẦN BỊ THIẾU TRONG FILE BẠN GỬI) --- */
-  .modal-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); 
-    display: flex; justify-content: center; align-items: center;
-    z-index: 1000; 
-  }
-  
-  .modal-content { /* Style chung, các modal cụ thể có thể ghi đè */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem; /* Padding cơ bản */
+  font-size: 0.9rem; /* Font size cơ bản */
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+.btn:hover:not(:disabled) {
+  text-decoration: none;
+}
+.btn:focus, .btn.focus {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25); /* Bootstrap focus color */
+}
+.btn:disabled, .btn.disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Variants */
+.btn-primary {
+  color: #fff;
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+.btn-primary:hover:not(:disabled) {
+  background-color: #0b5ed7;
+  border-color: #0a58ca;
+}
+
+.btn-secondary {
+  color: #fff;
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+.btn-secondary:hover:not(:disabled) {
+  background-color: #5a6268;
+  border-color: #545b62;
+}
+
+.btn-danger {
+  color: #fff;
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+.btn-danger:hover:not(:disabled) {
+  background-color: #c82333;
+  border-color: #bd2130;
+}
+
+.btn-success {
+  color: #fff;
+  background-color: #198754;
+  border-color: #198754;
+}
+.btn-success:hover:not(:disabled) {
+  background-color: #157347;
+  border-color: #146c43;
+}
+
+.btn-warning {
+  color: #000;
+  background-color: #ffc107;
+  border-color: #ffc107;
+}
+.btn-warning:hover:not(:disabled) {
+  background-color: #ffca2c;
+  border-color: #ffc720;
+}
+
+.btn-info {
+  color: #000;
+  background-color: #0dcaf0;
+  border-color: #0dcaf0;
+}
+.btn-info:hover:not(:disabled) {
+  background-color: #31d2f2;
+  border-color: #25cff1;
+}
+
+.btn-light {
+  color: #000;
+  background-color: #f8f9fa;
+  border-color: #f8f9fa;
+}
+.btn-light:hover:not(:disabled) {
+  color: #000;
+  background-color: #f9fafb;
+  border-color: #f9fafb;
+}
+.btn-light:not(:disabled):not(.disabled):active, .btn-light:not(:disabled):not(.disabled).active,
+.show > .btn-light.dropdown-toggle {
+  color: #000;
+  background-color: #f9fafb;
+  border-color: #f9fafb;
+}
+
+
+.btn-dark {
+  color: #fff;
+  background-color: #212529;
+  border-color: #212529;
+}
+.btn-dark:hover:not(:disabled) {
+  background-color: #1c1f23;
+  border-color: #1a1e21;
+}
+
+/* Sizes */
+.btn-small {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+.btn-medium {
+  padding: 0.4rem 0.9rem; /* Điều chỉnh cho phù hợp */
+  font-size: 0.9rem;
+}
+.btn-large {
+  padding: 0.6rem 1.2rem;
+  font-size: 1.1rem;
+}
+
+
+/* --- MODAL STYLES (Cho ConfirmationDialog) --- */
+.modal-overlay.confirmation-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(33, 37, 41, 0.65); /* Nền mờ bootstrap dark */
+  display: flex; justify-content: center; align-items: center;
+  z-index: 1050;
+  padding: 15px;
+  animation: fadeInOverlay 0.3s ease-out;
+}
+
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content.confirmation-modal {
+  background-color: #fff;
+  padding: 25px 30px;
+  border-radius: 0.3rem; /* Bootstrap border-radius */
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+  animation: fadeInModalContent 0.3s ease-out;
+}
+
+@keyframes fadeInModalContent {
+  from { opacity: 0; transform: translateY(-20px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-content.confirmation-modal h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.25rem; /* Bootstrap modal-title size */
+  font-weight: 500;
+  color: #212529;
+}
+
+.modal-content.confirmation-modal p {
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  color: #495057;
+  line-height: 1.5;
+}
+
+.confirmation-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem; /* Khoảng cách Bootstrap */
+}
+/* Các nút trong modal sẽ sử dụng style từ .btn và các variant của nó */
+
+
+/* --- TABLE COMMON STYLES (Cho ManageBookingsPage) --- */
+.bookings-table-container { /* Hoặc một class chung hơn như .table-responsive-container */
     background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    min-width: 300px;
-    max-width: 80%;
-    max-height: 90vh; 
-    display: flex; flex-direction: column;
-    position: relative; 
-  }
-  
-  /* Các style modal header, body, footer chung có thể đặt ở đây */
-  /* Ví dụ: */
-  .modal-header {
-    display: flex; justify-content: space-between; align-items: center;
-    border-bottom: 1px solid #dee2e6; padding-bottom: 10px; margin-bottom: 15px;
-  }
-  .modal-title { margin: 0; font-size: 1.5rem; }
-  .modal-close-btn { /* ... */ }
-  .modal-body { flex-grow: 1; overflow-y: auto; margin-bottom: 15px; }
-  .modal-footer { /* ... */ }
-  
-  /* Các style cụ thể cho từng loại modal sẽ nằm trong file CSS riêng của modal đó */
-  /* Ví dụ: AddShowtimeModal.css, ShowtimeDetailModal.css */
-  
-  /* --- Pagination Styles (Nếu có) --- */
-  /* ... */
+    padding: 1.25rem; /* 20px */
+    border-radius: 0.3rem; /* 8px */
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075); /* Bootstrap shadow-sm */
+    overflow-x: auto; /* Cho phép cuộn ngang nếu bảng quá rộng */
+}
+.bookings-table { /* Hoặc .data-table */
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem; /* Khoảng cách dưới bảng */
+}
+.bookings-table th, .bookings-table td {
+    padding: 0.75rem; /* 12px */
+    text-align: left;
+    vertical-align: middle; /* Căn giữa theo chiều dọc */
+    border-bottom: 1px solid #dee2e6; /* Bootstrap table border color */
+}
+.bookings-table th {
+    background-color: #f8f9fa; /* Bootstrap table-light a bit lighter */
+    font-weight: 600;
+    color: #495057;
+    white-space: nowrap; /* Ngăn tiêu đề xuống dòng */
+}
+.bookings-table tbody tr:hover {
+    background-color: #f1f3f5; /* Màu hover nhạt */
+}
+.bookings-table .actions-cell .btn {
+    margin-right: 0.5rem; /* 8px */
+}
+.bookings-table .actions-cell .btn:last-child {
+    margin-right: 0;
+}
+.bookings-table .no-results {
+    text-align: center;
+    padding: 1.25rem;
+    color: #6c757d;
+    font-style: italic;
+}
+.status-badge {
+    padding: 0.25em 0.6em; /* Bootstrap badge padding */
+    border-radius: 10rem; /* Bo tròn hoàn toàn */
+    font-size: 0.75em;
+    font-weight: 700;
+    color: #fff;
+    display: inline-block; /* Để padding hoạt động đúng */
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+}
+.status-đã-thanh-toán { background-color: #198754; /* Bootstrap success */ }
+.status-chưa-thanh-toán { background-color: #ffc107; color: #000; /* Bootstrap warning */ }
+.status-đã-hủy { background-color: #dc3545; /* Bootstrap danger */ }
+
+.loading-message, .error-message-text {
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 1.1rem;
+}
+.error-message-text {
+    color: #dc3545; /* Màu đỏ cho lỗi */
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 0.25rem;
+}

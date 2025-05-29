@@ -1,0 +1,154 @@
+/* src/pages/Staff/Tickets/CreateTicket/CreateTicketWorkflow.css */
+
+.create-ticket-step {
+  padding: 25px; /* Tăng padding cho section */
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Tăng shadow một chút */
+  margin-bottom: 25px;
+}
+
+.create-ticket-step h2 {
+  margin-top: 0;
+  margin-bottom: 25px; /* Tăng margin dưới */
+  font-size: 1.6rem;  /* Tăng font size tiêu đề bước */
+  color: #2c3e50; /* Màu chữ đậm hơn */
+  padding-bottom: 15px; /* Tăng padding dưới */
+  border-bottom: 1px solid #e0e0e0; /* Viền dưới rõ hơn */
+}
+
+/* --- Movie Selection Specific Styles --- */
+.movie-list-workflow {
+  display: grid;
+  /* Cho phép các cột có chiều rộng tối thiểu 150px và tối đa là 1fr (chia đều không gian còn lại) */
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 25px; /* Khoảng cách lớn hơn giữa các card */
+}
+
+.movie-card-workflow {
+  display: flex; /* Sử dụng flex để các item bên trong (img, p) xếp dọc */
+  flex-direction: column;
+  align-items: center; /* Căn giữa các item theo chiều ngang */
+  border: 1px solid #e0e0e0; /* Viền nhạt hơn */
+  border-radius: 8px; /* Bo góc lớn hơn */
+  padding: 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  background-color: #fff; /* Nền trắng cho card */
+  overflow: hidden; /* Để đảm bảo bo góc áp dụng cho cả ảnh */
+}
+
+.movie-card-workflow:hover {
+  transform: translateY(-5px) scale(1.02); /* Hiệu ứng nổi bật hơn khi hover */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  border-color: #007bff;
+}
+
+.movie-card-workflow.selected {
+  border-color: #0056b3; /* Viền đậm hơn khi được chọn */
+  background-color: #e7f3ff; /* Nền xanh nhạt khi được chọn */
+  box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.3); /* Viền ngoài khi được chọn */
+  transform: scale(1.02);
+}
+
+.movie-card-workflow img {
+  width: 100%; /* Chiếm toàn bộ chiều rộng của card */
+  height: 200px; /* Chiều cao cố định cho poster (điều chỉnh nếu cần) */
+  object-fit: cover; /* Đảm bảo ảnh che phủ khu vực, có thể cắt bớt */
+  border-radius: 6px; /* Bo góc cho ảnh */
+  margin-bottom: 12px; /* Khoảng cách dưới ảnh */
+  background-color: #f0f0f0; /* Màu nền cho placeholder nếu ảnh không tải được */
+}
+/* Nếu ảnh là placeholder hoặc không tải được, có thể thêm style cho alt text */
+.movie-card-workflow img:not([src]),
+.movie-card-workflow img[src=""] {
+    /* Ví dụ: Hiển thị text thay thế */
+    content: 'No Poster';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 0.9em;
+}
+
+
+.movie-card-workflow p { /* Tên phim */
+  font-size: 0.95rem; /* Tăng kích thước chữ một chút */
+  font-weight: 600; /* Đậm hơn */
+  margin: 0;
+  color: #343a40;
+  /* Giúp text không bị tràn nếu quá dài (tùy chọn) */
+  line-height: 1.3;
+  /* Có thể thêm giới hạn số dòng text nếu cần */
+  /* display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 2.6em; Đảm bảo chiều cao tối thiểu cho 2 dòng */
+}
+
+
+/* --- Showtime Selection Styles (Ví dụ, nếu bạn muốn style cho trang sau) --- */
+.showtime-list-workflow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px; /* Khoảng cách giữa các nút suất chiếu */
+}
+
+/* Sử dụng class của Button component nếu có, hoặc style thẻ button trực tiếp */
+.showtime-button-workflow.btn { /* Nếu bạn dùng Button component và nó có class .btn */
+  margin-bottom: 8px; /* Hoặc padding bên trong Button component */
+  /* Các style khác cho nút suất chiếu */
+}
+
+
+/* --- Workflow Actions (Nút Tiếp tục/Quay lại) --- */
+.workflow-actions {
+  margin-top: 35px; /* Tăng khoảng cách */
+  padding-top: 25px; /* Tăng padding */
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between; /* Hoặc flex-end nếu chỉ có 1 nút */
+  gap: 15px;
+}
+
+.workflow-actions .btn { /* Style chung cho các nút trong workflow nếu cần */
+    min-width: 140px; /* Tăng chiều rộng tối thiểu cho nút */
+    padding: 10px 20px !important; /* Tăng padding (quan trọng để ghi đè nếu Button component có padding riêng) */
+    font-size: 1rem !important;    /* Tăng font size */
+}
+
+.workflow-summary {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #eef2f7;
+    border-radius: 6px;
+}
+.workflow-summary p {
+    margin: 5px 0;
+}
+
+/* Confirm Order Page specific */
+.confirm-order-step .order-details {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+}
+.confirm-order-step .order-details p {
+    font-size: 1.05rem;
+    margin: 8px 0;
+}
+.confirm-order-step .order-details h3 {
+    margin-top: 15px;
+    color: #28a745; /* Màu xanh cho tổng tiền */
+}
+.confirm-order-step .payment-methods {
+    margin-top: 20px;
+}
+.confirm-order-step .payment-methods h4 {
+    margin-bottom: 15px;
+}
