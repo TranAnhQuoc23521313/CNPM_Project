@@ -76,10 +76,18 @@ const AppRoutes = () => {
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
 
   const handleLoginSuccess = (userData) => {
-    console.log("Login successful, updating currentUser state:", userData);
-    setCurrentUser(userData);
+    // userData từ API giờ có thể là: { token, role, username, manv }
+    console.log("Login successful in AppRoutes, updating currentUser state:", userData);
+    setCurrentUser({
+        token: userData.token,
+        role: userData.role,
+        username: userData.username, // Tùy chọn lưu thêm
+        manv: userData.manv         // Tùy chọn lưu thêm
+    });
     localStorage.setItem('authToken', userData.token);
     localStorage.setItem('userRole', userData.role);
+    if (userData.username) localStorage.setItem('username', userData.username); // Tùy chọn
+    if (userData.manv) localStorage.setItem('manv', userData.manv);         // Tùy chọn
   };
 
   // Hàm này sẽ được gọi khi người dùng nhấn nút "Đăng xuất" trên Header

@@ -11,6 +11,9 @@ const movieRoutes = require('./routes/movieRoutes');
 const showtimeRoutes = require('./routes/showtimeRoutes'); // IMPORT ROUTE MỚI
 const screenRoutes = require('./routes/screenRoutes');// IMPORT ROUTE MỚI
 const productRoutes = require('./routes/productRoutes');
+const employeeRoutes = require('./routes/employeeRoutes');
+const accountRoutes = require('./routes/accountRoutes');
+const authRoutes = require('./routes/authRoutes');
 // Ví dụ:
 // const showtimeRoutes = require('./routes/showtimeRoutes');
 // const userRoutes = require('./routes/userRoutes');
@@ -56,6 +59,9 @@ app.use('/api/movies', movieRoutes);
 app.use('/api/showtimes', showtimeRoutes); 
 app.use('/api/screens', screenRoutes); // Gắn screenRoutes vào đường dẫn /api/screens
 app.use('/api/products', productRoutes);
+app.use('/api/employees',employeeRoutes);
+app.use('/api/accounts', accountRoutes);
+app.use('/api/auth', authRoutes);
 // Ví dụ gắn các routes khác:
 // app.use('/api/showtimes', showtimeRoutes);
 // app.use('/api/auth', userRoutes); // Cho đăng nhập, đăng ký
