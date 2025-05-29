@@ -5,7 +5,7 @@ class MovieRepository {
     async findAll() {
         try {
             const [rows] = await pool.query('SELECT * FROM PHIM'); // Có thể thêm ORDER BY
-            console.log('MovieRepository.findAll: rows:', rows);
+            //console.log('MovieRepository.findAll: rows:', rows);
             return rows;
         } catch (error) {
             console.error('Error in MovieRepository.findAll:', error);

@@ -7,3 +7,111 @@
     max-width: 750px; /* Có thể rộng hơn một chút */
 }
 /* Các style cho .detail-grid, .detail-item đã có ở CustomerInvoiceDetailModal.css có thể dùng lại */
+
+.detail-item.image-detail-item {
+  /* Style cho khu vực chứa ảnh hóa đơn nếu cần */
+  grid-column: span 2; /* Làm cho nó chiếm 2 cột nếu detail-grid là grid 2 cột */
+  display: flex;
+  flex-direction: column; /* Để tiêu đề và ảnh/caption nằm dọc */
+  align-items: flex-start; /* Căn trái tiêu đề */
+}
+
+.detail-item.image-detail-item strong {
+  margin-bottom: 8px; /* Khoảng cách giữa tiêu đề và ảnh */
+}
+
+.transaction-image-container {
+  width: 100%; /* Hoặc một chiều rộng cố định/max-width */
+  max-width: 300px; /* Giới hạn chiều rộng tối đa của ảnh */
+  margin-top: 5px;
+  border: 1px solid #ddd;
+  padding: 5px;
+  box-sizing: border-box;
+  background-color: #f9f9f9;
+  text-align: center; /* Căn giữa ảnh nếu nó nhỏ hơn container */
+}
+
+.transaction-invoice-image {
+  max-width: 100%; /* Ảnh sẽ co dãn để vừa với container */
+  height: auto;   /* Giữ tỷ lệ khung hình */
+  display: block; /* Loại bỏ khoảng trống thừa bên dưới ảnh inline */
+  margin: 0 auto 5px auto; /* Căn giữa ảnh và thêm khoảng cách dưới */
+  border-radius: 4px;
+}
+
+.image-filename-caption {
+  font-size: 0.85em;
+  color: #555;
+  text-align: center; /* Căn giữa caption */
+  margin-top: 5px;
+}
+
+.image-load-error {
+    color: #dc3545; /* Màu đỏ cho thông báo lỗi */
+    font-style: italic;
+}
+
+/* ----- */
+
+.clickable-image {
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+.clickable-image:hover {
+  transform: scale(1.05); /* Hiệu ứng hover nhẹ nhàng */
+}
+
+/* Overlay cho ảnh phóng to */
+.enlarged-image-overlay {
+  position: fixed; /* Che phủ toàn bộ màn hình */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85); /* Nền đen mờ */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1001; /* Cao hơn modal chi tiết (giả sử modal chi tiết có z-index 1000) */
+  padding: 20px; /* Khoảng đệm để ảnh không chạm sát viền */
+  box-sizing: border-box;
+}
+
+/* Nút đóng cho ảnh phóng to */
+.enlarged-image-close-button {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 35px; /* Kích thước lớn cho nút 'X' */
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 1002; /* Nằm trên ảnh */
+  padding: 0;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.enlarged-image-close-button:hover {
+  color: #ccc;
+}
+
+/* Container cho nội dung ảnh (để xử lý click không đóng modal) */
+.enlarged-image-content {
+  max-width: 90vw;   /* Giới hạn chiều rộng ảnh, ví dụ 90% chiều rộng viewport */
+  max-height: 90vh;  /* Giới hạn chiều cao ảnh, ví dụ 90% chiều cao viewport */
+  display: flex;     /* Giúp căn giữa ảnh nếu nó nhỏ hơn max-width/max-height */
+  justify-content: center;
+  align-items: center;
+}
+
+/* Ảnh được phóng to */
+.enlarged-image {
+  max-width: 100%;   /* Ảnh sẽ co dãn để vừa với .enlarged-image-content */
+  max-height: 100%;  /* Ảnh sẽ co dãn để vừa với .enlarged-image-content */
+  object-fit: contain; /* Đảm bảo toàn bộ ảnh hiển thị, không bị cắt xén */
+  border-radius: 4px; /* Bo góc nhẹ nhàng (tùy chọn) */
+  box-shadow: 0 0 25px rgba(0,0,0,0.5); /* Đổ bóng (tùy chọn) */
+}
