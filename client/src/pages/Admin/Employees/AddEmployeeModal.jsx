@@ -84,13 +84,13 @@ function AddEmployeeModal({ isOpen, onClose, employees, onAddEmployee }) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (e) => {
+  /* const handleChange = (e) => {
     const { name, value } = e.target;
     //set(prev => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: null }));
     }
-  };
+  }; */
 
   const handleSubmit = (e) => {
     e.preventDefault();

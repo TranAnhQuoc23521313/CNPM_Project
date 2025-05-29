@@ -232,3 +232,83 @@
 .btn-modal-close:hover {
     background-color: #e9ecef;
 }
+
+/* TEST PHẦN POSTER HÓA ĐƠN */
+.form-group.custom-file-upload-group {
+  /* Nếu cần style đặc biệt cho form group này */
+}
+
+.custom-file-input-area {
+  width: 100%; /* Hoặc một kích thước cố định */
+  height: 150px; /* Hoặc một kích thước cố định */
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+  position: relative; /* Để định vị nút xóa ảnh */
+  overflow: hidden; /* Để ảnh preview không tràn ra ngoài nếu kích thước lớn */
+  background-color: #f8f9fa;
+}
+
+.custom-file-input-area:hover,
+.custom-file-input-area:focus { /* Thêm :focus cho accessibility */
+  border-color: #007bff;
+}
+
+.invoice-preview-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Hoặc 'cover' tùy bạn muốn ảnh hiển thị thế nào */
+}
+
+.invoice-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #6c757d;
+  text-align: center;
+}
+
+.invoice-placeholder .icon-lg { /* Ví dụ nếu bạn dùng icon */
+  width: 48px;
+  height: 48px;
+  margin-bottom: 8px;
+  color: #adb5bd;
+}
+
+.invoice-placeholder span {
+  font-size: 0.95em;
+}
+
+.btn-remove-image-overlay {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%; /* Làm tròn nút */
+  width: 28px; /* Kích thước nút */
+  height: 28px;
+  font-size: 0.8em; /* Kích thước chữ/icon trong nút */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  padding: 0;
+  line-height: 1; /* Đảm bảo chữ/icon căn giữa */
+}
+
+.btn-remove-image-overlay:hover {
+  background-color: rgba(220, 53, 69, 0.8); /* Màu đỏ khi hover */
+}
+
+.btn-remove-image-overlay .icon-sm { /* Ví dụ nếu bạn dùng icon cho nút xóa */
+  width: 16px;
+  height: 16px;
+}
