@@ -1,0 +1,274 @@
+/* src/pages/Staff/Facilities/StaffFacilitiesManagement.css */
+
+/* --- CHUNG CHO TOÀN TRANG --- */
+.staff-facilities-management-page .page-header {
+  margin-bottom: 20px; /* Giảm khoảng cách dưới page-header một chút */
+  padding-bottom: 15px; /* Giảm padding dưới của page-header */
+}
+
+.staff-facilities-management-page .page-header h1 {
+  font-size: 1.6rem; /* Kích thước tiêu đề chính của trang */
+}
+
+.tab-navigation {
+  display: flex;
+  gap: 8px; /* Khoảng cách nhỏ hơn giữa các nút tab */
+  margin-top: 15px;
+}
+
+/* Nút tab sẽ được style bởi Button component thông qua props 'variant' */
+/* Ví dụ: variant={activeTab === 'list' ? "primary" : "light"} */
+/* Đảm bảo Button component của bạn có style cho variant "light" hoặc "secondary" cho tab không active */
+.tab-navigation .btn {
+  font-weight: 500; /* Hơi đậm hơn cho text của tab */
+}
+
+
+.tab-content {
+  margin-top: 25px; /* Khoảng cách từ tab navigation đến content */
+  background-color: #ffffff;
+  padding: 25px 30px;
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06); /* Shadow nhẹ nhàng hơn */
+}
+
+/* --- STYLE CHUNG CHO CÁC FORM (ReportIssueForm, RepairLogForm) --- */
+.device-form {
+  max-width: 680px; /* Tăng nhẹ chiều rộng form */
+  margin: 15px auto 30px auto; /* Khoảng cách trên dưới */
+  padding: 15px; /* Giảm padding nếu tab-content đã có padding */
+}
+
+.device-form h3 {
+  font-size: 1.5rem; /* Kích thước tiêu đề form */
+  color: #34495e; /* Màu tiêu đề đậm hơn */
+  margin-top: 0;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #ecf0f1; /* Viền nhạt hơn */
+  text-align: center;
+  font-weight: 500;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 500;
+  color: #525f7f; /* Màu label */
+  margin-bottom: 7px;
+  font-size: 0.875rem; /* Kích thước label nhỏ hơn một chút */
+}
+
+/* Style chung cho các input, select, textarea trong form */
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="date"],
+.form-group select,
+.form-group textarea,
+.autocomplete-wrapper input[type="text"] { /* Áp dụng cho cả Autocomplete input */
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #dee2e6; /* Viền nhạt hơn */
+  border-radius: 6px; /* Bo tròn nhiều hơn */
+  font-size: 0.9rem;
+  color: #495057;
+  background-color: #fff; /* Nền trắng cho input */
+  box-sizing: border-box;
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.form-group input[type="file"] {
+  padding: 8px 0;
+  font-size: 0.9rem;
+  border: none;
+  background-color: transparent;
+  display: block; /* Để chiếm toàn bộ dòng */
+  margin-top: 5px;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus,
+.autocomplete-wrapper input[type="text"]:focus {
+  outline: none;
+  border-color: #5e72e4; /* Màu focus (ví dụ: indigo-ish) */
+  box-shadow: 0 0 0 0.2rem rgba(94, 114, 228, 0.2);
+}
+
+.form-group input[disabled],
+.form-group input[readOnly],
+.form-group select[disabled],
+.form-group textarea[disabled] {
+  background-color: #e9ecef !important;
+  opacity: 0.8 !important; /* Hơi rõ hơn chút */
+  cursor: not-allowed !important;
+  color: #6c757d !important;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Hiển thị tên file và danh sách preview ảnh */
+.file-name-display,
+.image-preview-list {
+  margin-top: 10px;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+.image-preview-list {
+  padding: 12px;
+  border: 1px dashed #d1d9e6;
+  border-radius: 6px;
+  background-color: #f8f9fc;
+}
+.image-preview-list .image-count-text {
+  font-size: 0.8rem;
+  color: #8898aa;
+  margin-bottom: 8px;
+  display: block;
+}
+.image-preview-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  font-size: 0.875rem;
+  border-bottom: 1px solid #e9ecef;
+}
+.image-preview-item:last-child {
+  border-bottom: none;
+}
+.image-preview-item span {
+  word-break: break-all;
+  margin-right: 10px;
+  color: #525f7f;
+}
+/* Nút xóa ảnh trong preview sẽ được style bởi Button component */
+
+.form-actions {
+  margin-top: 30px;
+  text-align: right; /* Đẩy nút về bên phải */
+  padding-top: 15px;
+  border-top: 1px solid #ecf0f1; /* Thêm đường kẻ phân cách nhẹ */
+}
+.form-actions .btn + .btn {
+  margin-left: 10px;
+}
+
+.loading-text { /* Text khi đang tải autocomplete */
+  font-size: 0.85rem;
+  color: #6c757d;
+  padding: 5px 0;
+  font-style: italic;
+}
+
+/* --- STYLE CHO TAB DANH SÁCH THIẾT BỊ --- */
+.device-list-tab-content {
+  /* Nội dung tab có thể không cần style riêng nếu .tab-content đã đủ */
+}
+
+.device-list-tab-content h3 {
+  font-size: 1.4rem; /* Kích thước tiêu đề cho tab */
+  color: #343a40;
+  margin-top: 0;
+  margin-bottom: 20px;
+  text-align: left; /* Căn trái tiêu đề tab */
+  font-weight: 600;
+}
+
+.device-list-search-bar {
+  margin-bottom: 20px;
+  display: flex;
+}
+
+.device-list-search-bar input {
+  width: 100%;
+  max-width: 450px; /* Giới hạn chiều rộng ô tìm kiếm */
+  padding: 9px 14px; /* Đồng bộ padding với các input khác */
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+}
+.device-list-search-bar input:focus {
+  outline: none;
+  border-color: #5e72e4;
+  box-shadow: 0 0 0 0.2rem rgba(94, 114, 228, 0.2);
+}
+
+.table-responsive-wrapper { /* Bọc bảng để cuộn ngang */
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 5px; /* Giảm margin top */
+}
+
+.device-list-table {
+  width: 100%;
+  min-width: 650px; /* Đảm bảo bảng có chiều rộng tối thiểu nhất định */
+  border-collapse: collapse;
+  font-size: 0.875rem; /* Kích thước font cho bảng */
+  /* box-shadow: 0 1px 3px rgba(0,0,0,0.05); */ /* Bỏ shadow nếu .tab-content đã có */
+}
+
+.device-list-table th,
+.device-list-table td {
+  border: 1px solid #e9ecef; /* Viền nhạt hơn */
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap; /* Ngăn text xuống dòng trừ khi cần */
+}
+.device-list-table td:nth-child(2) { /* Cột Tên Thiết Bị */
+  white-space: normal; /* Cho phép tên dài xuống dòng */
+  min-width: 220px; /* Chiều rộng tối thiểu cho cột tên */
+  font-weight: 500;
+  color: #343a40;
+}
+.device-list-table td:nth-child(1) { /* Cột Mã Thiết Bị */
+    font-family: 'Courier New', Courier, monospace; /* Font cho mã */
+    color: #525f7f;
+}
+
+
+.device-list-table th {
+  background-color: #f8f9fc; /* Màu nền header bảng */
+  font-weight: 600;
+  color: #525f7f; /* Màu chữ header bảng */
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.device-list-table tbody tr:nth-child(even) {
+  background-color: #fdfdfe; /* Màu xen kẽ rất nhạt */
+}
+.device-list-table tbody tr:hover {
+  background-color: #eef2f7;
+}
+
+/* Style cho các trạng thái trong bảng */
+.status-active { color: #28a745; font-weight: 500; }
+.status-maintenance { color: #ffc107; font-weight: 500; }
+.status-repairing { color: #fd7e14; font-weight: 500; }
+.status-broken { color: #dc3545; font-weight: 500; }
+.status-unknown { color: #6c757d; font-style: italic; font-weight: 400; }
+
+.loading-text-tab,
+.error-text-tab,
+.no-items-found-tab {
+    text-align: center;
+    padding: 30px 20px;
+    color: #6c757d;
+    font-size: 1rem;
+    font-style: italic;
+}
+.error-text-tab {
+    color: #dc3545;
+    font-weight: 500;
+    font-style: normal;
+}

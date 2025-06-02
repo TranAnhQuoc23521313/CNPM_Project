@@ -32,6 +32,7 @@ import SelectSeatsPage from '../pages/Staff/Tickets/CreateTicket/SelectSeatsPage
 import AddConcessionsPage from '../pages/Staff/Tickets/CreateTicket/AddConcessionsPage.jsx'; // Tùy chọn
 import CustomerInfoPage from '../pages/Staff/Tickets/CreateTicket/CustomerInfoPage.jsx';   // Tùy chọn
 import ConfirmOrderPage from '../pages/Staff/Tickets/CreateTicket/ConfirmOrderPage.jsx';
+import StaffFacilitiesManagementPage from '../pages/Staff/Facilities/StaffFacilitiesManagement.jsx'; 
 
 // Common Pages
 const NotFound = () => (
@@ -218,6 +219,7 @@ const AppRoutes = () => {
             <Route path="customer-info" element={<CustomerInfoPage />} />
             <Route path="confirm-order" element={<ConfirmOrderPage />} />
           </Route>
+          <Route path="facilities" element={<StaffFacilitiesManagementPage />} />
         </Route>
 
         {/* --- DEFAULT ROUTE & FALLBACKS --- */}

@@ -1,0 +1,71 @@
+/* src/components/common/Autocomplete.css */
+.autocomplete-wrapper {
+  position: relative;
+  width: 100%; /* Hoặc theo form-group */
+}
+
+.autocomplete-wrapper input[type="text"] {
+  width: 100%;
+  /* Kế thừa style từ .form-group input hoặc định nghĩa riêng */
+  /* Ví dụ: */
+  padding: 10px 14px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+}
+
+.suggestions-list {
+  position: absolute;
+  top: 100%; /* Ngay dưới input */
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-top: none; /* Tránh double border với input */
+  border-radius: 0 0 5px 5px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 200px; /* Giới hạn chiều cao, thêm scrollbar nếu cần */
+  overflow-y: auto;
+  z-index: 10; /* Để nổi lên trên các element khác */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.suggestions-list li {
+  padding: 10px 15px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.9rem;
+}
+.suggestions-list li:last-child {
+  border-bottom: none;
+}
+
+.suggestions-list li:hover {
+  background-color: #f0f0f0;
+}
+
+.no-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-top: none;
+  border-radius: 0 0 5px 5px;
+  padding: 10px 15px;
+  color: #6c757d;
+  font-style: italic;
+  z-index: 10;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.autocomplete-error { /* Kế thừa từ .error-text hoặc style riêng */
+  display: block;
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: #dc3545;
+}
