@@ -1,29 +1,25 @@
 // client/src/pages/Showtimes/ShowtimesPage.jsx
-import React, { useState, useEffect, useCallback, useMemo } from 'react'; // Thêm useCallback, useMemo
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Button from '../../../components/common/Button.jsx';
 import './Showtimes.css';
 import ShowtimeListModal from './ShowtimeListModal.jsx';
 import ShowtimeDetailModal from './ShowtimeDetailModal.jsx';
 import AddShowtimeModal from './AddShowtimeModal.jsx';
+import EditShowtimeModal from './EditShowtimeModal.jsx';
 import { getAllMoviesApi } from '../../../services/movieApiService.js';
-import { createShowtimeApi, getShowtimesByMovieApi } from '../../../services/showtimeApiService.js'; // Giả sử bạn đã tạo hàm này trong showtimeApiService.js
-import { getAllScreensApi } from '../../../services/screenApiService.js'; // Giả sử bạn đã tạo hàm này trong screenApiService.js
-import ErrorMessageModal from '../../../components/common/ErrorMessageModal.jsx'; // Nếu bạn có modal này
+import { createShowtimeApi, getShowtimesByMovieApi, updateShowtimeApi } from '../../../services/showtimeApiService.js';
+import { getAllScreensApi } from '../../../services/screenApiService.js';
+import ErrorMessageModal from '../../../components/common/ErrorMessageModal.jsx';
 import SuccessMessageModal from '../../../components/common/SuccessMessageModal.jsx';
-// Bạn sẽ cần import service cho showtimes và screens
-// import { getAllShowtimesForMovieApi } from '../../services/showtimeApiService.js'; // Ví dụ
-// import { getAllScreensApi } from '../../services/screenApiService.js'; // Ví dụ
 
-// mapMovieApiToClientForShowtimePage giữ nguyên
-
+// ... (map functions giữ nguyên)
 const mapMovieApiToClientForShowtimePage = (apiMovie) => ({
     id: apiMovie.MAPHIM,
     title: apiMovie.TENPHIM,
     posterUrl: apiMovie.HINHANH ? `${process.env.REACT_APP_API_URL}${apiMovie.HINHANH}` : null,
     posterPlaceholder: `Poster ${apiMovie.TENPHIM?.split(' ')[0] || 'Movie'}`,
-    // Thêm các trường gốc nếu các modal con cần
     HINHANH: apiMovie.HINHANH,
-    TENPHIM_GOC: apiMovie.TENPHIM // Giữ lại tên gốc nếu title có thể bị thay đổi ở client
+    TENPHIM: apiMovie.TENPHIM
 });
 
 const mapScreenApiToClient = (apiScreen) => ({
@@ -32,79 +28,77 @@ const mapScreenApiToClient = (apiScreen) => ({
     totalSeats: apiScreen.SOGHE,
     status: apiScreen.TRANGTHAIPHONG,
     type: apiScreen.LOAIPHONG,
-    // Thêm các trường khác nếu có
 });
 
 const mapApiShowtimeToClient = (apiShowtime) => ({
     id: apiShowtime.MASUATCHIEU,
-    time: new Date(apiShowtime.THOIGIAN).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }), // Format giờ
-    date: new Date(apiShowtime.THOIGIAN).toLocaleDateString(), // Format ngày
-    screen: apiShowtime.PHONG_TENPHONG || 'N/A', // Lấy tên phòng từ dữ liệu JOINED
-    // Thêm các trường khác nếu cần
-    rawDateTime: apiShowtime.THOIGIAN, // Giữ lại thời gian gốc nếu cần
-    movieId: apiShowtime.PHIM_MAPHIM, // Giữ lại để truyền cho DetailModal
-    // ... (thêm các thông tin bạn muốn truyền cho onSelectShowtime)
+    time: new Date(apiShowtime.THOIGIAN).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
+    date: new Date(apiShowtime.THOIGIAN).toLocaleDateString('vi-VN'),
+    screen: apiShowtime.PHONG_TENPHONG || 'N/A',
+    screenName: apiShowtime.PHONG_TENPHONG || 'N/A',
+    rawDateTime: apiShowtime.THOIGIAN,
+    movieId: apiShowtime.PHIM_MAPHIM,
+    movieTitle: apiShowtime.PHIM_TENPHIM,
+    screenId: apiShowtime.PHONG_MAPHONG,
     price: apiShowtime.GIASUATCHIEU,
     status: apiShowtime.TRANGTHAI,
 });
 
+
 const ShowtimesPage = () => {
     const pageTitle = 'Quản lý Suất Chiếu';
 
-    const [movies, setMovies] = useState([]); // Danh sách phim từ API
-    const [screens, setScreens] = useState([]); // State cho danh sách phòng chiếu
-    //const [showtimes, setShowtimes] = useState([]); // Danh sách suất chiếu từ API
-    //const [isLoadingMovies, setIsLoadingMovies] = useState(true); // Loading riêng cho phim
-    const [isLoadingScreens, setIsLoadingScreens] = useState(true); // Loading riêng cho phòng
+    const [movies, setMovies] = useState([]);
+    const [screens, setScreens] = useState([]);
+    const [isLoadingScreens, setIsLoadingScreens] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [isLoadingShowtimes, setIsLoadingShowtimes] = useState(true); // Loading riêng cho suất chiếu
+    const [isLoadingShowtimes, setIsLoadingShowtimes] = useState(false);
 
-    // State cho các modals
     const [isMovieListModalOpen, setIsMovieListModalOpen] = useState(false);
-    const [selectedMovieForShowtimes, setSelectedMovieForShowtimes] = useState(null); // Phim được chọn để xem/quản lý suất chiếu
+    const [selectedMovieForShowtimes, setSelectedMovieForShowtimes] = useState(null);
+    const [currentMovieShowtimes, setCurrentMovieShowtimes] = useState([]);
+
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [selectedShowtimeForDetail, setSelectedShowtimeForDetail] = useState(null);
+
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [movieContextForAddShowtime, setMovieContextForAddShowtime] = useState(null);
-    const [currentMovieShowtimes, setCurrentMovieShowtimes] = useState([]); // Suất chiếu cho phim đang chọn
 
-    // State cho Modal thông báo lỗi
-    const [errorToDisplay, setErrorToDisplay] = useState(null); // null khi không có lỗi, string khi có lỗi
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [showtimeToEdit, setShowtimeToEdit] = useState(null);
 
-    // State cho Modal thông báo thành công
+    const [errorToDisplay, setErrorToDisplay] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
 
-    // Fetch danh sách phim
+    // ... (fetchMovies, fetchScreens, useEffect, moviesToDisplay, handleSearchChange giữ nguyên) ...
     const fetchMovies = useCallback(async () => {
-        console.log('ShowtimesPage: Attempting to fetch movies...');
+        console.log('ShowtimesPage: Đang tải danh sách phim...');
         setIsLoading(true);
         setError(null);
         try {
             const apiMovies = await getAllMoviesApi();
             setMovies(apiMovies.map(mapMovieApiToClientForShowtimePage));
         } catch (err) {
-            console.error("ShowtimesPage: Error fetching movies", err);
-            //setError(err.message || "An error occurred while fetching movies.");
+            console.error("ShowtimesPage: Lỗi tải phim", err);
             const displayError = err.message || "Không thể tải xuống danh sách phim."
             setErrorToDisplay(displayError);
+            setError(displayError);
         } finally {
             setIsLoading(false);
         }
     }, []);
 
     const fetchScreens = useCallback(async () => {
-        console.log('ShowtimesPage: Attempting to fetch screens...');
+        console.log('ShowtimesPage: Đang tải danh sách phòng chiếu...');
         setIsLoadingScreens(true);
-        // setError(null); // Hoặc setErrorScreens(null)
         try {
             const apiScreens = await getAllScreensApi();
-            console.log('ShowtimesPage: Screens fetched successfully:', apiScreens);
-            setScreens(apiScreens.map(mapScreenApiToClient)); // Map nếu cần
+            console.log('ShowtimesPage: Tải phòng chiếu thành công:', apiScreens);
+            setScreens(apiScreens.map(mapScreenApiToClient));
         } catch (err) {
-            console.error("ShowtimesPage: Error fetching screens", err);
-            //setError(err.message || "Could not load screening rooms."); // Hoặc setErrorScreens
+            console.error("ShowtimesPage: Lỗi tải phòng chiếu", err);
             const displayError = err.message || "Không thể tải danh sách phòng chiếu."
             setErrorToDisplay(displayError);
         } finally {
@@ -114,10 +108,9 @@ const ShowtimesPage = () => {
 
     useEffect(() => {
         fetchMovies();
-        fetchScreens(); // Gọi khi component mount
-    }, [fetchMovies, fetchScreens]); // Thêm fetchScreens vào dependencies nếu có
+        fetchScreens();
+    }, [fetchMovies, fetchScreens]);
 
-    // Lọc phim để hiển thị
     const moviesToDisplay = useMemo(() => {
         if (!searchQuery) return movies;
         return movies.filter(movie =>
@@ -125,70 +118,70 @@ const ShowtimesPage = () => {
         );
     }, [movies, searchQuery]);
 
-
     const handleSearchChange = useCallback((event) => {
         setSearchQuery(event.target.value);
     }, []);
 
-    // Mở Modal hiển thị danh sách suất chiếu của một phim
+
     const openShowtimeListModal = useCallback(async (movie) => {
         if (!movie || !movie.id) return;
-
-        console.log(`ShowtimesPage: Opening showtime list for movie: ${movie.title} (ID: ${movie.id})`);
-        setSelectedMovieForShowtimes(movie); // Lưu phim đang được chọn
-        setIsMovieListModalOpen(true);       // Mở modal
-        setIsLoadingShowtimes(true);         // Bắt đầu loading cho suất chiếu
-        setCurrentMovieShowtimes([]);        // Xóa suất chiếu cũ (nếu có)
-        setErrorToDisplay(null);             // Reset lỗi hiển thị
-
+        console.log(`ShowtimesPage: Mở danh sách suất chiếu cho phim: ${movie.title} (ID: ${movie.id})`);
+        setSelectedMovieForShowtimes(movie); // Quan trọng: set phim đang được chọn
+        setIsMovieListModalOpen(true);
+        setIsLoadingShowtimes(true);
+        setCurrentMovieShowtimes([]);
+        setErrorToDisplay(null);
         try {
             const apiShowtimes = await getShowtimesByMovieApi(movie.id);
-            console.log(`ShowtimesPage: Fetched showtimes for ${movie.title}:`, apiShowtimes);
             setCurrentMovieShowtimes(apiShowtimes.map(mapApiShowtimeToClient));
-            console.log("ShowtimesPage: Current movie showtimes:", apiShowtimes);
         } catch (err) {
-            console.error(`ShowtimesPage: Error fetching showtimes for movie ${movie.id}`, err);
-            const displayError = err.message || `Could not load showtimes for ${movie.title}.`;
-            setErrorToDisplay(displayError); // Dùng modal lỗi chung
-            setCurrentMovieShowtimes([]); // Đảm bảo là mảng rỗng khi lỗi
+            console.error(`ShowtimesPage: Lỗi tải suất chiếu cho phim ${movie.id}`, err);
+            const displayError = err.response?.data?.message || err.message || `Không thể tải suất chiếu cho phim ${movie.title}.`;
+            setErrorToDisplay(displayError);
+            setCurrentMovieShowtimes([]);
         } finally {
             setIsLoadingShowtimes(false);
         }
-    }, []); // Dependencies sẽ được thêm bởi ESLint nếu cần, hoặc để trống nếu không có
+    }, []);
 
     const closeShowtimeListModal = useCallback(() => {
         setIsMovieListModalOpen(false);
-        setSelectedMovieForShowtimes(null);
-        setCurrentMovieShowtimes([]); // Reset suất chiếu khi đóng modal
+        // Không reset selectedMovieForShowtimes ở đây nếu muốn Detail/Edit Modal có thể quay lại list
+        // Nếu không muốn quay lại, có thể reset: setSelectedMovieForShowtimes(null);
     }, []);
 
-    // Mở Modal chi tiết một suất chiếu (được gọi từ ShowtimeListModal)
-    const handleShowtimeSelectForDetail = useCallback((showtime, parentMovie) => {
-        console.log("ShowtimesPage: Opening detail for showtime:", showtime, "of movie:", parentMovie);
-        closeShowtimeListModal(); // Đóng modal danh sách trước
+    const handleShowtimeSelectForDetail = useCallback((showtime) => {
+        console.log("ShowtimesPage: Mở chi tiết suất chiếu:", showtime);
         setSelectedShowtimeForDetail(showtime);
-        // parentMovieForDetail có thể không cần nếu selectedShowtime đã có đủ thông tin phim
-        // Hoặc nếu selectedMovieForShowtimes vẫn còn giá trị và đó chính là parentMovie
+        // selectedMovieForShowtimes vẫn giữ giá trị từ openShowtimeListModal
         setIsDetailModalOpen(true);
-    }, [closeShowtimeListModal]);
+        // Giữ ShowtimeListModal mở ở nền
+    }, []);
 
     const handleCloseShowtimeDetailModal = useCallback(() => {
         setIsDetailModalOpen(false);
         setSelectedShowtimeForDetail(null);
-        // Mở lại modal danh sách suất chiếu nếu người dùng muốn quay lại
-        // if (selectedMovieForShowtimes) {
-        //   setIsMovieListModalOpen(true);
-        // }
+        // Không tự động mở lại list, để user tự quyết định
     }, []);
 
-    const handleOpenAddShowtimeForSpecificMovie = useCallback((movieFromListModal) => {
-        closeShowtimeListModal();
-        setMovieContextForAddShowtime(movieFromListModal);
-        setIsAddModalOpen(true);
-    }, [closeShowtimeListModal]);
+    // HÀM MỚI ĐỂ MỞ EDIT MODAL TỪ DETAIL MODAL
+    const openEditModalFromDetailCallback = useCallback((showtimeData) => {
+        console.log("ShowtimesPage: Yêu cầu mở Edit Modal cho suất chiếu:", showtimeData);
+        setShowtimeToEdit(showtimeData); // showtimeData đã được mapApiShowtimeToClient
+        setIsEditModalOpen(true);
+        setIsDetailModalOpen(false); // Đóng Detail Modal
+        // isMovieListModalOpen vẫn giữ trạng thái của nó
+    }, []);
 
-    // Mở Modal thêm suất chiếu chung (có thể được kích hoạt từ nút "+ Add Showtime" chính)
+
+    const handleOpenAddShowtimeForSpecificMovie = useCallback((movieFromContext) => {
+        setMovieContextForAddShowtime(movieFromContext || selectedMovieForShowtimes);
+        setIsAddModalOpen(true);
+        // Giữ ShowtimeListModal mở ở nền
+    }, [selectedMovieForShowtimes]);
+
     const handleOpenAddShowtimeOverallModal = useCallback(() => {
+        setMovieContextForAddShowtime(null);
         setIsAddModalOpen(true);
     }, []);
 
@@ -197,126 +190,158 @@ const ShowtimesPage = () => {
         setMovieContextForAddShowtime(null);
     }, []);
 
-    // Xử lý khi submit form thêm suất chiếu
     const handleAddShowtimeSubmit = useCallback(async (newShowtimeDataFromModal) => {
-        console.log('ShowtimesPage: Attempting to add new showtime from modal:', newShowtimeDataFromModal);
-        setIsLoading(true); // Có thể cần state loading riêng cho việc thêm suất chiếu
-        setError(null);
+        console.log('ShowtimesPage: Đang thêm suất chiếu mới:', newShowtimeDataFromModal);
+        setErrorToDisplay(null);
+        setSuccessMessage(null);
         try {
-            // newShowtimeDataFromModal có: movieId, movieTitle, time, date, screenId, screenName, price
-            // Hàm createShowtimeApi sẽ map nó sang định dạng server cần
-            const addedShowtime = await createShowtimeApi(newShowtimeDataFromModal);
-            //alert(`Suất chiếu cho phim "${newShowtimeDataFromModal.movieTitle}" đã được thêm thành công! (ID: ${addedShowtime.MASUATCHIEU})`);
-            closeAddShowtimeModal();
-            const displaySuccessMessage = `Suất chiếu cho phim "${newShowtimeDataFromModal.movieTitle}" đã được thêm thành công!`;
+            await createShowtimeApi(newShowtimeDataFromModal);
+            const displaySuccessMessage = `Suất chiếu cho phim "${newShowtimeDataFromModal.movieTitle}" lúc ${newShowtimeDataFromModal.time} ngày ${newShowtimeDataFromModal.date} tại phòng ${newShowtimeDataFromModal.screenName} đã được thêm thành công!`;
             setSuccessMessage(displaySuccessMessage);
-            // TODO: Cập nhật danh sách suất chiếu nếu cần (ví dụ: nếu đang xem danh sách suất chiếu của một phim cụ thể)
-            // Hoặc chỉ đơn giản là thông báo thành công.
+            closeAddShowtimeModal();
+
+            if (selectedMovieForShowtimes && selectedMovieForShowtimes.id === newShowtimeDataFromModal.movieId && isMovieListModalOpen) {
+                await openShowtimeListModal(selectedMovieForShowtimes); // Tải lại danh sách
+            }
         } catch (err) {
-            console.error("ShowtimesPage: Error adding showtime", err);
-            // setError(err.message || "Could not add showtime."); // Có thể dùng ErrorMessageModal
-            //alert(err.message || "Could not add showtime.");
-            //const displayError = err.message || "Không thể thêm xuất chiếu này.";
-            const displayError = "Không thể thêm suất chiếu này. Do đã tồn tại suất chiếu khác trong khoảng thời gian này.";
+            console.error("ShowtimesPage: Lỗi thêm suất chiếu", err);
+            const displayError = err.response?.data?.message || err.message || "Không thể thêm suất chiếu. Vui lòng kiểm tra trùng lịch hoặc thông tin phòng chiếu.";
             setErrorToDisplay(displayError);
-        } finally {
-            setIsLoading(false);
         }
-    }, [closeAddShowtimeModal]); // Thêm các dependencies khác nếu cần (ví dụ hàm fetch lại suất chiếu)
+    }, [closeAddShowtimeModal, selectedMovieForShowtimes, openShowtimeListModal, isMovieListModalOpen]);
+
+    const handleShowtimeDeleted = useCallback(async (deletedShowtimeId, movieIdOfDeletedShowtime) => {
+        setSuccessMessage(`Suất chiếu ID ${deletedShowtimeId} đã được xóa thành công.`);
+        handleCloseShowtimeDetailModal();
+
+        if (selectedMovieForShowtimes && selectedMovieForShowtimes.id === movieIdOfDeletedShowtime && isMovieListModalOpen) {
+            await openShowtimeListModal(selectedMovieForShowtimes); // Tải lại danh sách
+        }
+    }, [handleCloseShowtimeDetailModal, selectedMovieForShowtimes, openShowtimeListModal, isMovieListModalOpen]);
+
+
+    const closeEditModal = useCallback(() => {
+        setIsEditModalOpen(false);
+        setShowtimeToEdit(null);
+        // Nếu muốn quay lại list sau khi sửa và list đang mở cho phim đó:
+        if (selectedMovieForShowtimes && showtimeToEdit?.movieId === selectedMovieForShowtimes.id && isMovieListModalOpen) {
+            // Có thể không cần làm gì nếu isMovieListModalOpen vẫn true
+        } else if (selectedMovieForShowtimes && showtimeToEdit?.movieId === selectedMovieForShowtimes.id && !isMovieListModalOpen) {
+            // Nếu list đã bị đóng nhưng vẫn muốn quay lại, mở lại list
+            // setIsMovieListModalOpen(true); // Điều này có thể không cần thiết, tùy vào luồng UX
+        }
+    }, [selectedMovieForShowtimes, showtimeToEdit, isMovieListModalOpen]);
+
+    const handleUpdateShowtimeSubmit = useCallback(async (updatedData, showtimeId) => {
+        console.log('ShowtimesPage: Đang cập nhật suất chiếu ID:', showtimeId, 'với dữ liệu:', updatedData);
+        setErrorToDisplay(null);
+        setSuccessMessage(null);
+        try {
+            const result = await updateShowtimeApi(showtimeId, updatedData);
+            setSuccessMessage(result.message || `Suất chiếu ID ${showtimeId} đã được cập nhật thành công!`);
+            
+            const movieOfEditedShowtimeId = showtimeToEdit?.movieId;
+            closeEditModal(); // Đóng edit modal
+
+            // Nếu modal danh sách của phim đó đang mở, làm mới nó
+            if (selectedMovieForShowtimes && selectedMovieForShowtimes.id === movieOfEditedShowtimeId && isMovieListModalOpen) {
+                await openShowtimeListModal(selectedMovieForShowtimes);
+            }
+        } catch (err) {
+            console.error("ShowtimesPage: Lỗi cập nhật suất chiếu", err);
+            setErrorToDisplay(err.response?.data?.message || err.message || "Không thể cập nhật suất chiếu.");
+        }
+    }, [closeEditModal, showtimeToEdit, selectedMovieForShowtimes, openShowtimeListModal, isMovieListModalOpen]);
 
     const handleCloseErrorModal = useCallback(() => {
         setErrorToDisplay(null);
     }, []);
 
-    // Success Modal
     const handleCloseSuccessModal = useCallback(() => {
         setSuccessMessage(null);
     }, []);
 
-
-
-
     // --- RENDER ---
     if (isLoading && movies.length === 0 && !error) {
-        return <div className="page-container showtimes-management-page loading-container"><p>Loading movies...</p></div>;
+        return <div className="page-container showtimes-management-page loading-container"><p>Đang tải danh sách phim...</p></div>;
     }
     if (error && movies.length === 0) {
-        return <div className="page-container showtimes-management-page error-container"><h1>{pageTitle}</h1><p className="error-message">Error: {error}</p><Button onClick={fetchMovies}>Retry</Button></div>;
+        return (
+            <div className="page-container showtimes-management-page error-container">
+                <h1>{pageTitle}</h1>
+                <p className="error-message">Lỗi: {error}</p>
+                <Button onClick={fetchMovies}>Thử lại</Button>
+            </div>
+        );
     }
 
     return (
-        <div className="showtimes-management-page page-container"> {/* Thêm page-container */}
-            <div className="content-card"> {/* Card trắng bao ngoài */}
-
-                <h1 className="page-main-title">Quản Lý Suất Chiếu</h1> {/* Tiêu đề chính của trang */}
-
-                <div className="showtimes-page-header"> {/* Thanh controls */}
-                    <div className="search-input-container"> {/* Bọc ô tìm kiếm */}
+        <div className="showtimes-management-page page-container">
+            <div className="content-card">
+                <h1 className="page-main-title">{pageTitle}</h1>
+                <div className="showtimes-page-header">
+                    <div className="search-input-container">
                         <input
                             type="text"
-                            placeholder="Tìm kiếm suất chiếu (theo phim, phòng, ngày...)"
-                            className="showtime-search-input" // Class mới cho input
-                         value={searchQuery}
-                         onChange={handleSearchChange}
-                         disabled={isLoading&&movies.length > 0}
+                            placeholder="Tìm kiếm phim..."
+                            className="showtime-search-input"
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                            disabled={isLoading && movies.length > 0}
                         />
                     </div>
-                    <button
-                        className="btn-add-new-showtime" // Class mới cho nút
-                     onClick={handleOpenAddShowtimeForSpecificMovie}
+                    <Button
+                        variant="primary"
+                        className="btn-add-new-showtime"
+                        onClick={handleOpenAddShowtimeOverallModal}
+                        disabled={isLoadingScreens || movies.length === 0 || screens.length === 0}
                     >
-                        + Add Showtiem
-                    </button>
+                        + Thêm Suất Chiếu
+                    </Button>
                 </div>
 
-                {/* Khu vực hiển thị danh sách thẻ phim và suất chiếu */}
+                {error && movies.length > 0 && <p className="error-message inline-error" style={{textAlign: 'center', marginBottom: '15px'}}>{error}</p>}
+                {isLoading && movies.length > 0 && <div className="inline-loading" style={{textAlign: 'center', marginBottom: '15px'}}>Đang cập nhật...</div>}
+
                 <div className="movie-cards-container">
-                    {/* ... các thẻ phim ... */}
-                </div>
-
-                {/* Thông báo không có dữ liệu */}
-                {/* ... */}
-
-            </div> {/* Đóng content-card */}
-
-
-            {error && movies.length > 0 && <p className="error-message inline-error">{error}</p>}
-            {isLoading && movies.length > 0 && <div className="inline-loading">Updating...</div>}
-
-            <div className="movie-cards-container"> {/* Đổi tên class cho rõ ràng */}
-                {moviesToDisplay.length > 0 ? (
-                    moviesToDisplay.map((movie) => (
-                        <div key={movie.id} className="movie-card-item"> {/* Class của card phim */}
-                            <div className="movie-poster-display"> {/* Vùng chứa poster */}
-                                {movie.posterUrl ? (
-                                    <img src={movie.posterUrl} alt={`${movie.title} Poster`} className="actual-poster-img" />
-                                ) : (
-                                    <span className="poster-placeholder-text">{movie.posterPlaceholder}</span>
-                                )}
+                    {moviesToDisplay.length > 0 ? (
+                        moviesToDisplay.map((movie) => (
+                            <div key={movie.id} className="movie-card-item">
+                                <div className="movie-poster-display">
+                                    {movie.posterUrl ? (
+                                        <img src={movie.posterUrl} alt={`Poster phim ${movie.title}`} className="actual-poster-img" />
+                                    ) : (
+                                        <span className="poster-placeholder-text">{movie.posterPlaceholder}</span>
+                                    )}
+                                </div>
+                                <div className="movie-title-bar">{movie.title}</div>
+                                <Button
+                                    variant="secondary"
+                                    className="showtime-toggle-button"
+                                    onClick={() => openShowtimeListModal(movie)}
+                                    disabled={isLoadingShowtimes && selectedMovieForShowtimes?.id === movie.id}
+                                >
+                                    {isLoadingShowtimes && selectedMovieForShowtimes?.id === movie.id ? "Đang tải..." : "Xem Suất Chiếu"}
+                                </Button>
                             </div>
-                            <div className="movie-title-bar">{movie.title}</div>
-                            <button className="showtime-toggle-button" onClick={() => openShowtimeListModal(movie)}>
-                                Showtimes
-                            </button>
-                        </div>
-                    ))
-                ) : (
-                    !isLoading && !error && (
-                        <p className="no-items-found">
-                            {searchQuery ? 'No movies found matching your search.' : 'No movies available.'}
-                        </p>
-                    )
-                )}
+                        ))
+                    ) : (
+                        !isLoading && !error && (
+                            <p className="no-items-found">
+                                {searchQuery ? 'Không tìm thấy phim nào phù hợp với tìm kiếm của bạn.' : 'Chưa có phim nào để hiển thị.'}
+                            </p>
+                        )
+                    )}
+                </div>
             </div>
 
-            {/* Modals */}
             {isMovieListModalOpen && selectedMovieForShowtimes && (
                 <ShowtimeListModal
                     isOpen={isMovieListModalOpen}
                     movie={selectedMovieForShowtimes}
-                    showtimes={currentMovieShowtimes} // Truyền suất chiếu đã fetch
-                    isLoading={isLoadingShowtimes}    // Truyền trạng thái loading
-                    error={errorToDisplay && selectedMovieForShowtimes ? errorToDisplay : null} // Truyền lỗi nếu có và liên quan đến modal này
+                    showtimes={currentMovieShowtimes}
+                    isLoading={isLoadingShowtimes}
+                    error={errorToDisplay && selectedMovieForShowtimes ? errorToDisplay : null}
                     onClose={closeShowtimeListModal}
                     onSelectShowtime={handleShowtimeSelectForDetail}
                     onOpenAddShowtimeModalForMovie={() => handleOpenAddShowtimeForSpecificMovie(selectedMovieForShowtimes)}
@@ -325,31 +350,45 @@ const ShowtimesPage = () => {
 
             {isDetailModalOpen && selectedShowtimeForDetail && (
                 <ShowtimeDetailModal
-                    isOpen={isDetailModalOpen} // Truyền prop isOpen
-                    // movie={parentMovieForDetail} // Có thể không cần nếu selectedShowtimeForDetail đã có thông tin phim
-                    showtime={selectedShowtimeForDetail} // Truyền toàn bộ object suất chiếu
+                    isOpen={isDetailModalOpen}
+                    movie={selectedMovieForShowtimes} // Phim cha, chứa tất cả suất chiếu để hiển thị "các giờ chiếu khác"
+                    showtime={selectedShowtimeForDetail} // Suất chiếu cụ thể đang xem
                     onClose={handleCloseShowtimeDetailModal}
+                    onShowtimeDeleted={handleShowtimeDeleted}
+                    onOpenEditModal={openEditModalFromDetailCallback} // TRUYỀN CALLBACK MỚI
                 />
             )}
 
-            <AddShowtimeModal
-                isOpen={isAddModalOpen}
-                onClose={closeAddShowtimeModal}
-                // Truyền danh sách phim và phòng chiếu đã fetch từ API
-                movies={movies} // Danh sách phim để người dùng chọn
-                screens={screens} // Danh sách phòng chiếu
-                onAddShowtime={handleAddShowtimeSubmit}
-            // selectedMovieId={selectedMovieForShowtimes?.id} // Nếu mở từ một phim cụ thể
-            />
+            {isAddModalOpen && (
+                <AddShowtimeModal
+                    isOpen={isAddModalOpen}
+                    onClose={closeAddShowtimeModal}
+                    movies={movieContextForAddShowtime ? [movieContextForAddShowtime] : movies}
+                    screens={screens}
+                    onAddShowtime={handleAddShowtimeSubmit}
+                />
+            )}
+
+            {isEditModalOpen && showtimeToEdit && (
+                <EditShowtimeModal
+                    isOpen={isEditModalOpen}
+                    onClose={closeEditModal}
+                    movies={movies} // Cần danh sách tất cả phim để hiển thị tên phim nếu phim bị disable
+                    screens={screens}
+                    initialShowtimeData={showtimeToEdit} // Dữ liệu suất chiếu cần sửa
+                    onSubmitUpdate={handleUpdateShowtimeSubmit}
+                />
+            )}
+
             <SuccessMessageModal
-                isOpen={!!successMessage} // Chỉ mở khi có thông báo thành công
+                isOpen={!!successMessage}
                 successMessage={successMessage}
-                onClose={handleCloseSuccessModal} // Đóng modal khi nhấn nút
+                onClose={handleCloseSuccessModal}
             />
             <ErrorMessageModal
-                isOpen={!!errorToDisplay} // Chỉ mở khi có thông báo lỗi
+                isOpen={!!errorToDisplay}
                 errorMessage={errorToDisplay}
-                onClose={handleCloseErrorModal} // Đóng modal khi nhấn nút
+                onClose={handleCloseErrorModal}
             />
         </div>
     );

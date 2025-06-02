@@ -1,17 +1,18 @@
 // client/src/pages/Movies/ShowtimeListModal.jsx
 import React from 'react';
-import Button from '../../../components/common/Button'; // Giả sử bạn có component Button
-// import './ShowtimeListModal.css'; // Đảm bảo CSS được import đúng nếu có file riêng
+import PropTypes from 'prop-types'; // Import PropTypes
+import Button from '../../../components/common/Button';
+import './ShowtimeListModal.css'; // Đảm bảo import file CSS đã cập nhật
 
 const ShowtimeListModal = ({
   isOpen,
   movie,
-  showtimes, // Nhận mảng showtimes từ props
-  isLoading, // Nhận trạng thái loading từ props
-  error,     // Nhận lỗi từ props
+  showtimes,
+  isLoading,
+  error,
   onClose,
   onSelectShowtime,
-  onOpenAddShowtimeModalForMovie // Prop này vẫn cần thiết từ ShowtimesPage
+  onOpenAddShowtimeModalForMovie
 }) => {
 
   if (!isOpen || !movie) {
@@ -19,71 +20,114 @@ const ShowtimeListModal = ({
   }
 
   const handleDetailClick = (showtime) => {
-    onSelectShowtime(showtime); // Gọi callback đã nhận từ props
+    onSelectShowtime(showtime);
+  };
+
+  const getStatusBadgeClass = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'sắp chiếu':
+        return 'sap-chieu';
+      case 'đang chiếu':
+        return 'dang-chieu';
+      case 'đã chiếu':
+        return 'da-chieu';
+      case 'đã hủy':
+        return 'da-huy';
+      default:
+        return '';
+    }
   };
 
   return (
-    <div className="modal-overlay simple-showtime-list-modal-overlay" onClick={onClose}>
-      <div className="modal-content simple-showtime-list-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>Suất chiếu của phim: {movie.title}</h2>
-          <button className="modal-close-button" onClick={onClose}>×</button>
+    <div className="showtime-list-modal-overlay" onClick={onClose}>
+      <div className="showtime-list-modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="showtime-list-modal-header">
+          <h2>Suất chiếu của phim: <span className="movie-title-highlight">{movie.title}</span></h2>
+          <button className="showtime-list-modal-close-button" onClick={onClose}>×</button>
         </div>
-        <div className="modal-body">
-          {isLoading && <p>Loading showtimes for {movie.title}...</p>}
-          {!isLoading && error && <p className="error-message" style={{ color: 'red' }}>{error}</p>}
+
+        <div className="showtime-list-modal-body">
+          {isLoading && <p className="loading-message-list">Đang tải danh sách suất chiếu cho phim {movie.title}...</p>}
+          {!isLoading && error && <p className="error-message-list">{error}</p>}
           {!isLoading && !error && showtimes && showtimes.length > 0 ? (
-            <table className="showtimes-table">
-              {/* KHÔNG CÓ KHOẢNG TRẮNG HOẶC COMMENT Ở ĐÂY */}
-              <thead>
-                <tr>
-                  <th>Ngày chiếu</th>
-                  <th>Thời gian</th>
-                  <th>Phòng chiếu</th>
-                  <th>Giá vé</th>
-                  <th>Trạng thái</th>
-                  <th>Chi tiết</th>
-                </tr>
-              </thead>
-              {/* KHÔNG CÓ KHOẢNG TRẮNG HOẶC COMMENT Ở ĐÂY */}
-              <tbody>
-                {showtimes.map((showtime) => (
-                  <tr key={showtime.id} className="showtime-row">
-                    <td>{showtime.date}</td>
-                    <td>{showtime.time}</td>
-                    <td>{showtime.screenName || showtime.screen}</td>
-                    <td>{showtime.price ? `${showtime.price.toLocaleString()} VND` : 'N/A'}</td>
-                    <td>{showtime.status}</td>
-                    <td>
-                      <Button
-                        variant="info"
-                        size="small"
-                        className="detail-button"
-                        onClick={() => handleDetailClick(showtime)}
-                      >
-                        Detail
-                      </Button>
-                    </td>
+            <div className="showtimes-table-container">
+              <table className="showtimes-table">
+                <thead>
+                  <tr>
+                    <th>Ngày chiếu</th>
+                    <th>Thời gian</th>
+                    <th>Phòng chiếu</th>
+                    <th>Giá vé</th>
+                    <th>Trạng thái</th>
+                    <th>Chi tiết</th>
                   </tr>
-                ))}
-              </tbody>
-              {/* KHÔNG CÓ KHOẢNG TRẮNG HOẶC COMMENT Ở ĐÂY */}
-            </table>
+                </thead>
+                <tbody>
+                  {showtimes.map((showtime) => (
+                    <tr key={showtime.id} className="showtime-row">
+                      <td>{showtime.date}</td> {/* Giả sử date đã format DD/MM/YYYY */}
+                      <td>{showtime.time}</td> {/* Giả sử time đã format HH:MM AM/PM */}
+                      <td>{showtime.screenName || showtime.screen}</td>
+                      <td>{showtime.price ? `${showtime.price.toLocaleString()} VND` : 'N/A'}</td>
+                      <td>
+                        <span className={`status-badge ${getStatusBadgeClass(showtime.status)}`}>
+                          {showtime.status || 'N/A'}
+                        </span>
+                      </td>
+                      <td>
+                        <Button
+                          variant="info" // Hoặc "secondary", "outline-primary" tùy theo Button component
+                          size="small"
+                          className="detail-button-list" // Class để tùy chỉnh thêm nếu cần
+                          onClick={() => handleDetailClick(showtime)}
+                        >
+                          Chi tiết
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : (
-            !isLoading && !error && <p>No showtimes currently available for this movie.</p>
+            !isLoading && !error && <p className="no-showtimes-message">Hiện tại không có suất chiếu nào cho phim này.</p>
           )}
-          {/* Nút thêm suất chiếu vẫn có thể ở đây 
-          {!isLoading && !error && movie && ( // Chỉ hiển thị nếu không loading, không lỗi và có movie
-            <div style={{ marginTop: '20px', textAlign: 'right' }}>
+        </div>
+        
+        {/* Nút "+ Thêm Suất Chiếu" trong footer (tùy chọn) */}
+        {/* {!isLoading && !error && movie && onOpenAddShowtimeModalForMovie && (
+            <div className="showtime-list-modal-footer">
               <Button variant="primary" onClick={onOpenAddShowtimeModalForMovie} disabled={isLoading}>
-                + Add Showtime for {movie.title}
+                + Thêm Suất Chiếu Mới
               </Button>
             </div>
-          )} */ }
-        </div>
+        )} */}
       </div>
     </div>
   );
+};
+
+// Thêm PropTypes để kiểm tra kiểu dữ liệu của props
+ShowtimeListModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  movie: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+  }), // movie có thể là null khi modal đóng
+  showtimes: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    date: PropTypes.string,
+    time: PropTypes.string,
+    screenName: PropTypes.string,
+    screen: PropTypes.string,
+    price: PropTypes.number,
+    status: PropTypes.string,
+  })),
+  isLoading: PropTypes.bool.isRequired,
+  error: PropTypes.string,
+  onClose: PropTypes.func.isRequired,
+  onSelectShowtime: PropTypes.func.isRequired,
+  onOpenAddShowtimeModalForMovie: PropTypes.func, // Prop này có thể không bắt buộc
 };
 
 export default ShowtimeListModal;

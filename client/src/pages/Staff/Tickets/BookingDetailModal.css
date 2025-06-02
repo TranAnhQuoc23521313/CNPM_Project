@@ -238,3 +238,51 @@
 .booking-detail-footer .btn {
   margin-left: 10px;
 }
+
+/*  new */
+
+.info-subsection-title {
+  font-size: 1em;
+  font-weight: bold;
+  color: #444;
+  margin-top: 15px;
+  margin-bottom: 8px;
+}
+
+.seat-details-list {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 10px;
+}
+
+.seat-detail-item {
+  padding: 5px 0;
+  border-bottom: 1px dashed #eee;
+  font-size: 0.9em;
+}
+.seat-detail-item:last-child {
+  border-bottom: none;
+}
+
+.seat-detail-item > span:first-child { /* Tên ghế */
+  display: block;
+  margin-bottom: 3px;
+}
+
+.seat-price-breakdown {
+  padding-left: 15px;
+  font-size: 0.95em;
+}
+.seat-price-breakdown span {
+  display: block;
+  color: #666;
+}
+.seat-price-breakdown span:last-child { /* Thành tiền vé */
+  font-weight: bold;
+  color: #333;
+}
+
+.info-item.total-amount-display span { /* Cho Tổng cộng hóa đơn */
+  color: red;
+  font-weight: bold;
+}

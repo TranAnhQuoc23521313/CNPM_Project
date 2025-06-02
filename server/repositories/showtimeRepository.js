@@ -113,5 +113,88 @@ class ShowtimeRepository {
             throw new Error('Database query failed to fetch showtimes for the movie.');
         }
     }
+
+    async findById(maSuatChieu, connection = pool) {
+        const sql = `
+            SELECT
+                sc.MASUATCHIEU, sc.THOIGIAN, sc.TRANGTHAI, sc.GIASUATCHIEU,
+                sc.MAPHIM, p.TENPHIM,
+                sc.MAPHONG, pc.TENPHONG, pc.LOAIPHONG
+            FROM SUATCHIEU sc
+            JOIN PHIM p ON sc.MAPHIM = p.MAPHIM
+            JOIN PHONGCHIEU pc ON sc.MAPHONG = pc.MAPHONG
+            WHERE sc.MASUATCHIEU = ?;
+        `;
+        try {
+            const [rows] = await connection.query(sql, [maSuatChieu]);
+            return rows.length > 0 ? rows[0] : null;
+        } catch (error) {
+            console.error(`Error in ShowtimeRepository.findById for ${maSuatChieu}:`, error);
+            throw new Error('Database query failed to fetch showtime by ID.');
+        }
+    }
+
+    async hasSoldTickets(maSuatChieu, connection = pool) {
+        // Kiểm tra xem có vé nào (không bị hủy) đã bán cho suất chiếu này không
+        const sql = "SELECT COUNT(*) as count FROM VE WHERE MASUATCHIEU = ? AND TRANGTHAIVE != 'Đã hủy'";
+        try {
+            const [rows] = await connection.query(sql, [maSuatChieu]);
+            return rows[0].count > 0;
+        } catch (error) {
+            console.error(`Error checking for sold tickets for MASUATCHIEU ${maSuatChieu}:`, error);
+            throw error;
+        }
+    }
+
+    async deleteById(maSuatChieu, connection = pool) {
+        const sql = "DELETE FROM SUATCHIEU WHERE MASUATCHIEU = ?";
+        try {
+            const [result] = await connection.query(sql, [maSuatChieu]);
+            return result; // result.affectedRows sẽ cho biết có xóa được không
+        } catch (error) {
+            console.error(`Error deleting showtime ${maSuatChieu}:`, error);
+            // Xử lý lỗi khóa ngoại nếu SUATCHIEU này đang được tham chiếu bởi VE
+            // (Mặc dù chúng ta sẽ kiểm tra trước, nhưng đây là phòng vệ)
+            if (error.code === 'ER_ROW_IS_REFERENCED_2' || error.message.includes('foreign key constraint fails')) {
+                throw new Error(`Không thể xóa suất chiếu ${maSuatChieu} vì vẫn còn vé hoặc dữ liệu liên quan. Vui lòng hủy các vé liên quan trước.`);
+            }
+            throw error;
+        }
+    }
+
+    async updateById(maSuatChieu, showtimeDataToUpdate, connection = pool) {
+        // showtimeDataToUpdate có thể chứa: MAPHIM, MAPHONG, THOIGIAN, GIASUATCHIEU, TRANGTHAI
+        const { MAPHIM, MAPHONG, THOIGIAN, GIASUATCHIEU, TRANGTHAI } = showtimeDataToUpdate;
+
+        // Xây dựng câu lệnh SET động dựa trên các trường được cung cấp
+        const fieldsToUpdate = [];
+        const values = [];
+
+        if (MAPHIM !== undefined) { fieldsToUpdate.push("MAPHIM = ?"); values.push(MAPHIM); }
+        if (MAPHONG !== undefined) { fieldsToUpdate.push("MAPHONG = ?"); values.push(MAPHONG); }
+        if (THOIGIAN !== undefined) { fieldsToUpdate.push("THOIGIAN = ?"); values.push(THOIGIAN); }
+        if (GIASUATCHIEU !== undefined) { fieldsToUpdate.push("GIASUATCHIEU = ?"); values.push(GIASUATCHIEU); }
+        if (TRANGTHAI !== undefined) { fieldsToUpdate.push("TRANGTHAI = ?"); values.push(TRANGTHAI); }
+
+        if (fieldsToUpdate.length === 0) {
+            // Không có gì để cập nhật
+            return { affectedRows: 0, changedRows: 0 };
+        }
+
+        const sql = `UPDATE SUATCHIEU SET ${fieldsToUpdate.join(", ")} WHERE MASUATCHIEU = ?`;
+        values.push(maSuatChieu);
+
+        try {
+            const [result] = await connection.query(sql, values);
+            return result; // result.affectedRows, result.changedRows
+        } catch (error) {
+            console.error(`Error updating showtime ${maSuatChieu}:`, error);
+            // Xử lý lỗi khóa ngoại nếu MAPHIM hoặc MAPHONG mới không hợp lệ
+            if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+                 throw new Error(`Cập nhật thất bại: Mã phim hoặc mã phòng chiếu không hợp lệ.`);
+            }
+            throw error;
+        }
+    }
 }
 module.exports = new ShowtimeRepository();

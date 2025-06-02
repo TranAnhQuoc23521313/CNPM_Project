@@ -1,113 +1,146 @@
 // src/pages/Staff/ManageBookings/BookingDetailModal.jsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Button from '../../../components/common/Button';
 import './BookingDetailModal.css';
+import { getSeatLayoutForShowtimeApi } from '../../../services/seatApiService';
 
-// --- COMPONENT HIỂN THỊ SƠ ĐỒ GHẾ (GẦN VỚI BAN ĐẦU) ---
-const SeatMapDisplay = ({ seatsSelectedByCustomer, allSeatsLayout }) => {
-  // Kiểm tra cơ bản dữ liệu đầu vào
-  if (!allSeatsLayout || !allSeatsLayout.rows || allSeatsLayout.rows.length === 0 || !allSeatsLayout.seatsPerRow) {
-    return <p className="no-seatmap-info">Không có thông tin sơ đồ ghế.</p>;
+// --- COMPONENT HIỂN THỊ SƠ ĐỒ GHẾ ĐỘNG ---
+const DynamicSeatMapDisplay = ({ seatLayoutFromApi, customerSelectedSeatIds, isLoadingLayout, layoutError }) => {
+  if (isLoadingLayout) {
+    return <p className="seatmap-loading-info">Đang tải sơ đồ ghế...</p>;
+  }
+  if (layoutError) {
+    return <p className="seatmap-error-info" style={{ color: 'red' }}>{layoutError}</p>;
+  }
+  if (!seatLayoutFromApi || !seatLayoutFromApi.data || seatLayoutFromApi.data.length === 0) {
+    return <p className="no-seatmap-info">Không có thông tin sơ đồ ghế cho suất chiếu này.</p>;
   }
 
-  // Tạo một Set để kiểm tra ghế đã chọn của khách hàng này nhanh hơn
-  const customerSelectedSeatsSet = new Set(
-    (seatsSelectedByCustomer || []).map(seat => `${seat.row}${seat.number}`)
-  );
+  const organizedLayout = { rows: [], maxCols: 0 };
+  const tempLayout = {};
+  seatLayoutFromApi.data.forEach(seat => {
+    if (!tempLayout[seat.row]) {
+      tempLayout[seat.row] = [];
+    }
+    tempLayout[seat.row][seat.number - 1] = seat;
+    if (seat.number > organizedLayout.maxCols) {
+      organizedLayout.maxCols = seat.number;
+    }
+  });
+
+  const sortedRowKeys = Object.keys(tempLayout).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+  organizedLayout.rows = sortedRowKeys.map(rowKey => {
+    const rowSeats = [];
+    for (let i = 0; i < organizedLayout.maxCols; i++) {
+      rowSeats.push(tempLayout[rowKey][i] || null);
+    }
+    return { rowId: rowKey, seats: rowSeats };
+  });
 
   return (
-    <div className="seat-map-display-container"> {/* Class này có thể giữ lại hoặc đổi nếu CSS gốc của bạn khác */}
-      <h4>Sơ đồ ghế</h4> {/* Tiêu đề này có trong CSS bạn gửi lần trước */}
-      <div className="screen-indicator">MÀN HÌNH</div> {/* Quay lại class gốc */}
-      {/* Lặp qua các hàng trong layout */}
-      {allSeatsLayout.rows.map(rowLabel => (
-        <div key={rowLabel} className="seat-row-display"> {/* Quay lại class gốc */}
-          <span className="row-label-display">{rowLabel}</span> {/* Nhãn hàng ghế (A, B, C...) */}
-          {/* Tạo các ô ghế cho mỗi hàng */}
-          {[...Array(allSeatsLayout.seatsPerRow)].map((_, seatIndex) => {
-            const seatNumber = seatIndex + 1;
-            const seatId = `${rowLabel}${seatNumber}`;
-            const isCustomerSeat = customerSelectedSeatsSet.has(seatId);
-
-            // Xác định class cho ghế dựa trên trạng thái
-            let seatClass = 'seat-box-display'; // Class cơ bản
-            if (isCustomerSeat) {
-              seatClass += ' customer-selected-seat'; // Ghế của khách hàng này
-            } else {
-              // Giả sử các ghế khác không thuộc đơn hàng này là "ghế khác" (màu xám)
-              // Trong một hệ thống đầy đủ, bạn sẽ có thêm trạng thái 'sold' cho ghế người khác đã mua
-              // hoặc 'unavailable' cho ghế hỏng, lối đi...
-              seatClass += ' other-seat-gray';
-            }
-            // Bạn có thể thêm logic cho ghế VIP ở đây nếu allSeatsLayout có thông tin đó
-            // if (allSeatsLayout.vipSeats?.some(s => s.row === rowLabel && s.number === seatNumber)) {
-            //   seatClass += ' vip-seat-display'; // Cần class CSS cho vip-seat-display
-            // }
-
-            return (
-              <span key={seatId} className={seatClass} title={`Ghế ${seatId}`}>
-                {seatNumber} {/* Chỉ hiển thị số ghế */}
-              </span>
-            );
-          })}
+    <div className="seat-map-display-container dynamic-seat-map">
+      <h4>Sơ đồ ghế</h4>
+      <div className="screen-indicator">MÀN HÌNH</div>
+      {organizedLayout.rows.map(({ rowId, seats: seatsInRow }) => (
+        <div key={rowId} className="seat-row-display">
+          <span className="row-label-display" key={`${rowId}-label-start`}>{rowId}</span>
+          <div className="seats-in-row-actual" key={`${rowId}-seats-container`}>
+            {seatsInRow.map((seat, index) => {
+              if (!seat) {
+                return <div key={`empty-${rowId}-${index}`} className="seat-placeholder-display"></div>;
+              }
+              let seatClass = `seat-box-display ${seat.type?.toLowerCase() || 'thuong'}`;
+              if (customerSelectedSeatIds.has(seat.id)) {
+                seatClass += ' customer-selected-seat';
+              } else if (seat.status === 'booked') {
+                seatClass += ' other-booked-seat';
+              } else if (seat.status === 'unavailable') {
+                seatClass += ' unavailable-seat';
+              } else {
+                seatClass += ' available-seat';
+              }
+              return (
+                <span key={seat.id} className={seatClass} title={`Ghế ${seat.row}${seat.number} (${seat.type}) - Trạng thái: ${seat.status}`}>
+                  {seat.number}
+                </span>
+              );
+            })}
+          </div>
+          <span className="row-label-display" key={`${rowId}-label-end`}>{rowId}</span>
         </div>
       ))}
-      {/* Chú thích ghế */}
-      <div className="seat-legend"> {/* Quay lại class gốc */}
-        <div className="legend-item">
-          <span className="seat-box-display customer-selected-seat"></span> Ghế khách chọn
-        </div>
-        <div className="legend-item">
-          <span className="seat-box-display other-seat-gray"></span> Ghế khác
-        </div>
-        {/* Thêm chú thích cho VIP nếu có */}
-        {/* <div className="legend-item"><span className="seat-box-display vip-seat-display"></span> Ghế VIP</div> */}
+      <div className="seat-legend">
+        <div className="legend-item"><span className="seat-box-display customer-selected-seat"></span> Ghế khách chọn (HĐ này)</div>
+        <div className="legend-item"><span className="seat-box-display other-booked-seat"></span> Đã bán (HĐ khác)</div>
+        <div className="legend-item"><span className="seat-box-display available-seat"></span> Còn trống</div>
+        {/* <div className="legend-item"><span className="seat-box-display unavailable-seat"></span> Không khả dụng</div> */}
       </div>
     </div>
   );
 };
 
-SeatMapDisplay.propTypes = {
-  seatsSelectedByCustomer: PropTypes.arrayOf(
-    PropTypes.shape({
-      row: PropTypes.string.isRequired,
-      number: PropTypes.number.isRequired,
-    })
-  ),
-  allSeatsLayout: PropTypes.shape({
-    rows: PropTypes.arrayOf(PropTypes.string).isRequired,
-    seatsPerRow: PropTypes.number.isRequired,
-    // vipSeats: PropTypes.array, // Thêm nếu bạn có dữ liệu ghế VIP
+DynamicSeatMapDisplay.propTypes = {
+  seatLayoutFromApi: PropTypes.shape({
+    data: PropTypes.arrayOf(PropTypes.object),
+    roomId: PropTypes.string,
   }),
+  customerSelectedSeatIds: PropTypes.instanceOf(Set).isRequired,
+  isLoadingLayout: PropTypes.bool,
+  layoutError: PropTypes.string,
 };
-// --- KẾT THÚC COMPONENT SEATMAPDISPLAY ---
+// --- KẾT THÚC COMPONENT DynamicSeatMapDisplay ---
 
 
-const BookingDetailModal = ({ isOpen, onClose, bookingDetails }) => {
-  if (!isOpen || !bookingDetails) {
-    return null;
+const BookingDetailModal = ({ isOpen, onClose, bookingDetails, isLoading: isLoadingBookingDetails }) => {
+  const [seatLayout, setSeatLayout] = useState(null);
+  const [isLoadingLayout, setIsLoadingLayout] = useState(false);
+  const [layoutError, setLayoutError] = useState(null);
+
+  useEffect(() => {
+    const fetchLayout = async () => {
+      if (isOpen && bookingDetails?.maSuatChieu) {
+        setIsLoadingLayout(true);
+        setLayoutError(null);
+        setSeatLayout(null);
+        try {
+          const layoutData = await getSeatLayoutForShowtimeApi(bookingDetails.maSuatChieu);
+          setSeatLayout(layoutData);
+        } catch (err) {
+          console.error("BookingDetailModal: Error fetching seat layout:", err);
+          setLayoutError(err.message || "Không thể tải sơ đồ ghế.");
+        } finally {
+          setIsLoadingLayout(false);
+        }
+      } else if (!isOpen) {
+        setSeatLayout(null);
+        setLayoutError(null);
+      }
+    };
+    fetchLayout();
+  }, [isOpen, bookingDetails]);
+
+  if (!isOpen) return null;
+
+  if (isLoadingBookingDetails || !bookingDetails) {
+    return (
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-content booking-detail-modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="booking-detail-header">
+            <h2 className="modal-main-title">Chi tiết vé</h2>
+            <Button onClick={onClose} variant="light" size="small" className="modal-close-icon-btn">×</Button>
+          </div>
+          <div className="booking-detail-body" style={{ justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+            <p>Đang tải chi tiết hóa đơn...</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  // Dữ liệu layout phòng chiếu (NÊN lấy từ API hoặc cấu hình dựa trên phòng chiếu của bookingDetails.screen)
-  const mockFullSeatLayout = {
-    rows: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'], // Ví dụ 8 hàng
-    seatsPerRow: 10,                               // Ví dụ 10 ghế mỗi hàng (GIỐNG HÌNH 2)
-    // vipSeats: [{row: 'G', number: 5}, {row: 'G', number: 6}],
-  };
-
-  // Tách ngày và giờ
-  let showtimeDate = 'N/A';
-  let showtimeTime = 'N/A';
-  if (bookingDetails.showtime && typeof bookingDetails.showtime === 'string') {
-    const parts = bookingDetails.showtime.trim().split(' ');
-    if (parts.length >= 2) {
-      showtimeDate = parts[0];
-      showtimeTime = parts.slice(1).join(' ');
-    } else if (parts.length === 1 && parts[0] !== "") {
-      showtimeDate = parts[0];
-    }
-  }
+  const customerSelectedSeatIds = new Set(
+    bookingDetails.seatsChosen?.map(s => s.id) || []
+  );
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -120,38 +153,66 @@ const BookingDetailModal = ({ isOpen, onClose, bookingDetails }) => {
         <div className="booking-detail-body">
           <div className="booking-info-panel">
             <h4 className="info-section-title">Thông tin đặt vé</h4>
-            <p className="info-item"><strong>Mã vé:</strong> <span>{bookingDetails.id || 'N/A'}</span></p>
-            <p className="info-item"><strong>Khách hàng:</strong> <span>{bookingDetails.customerName || 'Khách vãng lai'}</span></p>
-            <p className="info-item"><strong>SĐT:</strong> <span>{bookingDetails.customerPhone || 'N/A'}</span></p>
-            <p className="info-item"><strong>Phim:</strong> <span>{bookingDetails.movieTitle || 'N/A'}</span></p>
-            <p className="info-item"><strong>Phòng chiếu:</strong> <span>{bookingDetails.screen || 'N/A'}</span></p>
-            <p className="info-item"><strong>Ngày chiếu:</strong> <span>{showtimeDate}</span></p>
-            <p className="info-item"><strong>Giờ chiếu:</strong> <span>{showtimeTime}</span></p>
-            <p className="info-item"><strong>Ghế:</strong> <span>{bookingDetails.seats?.map(s => `${s.row}${s.number}`).join(', ') || 'N/A'}</span></p>
+            <p className="info-item"><strong>Mã hóa đơn:</strong> <span>{bookingDetails.id}</span></p>
+            <p className="info-item"><strong>Khách hàng:</strong> <span>{bookingDetails.customerName}</span></p>
+            <p className="info-item"><strong>SĐT:</strong> <span>{bookingDetails.customerPhone}</span></p>
+            <p className="info-item"><strong>Phim:</strong> <span>{bookingDetails.movieTitle}</span></p>
+            <p className="info-item"><strong>Phòng chiếu:</strong> <span>{bookingDetails.roomName}</span></p>
+            <p className="info-item"><strong>Ngày chiếu:</strong> <span>{bookingDetails.showtimeDate}</span></p>
+            <p className="info-item"><strong>Giờ chiếu:</strong> <span>{bookingDetails.showtimeTime}</span></p>
+            <p className="info-item"><strong>Ghế:</strong> <span>{bookingDetails.seatsChosen?.map(s => `${s.row}${s.number}`).join(', ') || 'N/A'}</span></p>
 
-            {bookingDetails.services && bookingDetails.services.length > 0 && (
+            {bookingDetails.seatsChosen && bookingDetails.seatsChosen.length > 0 && (
               <>
-                <h4 className="info-section-title section-spacing-top">Dịch vụ kèm theo</h4>
-                {bookingDetails.services.map((service, index) => (
-                  <p key={index} className="info-item">
-                    <strong>{service.name}:</strong> <span>{service.quantity} x {service.price?.toLocaleString('vi-VN')} đ</span>
+                <h5 className="info-subsection-title">Chi tiết ghế đã chọn:</h5>
+                <ul className="seat-details-list">
+                  {bookingDetails.seatsChosen.map((seat, index) => (
+                    <li key={seat.id || index} className="seat-detail-item"> {/* seat.id (MAGHE) là key chính */}
+                      <span><strong>Ghế {seat.row}{seat.number}</strong> ({seat.type || 'Thường'}):</span>
+                      <span className="ticket-id-display">Mã vé: {seat.ticketId || 'N/A'}</span>
+                      <div className="seat-price-breakdown">
+                        <span>Giá suất chiếu: {seat.basePrice?.toLocaleString('vi-VN')} đ</span>
+                        <span>Phụ thu ghế: {seat.surcharge?.toLocaleString('vi-VN')} đ</span>
+                        <span>Thành tiền vé: {seat.price?.toLocaleString('vi-VN')} đ</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                <p className="info-item">
+                  <strong>Tổng tiền vé:</strong>
+                  <span>
+                    {bookingDetails.seatsChosen.reduce((acc, seat) => acc + (seat.price || 0), 0).toLocaleString('vi-VN')} đ
+                  </span>
+                </p>
+              </>
+            )}
+
+            {bookingDetails.concessions && bookingDetails.concessions.length > 0 && (
+              <>
+                <h4 className="info-section-title section-spacing-top">Sản phẩm đã mua</h4>
+                {bookingDetails.concessions.map((item, index) => (
+                  <p key={item.name || index} className="info-item"> {/* key nên là duy nhất, ví dụ item.id nếu có */}
+                    <strong>{item.name}:</strong> <span>{item.quantity} x {item.price?.toLocaleString('vi-VN')} đ = {item.total?.toLocaleString('vi-VN')} đ</span>
                   </p>
                 ))}
               </>
             )}
-            <p className="info-item section-spacing-top"><strong>Khuyến mãi:</strong> <span>{bookingDetails.promotion || 'Không có'}</span></p>
-            <hr className="info-divider"/>
+            <hr className="info-divider" />
             <p className="info-item total-amount-display">
-                <strong>Tổng cộng:</strong>
-                <span>{bookingDetails.totalAmount?.toLocaleString('vi-VN')} đ</span>
+              <strong>Tổng cộng:</strong>
+              <span>{bookingDetails.totalAmount?.toLocaleString('vi-VN')} đ</span>
             </p>
-            <p className="info-item"><strong>Thanh toán:</strong> <span>{bookingDetails.paymentStatus || 'N/A'}</span></p>
+            <p className="info-item"><strong>Thanh toán:</strong> <span>{bookingDetails.paymentStatus} ({bookingDetails.paymentMethod})</span></p>
+            <p className="info-item"><strong>Ngày tạo HĐ:</strong> <span>{bookingDetails.creationDate}</span></p>
+            <p className="info-item"><strong>Nhân viên:</strong> <span>{bookingDetails.staffName}</span></p>
           </div>
 
           <div className="seat-map-panel">
-            <SeatMapDisplay
-                seatsSelectedByCustomer={bookingDetails.seats || []}
-                allSeatsLayout={mockFullSeatLayout}
+            <DynamicSeatMapDisplay
+              seatLayoutFromApi={seatLayout}
+              customerSelectedSeatIds={customerSelectedSeatIds}
+              isLoadingLayout={isLoadingLayout}
+              layoutError={layoutError}
             />
           </div>
         </div>
@@ -168,25 +229,39 @@ BookingDetailModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   bookingDetails: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    id: PropTypes.string,
+    movieTitle: PropTypes.string,
+    roomName: PropTypes.string,
+    showtimeDate: PropTypes.string,
+    showtimeTime: PropTypes.string,
     customerName: PropTypes.string,
     customerPhone: PropTypes.string,
-    movieTitle: PropTypes.string,
-    screen: PropTypes.string,
-    showtime: PropTypes.string,
-    seats: PropTypes.arrayOf(PropTypes.shape({
-        row: PropTypes.string,
-        number: PropTypes.number,
+    seatsChosen: PropTypes.arrayOf(PropTypes.shape({
+      id: PropTypes.string,
+      ticketId: PropTypes.string,
+      row: PropTypes.string,
+      number: PropTypes.number,
+      type: PropTypes.string,
+      price: PropTypes.number,
+      basePrice: PropTypes.number,
+      surcharge: PropTypes.number,
     })),
-    services: PropTypes.arrayOf(PropTypes.shape({
+    totalAmount: PropTypes.number,
+    paymentStatus: PropTypes.string,
+    paymentMethod: PropTypes.string,
+    creationDate: PropTypes.string,
+    staffName: PropTypes.string,
+    concessions: PropTypes.arrayOf(PropTypes.shape({ // Thêm shape cho concessions nếu có cấu trúc cụ thể
         name: PropTypes.string,
         quantity: PropTypes.number,
         price: PropTypes.number,
+        total: PropTypes.number,
+        // id: PropTypes.string, // Nếu item sản phẩm có id
     })),
-    promotion: PropTypes.string,
-    totalAmount: PropTypes.number,
-    paymentStatus: PropTypes.string,
+    roomId: PropTypes.string,
+    maSuatChieu: PropTypes.string,
   }),
+  isLoading: PropTypes.bool,
 };
 
 export default BookingDetailModal;

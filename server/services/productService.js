@@ -85,5 +85,68 @@ class ProductService {
         }
         throw new Error(`Failed to delete product '${masp}'.`);
     }
+
+    async checkProductAvailability(masp, quantityRequested) {
+        const product = await productRepository.findById(masp); // Dùng findById bình thường, không FOR UPDATE
+
+        if (!product) {
+            return {
+                available: false,
+                message: "Sản phẩm không tồn tại.",
+                reason: "not_found"
+            };
+        }
+
+        if (product.TRANGTHAISP === 'Ngừng kinh doanh') {
+            return {
+                available: false,
+                message: `Sản phẩm "${product.TENSP}" đã ngừng kinh doanh.`,
+                reason: "discontinued",
+                currentStock: product.SOLUONG, // Vẫn trả về tồn kho hiện tại
+                productStatus: product.TRANGTHAISP
+            };
+        }
+        
+        // Nếu yêu cầu số lượng là 0, luôn coi là hợp lệ (dùng để client reset)
+        if (quantityRequested === 0) {
+             return {
+                available: true,
+                message: "Số lượng được đặt về 0.",
+                currentStock: product.SOLUONG,
+                productStatus: product.TRANGTHAISP
+            };
+        }
+
+        if (product.SOLUONG < quantityRequested) {
+            return {
+                available: false,
+                message: `Sản phẩm "${product.TENSP}" chỉ còn ${product.SOLUONG} sản phẩm. Bạn không thể chọn ${quantityRequested}.`,
+                reason: "insufficient_stock",
+                currentStock: product.SOLUONG,
+                maxAllowed: product.SOLUONG, // Số lượng tối đa có thể chọn
+                productStatus: product.TRANGTHAISP
+            };
+        }
+
+        // Nếu TRANGTHAISP là 'Hết hàng' nhưng SOLUONG > 0 (lỗi dữ liệu), vẫn cho bán nếu quantityRequested <= SOLUONG
+        // Nhưng nếu SOLUONG <= 0 thì chắc chắn là hết hàng
+        if (product.SOLUONG <= 0 && quantityRequested > 0) {
+             return {
+                available: false,
+                message: `Sản phẩm "${product.TENSP}" đã hết hàng.`,
+                reason: "out_of_stock",
+                currentStock: 0,
+                maxAllowed: 0,
+                productStatus: 'Hết hàng' // Cập nhật lại nếu cần
+            };
+        }
+
+        return { // Hợp lệ
+            available: true,
+            message: "Sản phẩm có sẵn.",
+            currentStock: product.SOLUONG, // Số lượng tồn kho hiện tại của sản phẩm
+            productStatus: product.TRANGTHAISP
+        };
+    }
 }
 module.exports = new ProductService();

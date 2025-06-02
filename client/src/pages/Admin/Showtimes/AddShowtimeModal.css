@@ -1,142 +1,204 @@
-/* AddShowtimeModal.css */
+/* client/src/pages/Showtimes/AddShowtimeModal.css */
 
-/* ... (style cho .modal-overlay, .modal-content, .modal-header, .modal-close-button giữ nguyên) ... */
 .modal-overlay {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5); 
-  display: flex; align-items: center; justify-content: center;
-  z-index: 1000;
-  font-family: sans-serif;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.65); /* Tăng độ mờ */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  padding: 20px; /* Padding cho toàn màn hình */
+  box-sizing: border-box;
 }
 
-.modal-content {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    max-height: 90vh;
+.add-showtime-modal-v2 { /* Class mới cho content modal */
+  background: #ffffff;
+  border-radius: 12px; /* Bo góc lớn hơn */
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15); /* Bóng đổ mềm hơn */
+  width: 100%;
+  max-width: 700px; /* Tăng độ rộng cho layout 2 cột */
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Quan trọng */
+  animation: slideInUpModal 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.add-showtime-modal.modal-content {
-  max-width: 750px; 
-  width: 90%;
-  padding: 0;
+@keyframes slideInUpModal {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.add-showtime-modal .modal-header {
-  background-color: #fff; 
-  padding: 18px 25px; 
-  border-bottom: 1px solid #eaeaea; 
+.modal-header-v2 { /* Header mới */
+  padding: 20px 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid #f0f0f0; /* Viền rất nhạt */
+  background-color: #fff; /* Header nền trắng */
+  flex-shrink: 0;
 }
 
-.add-showtime-modal .modal-header h2 {
+.modal-header-v2 h2 {
   margin: 0;
-  font-size: 1.2em; 
+  font-size: 1.6rem;
   color: #333;
-  font-weight: 600; 
+  font-weight: 700; /* Chữ đậm hơn */
 }
 
-.add-showtime-modal .modal-close-button {
-  color: #aaa; 
-  font-size: 1.6em;
-  background: none;
+.modal-close-button-v2 { /* Nút đóng mới */
+  background: #f0f0f0; /* Nền cho nút đóng */
   border: none;
-  cursor: pointer;
-  line-height: 1;
-  padding: 0;
-}
-.add-showtime-modal .modal-close-button:hover { color: #555; }
-
-/* Thay đổi form và body */
-.add-showtime-modal form.add-showtime-form { 
-    display: flex; 
-    flex-direction: column; 
-    flex-grow: 1; /* Cho form chiếm hết chiều cao */
-    /* height: 100%; không cần nữa nếu modal-content là flex */
-}
-
-.add-showtime-modal .modal-body.add-modal-body {
-  padding: 25px 30px; 
-  overflow-y: auto; 
-  flex-grow: 1; /* Body sẽ chiếm không gian còn lại trừ header và action */
-}
-
-/* --- LAYOUT FORM GROUP (LABEL Ở TRÊN) --- */
-.form-group {
-  margin-bottom: 20px; 
-}
-
-.form-group label {
-  display: block; 
-  margin-bottom: 8px; 
-  font-weight: 500; 
-  color: #555; 
-  font-size: 0.9em;
-  text-align: left; 
-}
-
-.input-wrapper {
-  display: flex; 
-  align-items: center;
-  /* position: relative; không cần nữa nếu không có icon tùy chỉnh */
-}
-
-.form-group select,
-.form-group input {
-  width: 100%; 
-  padding: 10px 12px; 
-  border: 1px solid #ccc; 
-  border-radius: 5px; 
-  font-size: 1em; 
-  box-sizing: border-box; 
-}
-
-/* Bỏ style icon nếu không dùng */
-/* .input-wrapper.with-icon input { padding-right: 35px; } */
-/* .input-icon { ... } */
-
-/* Giữ lại style focus */
-.form-group select:focus,
-.form-group input:focus {
-  outline: none;
-  border-color: #86b7fe; 
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); 
-}
-
-.form-group select {
-  padding-right: 30px; 
-  background-color: #fff; 
-}
-
-/* --- BỎ STYLE CHO MODAL-FOOTER --- */
-/* .add-showtime-modal .modal-footer { ... } */
-
-/* --- STYLE CHO KHU VỰC CHỨA NÚT DONE TRONG BODY --- */
-.modal-form-actions {
+  border-radius: 50%; /* Nút tròn */
+  width: 32px;
+  height: 32px;
   display: flex;
-  justify-content: flex-end; /* Căn nút về bên phải */
-  margin-top: 25px; /* Khoảng cách phía trên nút */
-  padding-top: 20px; /* Thêm padding top để tách biệt khỏi trường cuối */
-  border-top: 1px solid #eaeaea; /* Thêm đường kẻ nhẹ phía trên nút */
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #555;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+.modal-close-button-v2:hover {
+  background-color: #e0e0e0;
+  color: #222;
 }
 
-.accept-button {
-  background-color: #0d6efd; 
+.add-showtime-form-v2 { /* Form mới */
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.modal-body-v2 { /* Body mới */
+  padding: 25px 30px;
+  overflow-y: auto;
+  flex-grow: 1;
+  background-color: #f9fafb; /* Nền body hơi xám nhẹ */
+}
+
+.form-grid-v2 { /* Grid layout cho các trường input */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* 2 cột, tự động xuống hàng */
+  gap: 25px; /* Khoảng cách giữa các ô trong grid */
+}
+
+.form-group-v2 { /* Group mới */
+  display: flex;
+  flex-direction: column;
+}
+.form-group-v2.full-span { /* Cho trường muốn chiếm cả 2 cột */
+    grid-column: 1 / -1;
+}
+
+
+.form-group-v2 label {
+  margin-bottom: 8px;
+  font-weight: 500; /* Chữ vừa phải */
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.input-wrapper-v2 select,
+.input-wrapper-v2 input[type="time"],
+.input-wrapper-v2 input[type="date"],
+.input-wrapper-v2 input[type="number"],
+.input-wrapper-v2 input[type="text"] {
+  width: 100%;
+  padding: 12px 15px; /* Padding lớn hơn */
+  border: 1px solid #d1d5db; /* Viền nhạt hơn */
+  border-radius: 6px; /* Bo góc vừa */
+  font-size: 0.95rem;
+  color: #374151;
+  box-sizing: border-box;
+  background-color: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-wrapper-v2 select {
+  appearance: none; -webkit-appearance: none; -moz-appearance: none;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23888%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 10px 10px;
+  padding-right: 40px;
+}
+
+.input-wrapper-v2 select:focus,
+.input-wrapper-v2 input:focus {
+  border-color: #3b82f6; /* Màu xanh dương (Tailwind blue-500) */
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.input-wrapper-v2 input::placeholder {
+  color: #9ca3af;
+}
+
+.form-error-message-v2 { /* Thông báo lỗi */
+  grid-column: 1 / -1; /* Chiếm cả grid */
+  color: #ef4444; /* Màu đỏ (Tailwind red-500) */
+  background-color: #fee2e2; /* Nền đỏ nhạt */
+  border: 1px solid #fca5a5;
+  padding: 12px 15px;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 0.9rem;
+  margin-bottom: 10px; /* Cho margin bottom nếu lỗi ở trên cùng */
+}
+
+
+.modal-footer-v2 { /* Footer mới */
+  padding: 20px 30px;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: flex-end;
+  background-color: #fff; /* Footer nền trắng */
+  flex-shrink: 0;
+}
+
+.submit-button-v2 { /* Nút submit mới */
+  background-color: #3b82f6; /* Xanh dương */
   color: white;
   border: none;
-  border-radius: 5px; 
-  padding: 10px 25px; /* Padding lớn hơn cho nút "Done" */
-  font-size: 0.95em; /* Kích thước chữ */
-  font-weight: 600; 
+  padding: 12px 30px; /* Nút to hơn */
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  line-height: 1.4; 
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, transform 0.1s;
+  box-shadow: 0 2px 5px rgba(59, 130, 246, 0.2);
 }
-.accept-button:hover {
-  background-color: #0b5ed7; 
+.submit-button-v2:hover {
+  background-color: #2563eb; /* Xanh đậm hơn */
+}
+.submit-button-v2:active {
+    transform: translateY(1px);
+}
+.submit-button-v2:disabled {
+  background-color: #9ca3af; /* Xám */
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* Responsive cho Grid */
+@media (max-width: 640px) { /* Dưới 640px thì các item trong grid sẽ tự xuống hàng */
+  .add-showtime-modal-v2 {
+    max-width: 95%;
+  }
+  .modal-header-v2 h2 {
+    font-size: 1.3rem;
+  }
+   .modal-body-v2 { padding: 20px; }
+   .form-grid-v2 {
+       grid-template-columns: 1fr; /* 1 cột trên mobile */
+       gap: 20px;
+   }
+    .modal-footer-v2 .submit-button-v2 {
+        width: 100%; /* Nút chiếm full width */
+    }
 }

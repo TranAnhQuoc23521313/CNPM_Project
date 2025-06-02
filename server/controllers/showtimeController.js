@@ -51,5 +51,51 @@ class ShowtimeController {
         }
     }
     // TODO: Implement getAllShowtimes, getShowtimeById, updateShowtime, deleteShowtime
+    async getShowtimeById(req, res, next) { // Thêm hàm này
+        try {
+            const maSuatChieu = req.params.id;
+            const showtime = await showtimeService.getShowtimeById(maSuatChieu);
+            if (!showtime) {
+                return res.status(404).json({ message: "Suất chiếu không tìm thấy." });
+            }
+            res.status(200).json(showtime);
+        } catch (error) {
+            console.error(`ShowtimeController.getShowtimeById for ${req.params.id} error:`, error);
+            next(error);
+        }
+    }
+
+    async deleteShowtime(req, res, next) {
+        try {
+            const maSuatChieu = req.params.id;
+            if (!maSuatChieu) {
+                return res.status(400).json({ message: "Mã suất chiếu là bắt buộc." });
+            }
+            const result = await showtimeService.deleteShowtime(maSuatChieu);
+            // Service đã trả về { success: true, message: "..." } hoặc ném lỗi
+            res.status(200).json(result);
+        } catch (error) {
+            console.error(`ShowtimeController.deleteShowtime for ${req.params.id} error:`, error);
+            // Service đã có thể set statusCode cho lỗi, middleware lỗi chung sẽ xử lý
+            next(error);
+        }
+    }
+
+    async updateShowtime(req, res, next) {
+        try {
+            const maSuatChieu = req.params.id;
+            const dataToUpdate = req.body; // { MAPHIM?, MAPHONG?, date?, time?, GIASUATCHIEU?, TRANGTHAI? }
+
+            if (Object.keys(dataToUpdate).length === 0) {
+                return res.status(400).json({ message: "Không có dữ liệu để cập nhật." });
+            }
+
+            const result = await showtimeService.updateShowtime(maSuatChieu, dataToUpdate);
+            res.status(200).json(result); // Trả về { success, message, data (suất chiếu đã cập nhật) }
+        } catch (error) {
+            console.error(`ShowtimeController.updateShowtime for ${req.params.id} error:`, error);
+            next(error);
+        }
+    }
 }
 module.exports = new ShowtimeController();

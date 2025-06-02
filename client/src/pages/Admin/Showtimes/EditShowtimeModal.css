@@ -1,0 +1,230 @@
+/* src/pages/Showtimes/EditShowtimeModal.css */
+
+/* Các style cơ bản cho overlay, content, header, close-button, footer
+   có thể lấy từ AddShowtimeModal.css (phần -v2) và đổi tên class nếu cần
+   Ví dụ: .edit-showtime-modal-overlay, .edit-showtime-modal-content-v2, etc.
+   Hoặc dùng chung class nếu cấu trúc JSX tương tự.
+*/
+
+.edit-showtime-modal-overlay { /* Giống AddShowtimeModal.css */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.edit-showtime-modal-content-v2 { /* Class mới cho content */
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideInUpModal 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* Dùng lại animation */
+}
+
+.modal-header-v2 { /* Dùng chung class với AddModal */
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+  background-color: #fff;
+  flex-shrink: 0;
+}
+.modal-header-v2 h2 {
+  margin: 0;
+  font-size: 1.6rem;
+  color: #333;
+  font-weight: 700;
+}
+.modal-close-button-v2 { /* Dùng chung class với AddModal */
+  background: #f0f0f0;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #555;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+.modal-close-button-v2:hover {
+  background-color: #e0e0e0;
+  color: #222;
+}
+
+
+.edit-showtime-form-v2 { /* Form mới */
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.modal-body-v2 { /* Dùng chung class với AddModal */
+  padding: 25px 30px;
+  overflow-y: auto;
+  flex-grow: 1;
+  background-color: #f9fafb;
+}
+
+.form-grid-v2 { /* Dùng chung class với AddModal */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.form-group-v2 { /* Dùng chung class với AddModal */
+  display: flex;
+  flex-direction: column;
+}
+.form-group-v2.full-span { /* Dùng chung class với AddModal */
+    grid-column: 1 / -1;
+}
+
+.form-group-v2 label { /* Dùng chung class với AddModal */
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* Input styling - Dùng chung class với AddModal */
+.input-wrapper-v2 select,
+.input-wrapper-v2 input[type="time"],
+.input-wrapper-v2 input[type="date"],
+.input-wrapper-v2 input[type="number"],
+.input-wrapper-v2 input[type="text"] {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: #374151;
+  box-sizing: border-box;
+  background-color: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-wrapper-v2 select {
+  appearance: none; -webkit-appearance: none; -moz-appearance: none;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23888%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 10px 10px;
+  padding-right: 40px;
+}
+
+.input-wrapper-v2 input[disabled],
+.input-wrapper-v2 input[readonly] { /* Style cho trường readonly */
+  background-color: #f3f4f6; /* Xám nhạt hơn */
+  color: #6b7280; /* Màu chữ cho readonly */
+  cursor: not-allowed;
+  border-color: #e5e7eb;
+}
+
+
+.input-wrapper-v2 select:focus,
+.input-wrapper-v2 input:focus { /* Dùng chung class với AddModal */
+  border-color: #3b82f6;
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.input-wrapper-v2 input::placeholder { /* Dùng chung class với AddModal */
+  color: #9ca3af;
+}
+
+.form-error-message-v2 { /* Dùng chung class với AddModal */
+  grid-column: 1 / -1;
+  color: #ef4444;
+  background-color: #fee2e2;
+  border: 1px solid #fca5a5;
+  padding: 12px 15px;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.modal-footer-v2 { /* Dùng chung class với AddModal */
+  padding: 20px 30px;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: flex-end; /* Đẩy các nút sang phải */
+  gap: 12px; /* Khoảng cách giữa các nút */
+  background-color: #fff;
+  flex-shrink: 0;
+}
+
+/* Các nút trong footer */
+.modal-footer-v2 .action-button-v2 {
+  padding: 10px 25px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+  border: none;
+}
+.modal-footer-v2 .action-button-v2:active {
+    transform: translateY(1px);
+}
+.modal-footer-v2 .action-button-v2:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+
+.modal-footer-v2 .cancel-button-v2 {
+  background-color: #e5e7eb; /* Xám nhạt cho nút Hủy */
+  color: #374151; /* Chữ tối */
+  border: 1px solid #d1d5db;
+}
+.modal-footer-v2 .cancel-button-v2:hover {
+  background-color: #d1d5db;
+}
+
+.modal-footer-v2 .submit-button-v2 { /* Dùng chung class với AddModal */
+  background-color: #3b82f6;
+  color: white;
+  box-shadow: 0 2px 5px rgba(59, 130, 246, 0.2);
+}
+.modal-footer-v2 .submit-button-v2:hover {
+  background-color: #2563eb;
+}
+.modal-footer-v2 .submit-button-v2:disabled {
+  background-color: #9ca3af;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .edit-showtime-modal-content-v2 {
+    max-width: 95%;
+  }
+  .form-grid-v2 {
+       grid-template-columns: 1fr;
+       gap: 20px;
+   }
+  .modal-footer-v2 {
+    flex-direction: column-reverse; /* Xếp nút chồng lên nhau, nút submit ở trên */
+    gap: 10px;
+  }
+  .modal-footer-v2 .action-button-v2 {
+    width: 100%;
+  }
+}

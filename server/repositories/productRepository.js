@@ -23,6 +23,23 @@ class ProductRepository {
         }
     }
 
+    async findProductByIdForUpdate(maSP) { // PHẢI nhận và sử dụng connection
+        const sql = 'SELECT MASP, TENSP, SOLUONG, TRANGTHAISP FROM SANPHAMKHAC WHERE MASP = ? FOR UPDATE';
+        try {
+            console.log(`ProductRepository: Locking product ${maSP} for update ON PASSED CONNECTION.`);
+            const [rows] = await pool.query(sql, [maSP]); // SỬ DỤNG `connection` ĐÃ TRUYỀN VÀO
+            if (rows.length === 0) {
+                console.warn(`ProductRepository: Product ${maSP} not found for update lock.`);
+                return null;
+            }
+            console.log(`ProductRepository: Product ${maSP} locked. Current stock (SOLUONG): ${rows[0].SOLUONG}`);
+            return rows[0];
+        } catch (error) {
+            console.error(`Error in ProductRepository.findProductByIdForUpdate for ${maSP}:`, error);
+            throw error;
+        }
+    }
+
     async create(productData) {
         // productData đã có MASP tự sinh từ service
         const { MASP, TENSP, LOAISP, GIASP, SOLUONG, TRANGTHAISP, HINHANHSP } = productData;
@@ -153,6 +170,23 @@ class ProductRepository {
         } catch (error) {
             console.error('Error in ProductRepository.findExactDuplicate:', error);
             throw new Error('DB query failed while checking for exact duplicate product.');
+        }
+    }
+
+    async updateStockAndStatus(maSP, newStock, newStatus) {
+        // Sử dụng SOLUONG
+        const sql = 'UPDATE SANPHAMKHAC SET SOLUONG = ?, TRANGTHAISP = ? WHERE MASP = ?';
+        try {
+            console.log(`ProductRepository: Updating product ${maSP}. New stock (SOLUONG): ${newStock}, New status: ${newStatus}`);
+            const [result] = await pool.query(sql, [newStock, newStatus, maSP]);
+            if (result.affectedRows === 0) {
+                console.warn(`ProductRepository: Product ${maSP} not found during stock update or stock/status unchanged.`);
+            }
+            console.log(`ProductRepository: Product ${maSP} stock and status updated. Affected rows: ${result.affectedRows}`);
+            return result.affectedRows;
+        } catch (error) {
+            console.error(`Error in ProductRepository.updateStockAndStatus for ${maSP}:`, error);
+            throw new Error(`DB query failed: Could not update stock/status for product ${maSP}.`);
         }
     }
 }

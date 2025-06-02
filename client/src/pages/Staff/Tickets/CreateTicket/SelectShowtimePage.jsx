@@ -3,78 +3,130 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Button from '../../../../components/common/Button';
 import './CreateTicketWorkflow.css';
+import { getShowtimesByMovieApi } from '../../../../services/showtimeApiService';
 
-const mockMovies = [{ id: 1, title: 'Godzilla x Kong: Đế Chế Mới', posterUrl: 'https://image.tmdb.org/t/p/w185/v4uV53L4P6h4HnZDx7ELhN1HkX1.jpg', duration: 115, genre: 'Hành động, Viễn tưởng' },
-                    { id: 2, title: 'Kung Fu Panda 4', posterUrl: 'https://image.tmdb.org/t/p/w185/kDp1vUBnMfTfS5iS7M05Y703s3s.jpg', duration: 94, genre: 'Hoạt hình, Phiêu lưu' },
-                    { id: 3, title: 'Dune: Part Two', posterUrl: 'https://image.tmdb.org/t/p/w185/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg', duration: 166, genre: 'Khoa học viễn tưởng, Phiêu lưu' }, ];
-const mockShowtimes = {   1: [ // Showtimes for movie ID 1
-    { id: 101, time: '18:00', date: '20/05/2024', room: 'Phòng 1', seatsAvailable: 50 },
-    { id: 102, time: '20:30', date: '20/05/2024', room: 'Phòng 2', seatsAvailable: 30 },
-    { id: 103, time: '19:00', date: '21/05/2024', room: 'Phòng 1', seatsAvailable: 60 },
-  ],
-                           2: [ // Showtimes for movie ID 2
-    { id: 201, time: '17:00', date: '20/05/2024', room: 'Phòng 3', seatsAvailable: 40 },
-    { id: 202, time: '19:30', date: '20/05/2024', room: 'Phòng 3', seatsAvailable: 25 },
-  ],
-};
+// Hàm chuyển đổi dữ liệu suất chiếu từ API sang định dạng client
+const mapApiShowtimeToClient = (apiShowtime) => ({
+  id: apiShowtime.MASUATCHIEU,
+  // Sử dụng định dạng nhất quán như phiên bản tốt đã đề xuất
+  time: new Date(apiShowtime.THOIGIAN).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false }),
+  date: new Date(apiShowtime.THOIGIAN).toLocaleDateString('vi-VN'),
+  screen: apiShowtime.PHONG_TENPHONG || 'N/A',
+  rawDateTime: apiShowtime.THOIGIAN,
+  movieId: apiShowtime.PHIM_MAPHIM,
+  price: apiShowtime.GIASUATCHIEU,
+  status: apiShowtime.TRANGTHAI,
+  // cinemaRoomId: apiShowtime.MAPHONG, // Ví dụ: mã phòng chiếu
+});
+
 const STAFF_BASE_PATH = "/staff";
 
 const SelectShowtimePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const movieId = location.state?.movieId; // Nhận movieId từ trang trước
 
-  const [movie, setMovie] = useState(null);
+  const movieId = location.state?.movieId;
+  const movieTitle = location.state?.movieTitle; // Nhận movieTitle từ trang trước
+
   const [availableShowtimes, setAvailableShowtimes] = useState([]);
-  const [selectedShowtimeId, setSelectedShowtimeId] = useState(null);
+  const [selectedShowtime, setSelectedShowtime] = useState(null); // Lưu trữ toàn bộ object suất chiếu đã chọn
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (movieId) {
-      const foundMovie = mockMovies.find(m => m.id === movieId);
-      setMovie(foundMovie);
-      setAvailableShowtimes(mockShowtimes[movieId] || []);
-    } else {
-      // Nếu không có movieId, điều hướng về trang chọn phim
+    if (!movieId || !movieTitle) {
+      // alert('Thông tin phim không hợp lệ. Vui lòng chọn lại phim từ đầu.');
       navigate(`${STAFF_BASE_PATH}/tickets/new/select-movie`);
+      return;
     }
-  }, [movieId, navigate]);
 
-  const handleShowtimeSelect = (showtimeId) => {
-    setSelectedShowtimeId(showtimeId);
+    const fetchShowtimesForMovie = async () => {
+      setIsLoading(true);
+      setError(null);
+      setAvailableShowtimes([]); // Xóa suất chiếu cũ trước khi tải mới
+      setSelectedShowtime(null); // Reset lựa chọn cũ
+      try {
+        const response = await getShowtimesByMovieApi(movieId);
+        console.log("FOUND RESPONSE:", response);
+        const mappedShowtimes = response.map(mapApiShowtimeToClient).sort((a, b) => new Date(a.rawDateTime) - new Date(b.rawDateTime));
+
+        setAvailableShowtimes(mappedShowtimes);
+        if (mappedShowtimes.length === 0) {
+          setError('Không có suất chiếu nào khả dụng cho phim này.');
+        }
+
+      } catch (err) {
+        console.error("Lỗi khi tải suất chiếu:", err);
+        setError(err.message || 'Đã xảy ra lỗi khi tải danh sách suất chiếu.');
+      } finally {
+        setIsLoading(false);
+        console.log("SELECT SHOWTIME PAGE");
+      }
+    };
+
+    fetchShowtimesForMovie();
+    // Thêm navigate vào dependency array nếu bạn muốn useEffect chạy lại khi navigate thay đổi (thường không cần thiết cho logic này)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [movieId, movieTitle]); // Chạy lại khi movieId hoặc movieTitle thay đổi
+
+  const handleShowtimeSelect = (showtime) => {
+    setSelectedShowtime(showtime);
   };
 
   const handleNext = () => {
-    if (selectedShowtimeId) {
-      navigate(`${STAFF_BASE_PATH}/tickets/new/select-seats`, { state: { movieId, showtimeId: selectedShowtimeId } });
+    if (selectedShowtime) {
+      navigate(`${STAFF_BASE_PATH}/tickets/new/select-seats`, {
+        state: {
+          movieId,
+          movieTitle,
+          showtimeId: selectedShowtime.id,
+          selectedShowtime // Truyền toàn bộ thông tin suất chiếu đã chọn
+        }
+      });
     } else {
       alert('Vui lòng chọn một suất chiếu.');
     }
   };
 
-  if (!movie) return <p>Đang tải thông tin phim...</p>; // Hoặc loading indicator
+  // Kiểm tra movieTitle để hiển thị tiêu đề chính xác
+  if (!movieTitle && !isLoading && !error) {
+    // Nếu không có movieTitle và không đang tải/lỗi, có thể useEffect đang xử lý chuyển hướng
+    return <p>Đang kiểm tra thông tin phim...</p>;
+  }
 
   return (
     <div className="create-ticket-step">
-      <h2>Bước 2: Chọn Suất Chiếu cho phim "{movie.title}"</h2>
-      {availableShowtimes.length > 0 ? (
+      {/* Sử dụng movieTitle từ location.state */}
+      <h2>Bước 2: Chọn Suất Chiếu cho phim "{movieTitle || 'Chưa chọn phim'}"</h2>
+
+      {isLoading && <p>Đang tải danh sách suất chiếu...</p>}
+      {error && <p className="error-message" style={{ color: 'red' }}>{error}</p>}
+
+      {!isLoading && !error && availableShowtimes.length > 0 && (
         <div className="showtime-list-workflow">
           {availableShowtimes.map(st => (
             <Button
               key={st.id}
-              variant={selectedShowtimeId === st.id ? 'primary' : 'secondary'}
-              onClick={() => handleShowtimeSelect(st.id)}
+              variant={selectedShowtime?.id === st.id ? 'primary' : 'secondary'}
+              onClick={() => handleShowtimeSelect(st)}
               className="showtime-button-workflow"
             >
-              {st.date} - {st.time} ({st.room})
+              {st.date} - {st.time} ({st.screen})
             </Button>
           ))}
         </div>
-      ) : (
-        <p>Không có suất chiếu nào cho phim này.</p>
       )}
+      {/* Thông báo khi không có suất chiếu đã được xử lý bởi setError */}
+
       <div className="workflow-actions">
         <Button onClick={() => navigate(-1)} variant="light">Quay lại</Button>
-        <Button onClick={handleNext} disabled={!selectedShowtimeId} variant="primary">Tiếp tục: Chọn Ghế</Button>
+        <Button
+          onClick={handleNext}
+          disabled={!selectedShowtime || isLoading}
+          variant="primary"
+        >
+          Tiếp tục: Chọn Ghế
+        </Button>
       </div>
     </div>
   );

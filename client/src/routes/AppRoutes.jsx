@@ -70,10 +70,15 @@ const ProtectedWrapper = ({ currentUser, allowedRoles, children }) => {
 const AppRoutes = () => {
   const navigate = useNavigate(); // KHỞI TẠO useNavigate
   const [currentUser, setCurrentUser] = useState(() => {
-    const token = localStorage.getItem('authToken');
-    const role = localStorage.getItem('userRole');
+    const token = localStorage.getItem('authToken'); // Lấy token đã lưu
+    const role = localStorage.getItem('userRole');   // Lấy role đã lưu
+    // Bạn có thể lưu thêm username và manv nếu cần
+    const username = localStorage.getItem('username');
+    const manv = localStorage.getItem('manv');
+
     if (token && role) {
-      return { token, role };
+      // Nếu có token và role, khôi phục currentUser
+      return { token, role, username, manv }; // Thêm username, manv vào đây
     }
     return null;
   });
@@ -82,18 +87,27 @@ const AppRoutes = () => {
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
 
   const handleLoginSuccess = (userData) => {
-    // userData từ API giờ có thể là: { token, role, username, manv }
+    // userData từ API giờ có thể là: { token, user: { username, role, manv } }
+    // Hoặc nếu LoginPage đã trích xuất user: { token, username, role, manv }
     console.log("Login successful in AppRoutes, updating currentUser state:", userData);
-    setCurrentUser({
+
+    // Đảm bảo userData có cấu trúc đúng như mong đợi từ LoginPage
+    // LoginPage gửi: { token: responseData.token, role: responseData.user.role, username: responseData.user.username, manv: responseData.user.manv }
+    if (userData && userData.token && userData.role) {
+      setCurrentUser({
         token: userData.token,
         role: userData.role,
-        username: userData.username, // Tùy chọn lưu thêm
-        manv: userData.manv         // Tùy chọn lưu thêm
-    });
-    localStorage.setItem('authToken', userData.token);
-    localStorage.setItem('userRole', userData.role);
-    if (userData.username) localStorage.setItem('username', userData.username); // Tùy chọn
-    if (userData.manv) localStorage.setItem('manv', userData.manv);         // Tùy chọn
+        username: userData.username,
+        manv: userData.manv
+      });
+      // Lưu vào localStorage để duy trì đăng nhập
+      localStorage.setItem('authToken', userData.token); // ĐỔI TÊN KEY LƯU TRỮ CHO NHẤT QUÁN
+      localStorage.setItem('userRole', userData.role);
+      if (userData.username) localStorage.setItem('username', userData.username);
+      if (userData.manv) localStorage.setItem('manv', userData.manv);
+    } else {
+      console.error("AppRoutes - handleLoginSuccess: Invalid userData received", userData);
+    }
   };
 
   // Hàm này sẽ được gọi khi người dùng nhấn nút "Đăng xuất" trên Header
@@ -109,6 +123,8 @@ const AppRoutes = () => {
     setCurrentUser(null);
     localStorage.removeItem('authToken');
     localStorage.removeItem('userRole');
+    localStorage.removeItem('username'); // <<< THÊM DÒNG NÀY
+    localStorage.removeItem('manv');     // <<< THÊM DÒNG NÀY
     setIsLogoutConfirmOpen(false); // Đóng modal
     navigate(LOGIN_PATH, { replace: true }); // Điều hướng về trang login
   };
@@ -128,8 +144,8 @@ const AppRoutes = () => {
           element={
             currentUser ? (
               currentUser.role === 'admin' ? <Navigate to={ADMIN_BASE_PATH} replace /> :
-              currentUser.role === 'staff' ? <Navigate to={STAFF_BASE_PATH} replace /> :
-              <Navigate to="/" replace />
+                currentUser.role === 'staff' ? <Navigate to={STAFF_BASE_PATH} replace /> :
+                  <Navigate to="/" replace />
             ) : (
               <LoginPage onLoginSuccess={handleLoginSuccess} />
             )
@@ -140,8 +156,8 @@ const AppRoutes = () => {
           element={
             currentUser ? (
               currentUser.role === 'admin' ? <Navigate to={ADMIN_BASE_PATH} replace /> :
-              currentUser.role === 'staff' ? <Navigate to={STAFF_BASE_PATH} replace /> :
-              <Navigate to="/" replace />
+                currentUser.role === 'staff' ? <Navigate to={STAFF_BASE_PATH} replace /> :
+                  <Navigate to="/" replace />
             ) : (
               <OtpPage onLoginSuccess={handleLoginSuccess} />
             )
@@ -190,7 +206,7 @@ const AppRoutes = () => {
         >
           <Route index element={<Navigate to="tickets" replace />} />
           {/* Ví dụ: <Route path="tickets" element={<StaffTicketSalesPage />} /> */}
-          <Route path="tickets" element={<ManageBookingsPage/>} />
+          <Route path="tickets" element={<ManageBookingsPage />} />
           {/* Thêm các route Staff khác */}
           {/* Các route cho quy trình tạo vé mới, lồng trong "tickets/new/" */}
           <Route path="tickets/new"> {/* Route cha cho quy trình tạo vé mới */}
@@ -209,9 +225,9 @@ const AppRoutes = () => {
           path="/"
           element={
             !currentUser ? <Navigate to={LOGIN_PATH} replace /> :
-            currentUser.role === 'admin' ? <Navigate to={ADMIN_BASE_PATH} replace /> :
-            currentUser.role === 'staff' ? <Navigate to={STAFF_BASE_PATH} replace /> :
-            <Navigate to={LOGIN_PATH} replace />
+              currentUser.role === 'admin' ? <Navigate to={ADMIN_BASE_PATH} replace /> :
+                currentUser.role === 'staff' ? <Navigate to={STAFF_BASE_PATH} replace /> :
+                  <Navigate to={LOGIN_PATH} replace />
           }
         />
         <Route path="/403" element={<AccessDenied />} />
@@ -219,7 +235,7 @@ const AppRoutes = () => {
       </Routes>
 
       {/* MODAL XÁC NHẬN ĐĂNG XUẤT */}
-      { <ConfirmationDialog
+      {<ConfirmationDialog
         isOpen={isLogoutConfirmOpen}
         onClose={cancelLogout}      // Khi nhấn "Ở lại" hoặc click ra ngoài
         onConfirm={confirmLogout}   // Khi nhấn "Đăng xuất" trên modal
@@ -229,7 +245,7 @@ const AppRoutes = () => {
         cancelButtonText="Ở lại"    // Text cho nút hủy/phụ
         confirmButtonVariant="danger" // Để nút "Đăng xuất" có style của btn-danger
         cancelButtonVariant="secondary"// Để nút "Ở lại" có style của btn-secondary
-      /> }
+      />}
     </>
   );
 };

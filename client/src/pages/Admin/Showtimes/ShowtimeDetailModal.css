@@ -1,250 +1,388 @@
-/* ShowtimeDetailModal.css */
+/* src/pages/Showtimes/ShowtimeDetailModal.css */
 
-.modal-overlay {
+.showtime-detail-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.65);
+  background-color: rgba(0, 0, 0, 0.7); /* Overlay tối hơn một chút */
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  z-index: 1050;
+  padding: 15px; /* Padding cho màn hình nhỏ */
+  box-sizing: border-box;
 }
 
-.showtime-detail-modal.modal-content {
-  background-color: #f4f6f8;
-  padding: 0;
-  border-radius: 6px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-  width: 90%;
-  max-width: 980px;
-  max-height: 90vh;
+.showtime-detail-modal-content {
+  background: #ffffff; /* Nền trắng cho nội dung chính */
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 980px; /* Tăng độ rộng của modal */
+  max-height: 90vh; /* Giới hạn chiều cao */
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: hidden; /* Quan trọng: để border-radius hoạt động đúng và quản lý scroll nội bộ */
+  animation: fadeInDetailModal 0.3s ease-out;
 }
 
-.showtime-detail-modal .modal-header {
-  background-color: #2c3e50;
-  color: white;
-  padding: 12px 20px;
+@keyframes fadeInDetailModal {
+  from { opacity: 0; transform: translateY(-15px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.showtime-detail-modal-header {
+  background-color: #2c3e50; /* Màu xanh đậm/xám tối cho header */
+  color: #ecf0f1; /* Màu chữ sáng cho header */
+  padding: 18px 25px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.showtime-detail-modal .modal-header h1 {
-  margin: 0;
-  font-size: 1.25em;
-  font-weight: 500;
-}
-
-.modal-body-columns {
-  display: flex;
-  flex-grow: 1;
-  overflow: hidden; /* Đổi thành hidden để các cột con tự scroll */
-  background-color: #f4f6f8;
-}
-
-/* Cột trái: Chi tiết suất chiếu */
-.showtime-info-column {
-  width: 360px;
-  padding: 20px 25px;
-  background-color: #ffffff;
-  border-right: 1px solid #e0e0e0;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto; /* Cho phép cột này cuộn riêng */
-  box-sizing: border-box; /* Thêm box-sizing */
-}
-
-.info-group {
-  margin-bottom: 12px;
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-}
-
-.info-group label {
-  font-size: 0.8em;
-  color: #6c757d;
-  margin-bottom: 0;
-  font-weight: 500;
-  text-transform: uppercase;
-  width: 100px;
+  border-bottom: 1px solid #34495e; /* Viền nhẹ cho header */
   flex-shrink: 0;
-  text-align: left;
 }
 
-.info-group p {
+.showtime-detail-modal-header h1 {
   margin: 0;
-  font-size: 0.95em;
-  color: #212529;
-  line-height: 1.4;
-  text-align: left;
+  font-size: 1.5rem; /* Kích thước tiêu đề */
+  font-weight: 600; /* Đậm vừa phải */
 }
 
-.info-group p a {
-  margin-left: 8px;
-  font-size: 0.9em;
-  color: #007bff;
-  text-decoration: none;
-  font-weight: 500;
-}
-.info-group p a:hover {
-  text-decoration: underline;
-}
-
-.info-group .time-slots-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 0;
-  flex-grow: 1;
-}
-
-.time-slot-btn {
-  padding: 7px 10px;
-  border: 1px solid #ced4da;
-  background-color: #fff;
-  color: #495057;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.85em;
-  font-weight: 500;
-}
-.time-slot-btn:hover {
-  border-color: #adb5bd;
-  background-color: #f8f9fa;
-}
-.time-slot-btn.active {
-  background-color: #dc3545;
-  color: white;
-  border-color: #dc3545;
-}
-
-.modal-actions-left {
-  margin-top: auto;
-  padding-top: 20px;
-  display: flex;
-  justify-content: flex-start;
-  gap: 10px; /* QUAN TRỌNG: Thêm khoảng cách giữa các nút */
-}
-
-.delete-btn, .exit-btn {
-  padding: 8px 18px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 0.9em;
-}
-.delete-btn {
-  background-color: #dc3545;
-  color: white;
-}
-.delete-btn:hover {
-  background-color: #c82333;
-}
-.exit-btn {
-  background-color: #007bff;
-  color: white;
-}
-.exit-btn:hover {
-  background-color: #0056b3;
-}
-
-/* Cột phải: Danh sách ghế */
-.seat-map-column {
-  flex-grow: 1;
-  padding: 20px 25px;
-  display: flex;
-  flex-direction: column;
-  background-color: #f4f6f8;
-  overflow-y: auto; /* Cho phép cột này cuộn riêng */
-  box-sizing: border-box; /* Thêm box-sizing */
-}
-
-.seat-map-column h2 {
-  margin-top: 0;
-  margin-bottom: 15px;
-  font-size: 1.2em;
-  color: #343a40;
-  text-align: center;
-  font-weight: 600;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #dee2e6;
-}
-
-.seat-stats {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 18px;
-  font-size: 0.9em;
-  color: #495057;
-  padding: 0 10px;
-}
-.seat-stats span {
-    font-weight: 500;
-}
-
-/* --- ĐẢM BẢO CÁC THUỘC TÍNH NÀY ĐÚNG --- */
-.seat-grid-container {
-  display: grid; /* QUAN TRỌNG: Sử dụng Grid Layout */
-  grid-template-columns: repeat(16, 1fr); /* QUAN TRỌNG: Chia thành 16 cột bằng nhau */
-  gap: 5px; /* Khoảng cách giữa các ghế */
-  padding: 15px;
-  background-color: #ffffff;
-  border-radius: 5px;
-  border: 1px solid #dee2e6;
-  box-sizing: border-box; /* Thêm box-sizing */
-}
-
-.seat-item {
-  /* aspect-ratio: 1 / 1; Có thể gây vấn đề nếu nội dung không đủ cao, thử bỏ đi */
-  min-height: 28px; /* Đặt chiều cao tối thiểu để đảm bảo ô không quá nhỏ */
-  padding: 5px 0; /* Thêm padding dọc để chữ không sát viền */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 3px;
-  font-size: 0.7em; /* Chữ nhỏ hơn nữa */
-  user-select: none;
-  border: 1px solid;
-  font-weight: 500;
-  text-align: center; /* Đảm bảo chữ căn giữa */
-  box-sizing: border-box; /* Thêm box-sizing */
-}
-/* --- KẾT THÚC KIỂM TRA GRID --- */
-
-.seat-available {
-  background-color: #fff;
-  border-color: #28a745;
-  color: #28a745;
-  cursor: default;
-}
-
-.seat-booked {
-  background-color: #e9ecef;
-  border-color: #ced4da;
-  color: #6c757d;
-  cursor: not-allowed;
-}
-
-
-/* Nút đóng modal */
-.modal-close-button {
+.showtime-detail-modal-close-button {
   background: none;
   border: none;
-  font-size: 1.5em;
-  color: #b0bec5;
+  font-size: 1.75rem;
+  color: #bdc3c7; /* Màu xám nhạt cho nút đóng */
   cursor: pointer;
   padding: 0;
   line-height: 1;
+  transition: color 0.2s ease;
 }
-.modal-close-button:hover {
-  color: #fff;
+.showtime-detail-modal-close-button:hover {
+  color: #ffffff;
+}
+
+.showtime-detail-modal-body {
+  display: flex;
+  flex-grow: 1; /* Cho phép body chiếm không gian còn lại */
+  overflow-y: auto; /* Scroll cho body nếu nội dung quá dài */
+}
+
+/* Cột thông tin bên trái */
+.showtime-detail-info-pane {
+  width: 330px; /* Độ rộng cố định cho cột thông tin */
+  min-width: 300px; /* Đảm bảo không quá hẹp */
+  padding: 25px;
+  background-color: #f9f9f9; /* Nền hơi xám nhẹ cho cột thông tin */
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Đẩy action buttons xuống dưới */
+}
+
+.info-section-scrollable { /* Cho phép scroll nếu thông tin quá dài */
+    flex-grow: 1;
+    overflow-y: auto;
+    margin-bottom: 20px; /* Khoảng cách với nút action */
+    padding-right: 5px; /* Chỗ cho scrollbar nếu có */
+}
+
+
+.info-block {
+  margin-bottom: 16px;
+}
+
+.info-label {
+  display: block;
+  font-size: 0.75rem; /* Label nhỏ hơn */
+  color: #7f8c8d; /* Màu xám cho label */
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.info-value {
+  font-size: 1rem;
+  color: #2c3e50; /* Màu chữ chính */
+  font-weight: 500;
+}
+.info-value.highlight strong { /* Giờ chiếu hiện tại */
+  color: #e74c3c; /* Màu đỏ nổi bật cho giờ */
+  font-weight: 700;
+}
+
+.time-slots-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+}
+.time-slot-btn {
+    background-color: #e0e0e0;
+    color: #333;
+    border: 1px solid #bdbdbd;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+.time-slot-btn:hover {
+    background-color: #d0d0d0;
+    border-color: #adadad;
+}
+.time-slot-btn.active {
+    background-color: #e74c3c; /* Màu đỏ khi active */
+    color: white;
+    border-color: #c0392b;
+    font-weight: bold;
+}
+.time-slot-btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+
+/* Action Buttons */
+.showtime-detail-actions {
+  display: flex;
+  gap: 10px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0; /* Đường kẻ phía trên nút */
+}
+
+.showtime-detail-actions button {
+  flex: 1; /* Chia đều không gian cho các nút */
+  padding: 12px 10px; /* Padding cho nút */
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s ease, opacity 0.2s ease;
+  text-align: center;
+  color: #ffffff; /* Màu chữ trắng chung cho các nút */
+}
+.showtime-detail-actions button:hover {
+  opacity: 0.9;
+}
+.showtime-detail-actions button:active {
+  transform: scale(0.98);
+}
+.showtime-detail-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-edit-detail {
+  background-color: #f39c12; /* Màu vàng cam (Sửa) */
+}
+.btn-delete-detail {
+  background-color: #e74c3c; /* Màu đỏ (Xoá) */
+}
+.btn-close-detail {
+  background-color: #3498db; /* Màu xanh dương (Thoát) */
+}
+
+/* Cột sơ đồ ghế bên phải */
+.showtime-detail-seatmap-pane {
+  flex-grow: 1; /* Chiếm phần còn lại */
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  background-color: #ecf0f1; /* Nền xám rất nhạt cho cột sơ đồ ghế */
+}
+
+.seatmap-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.seatmap-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #34495e;
+}
+.seatmap-stats span {
+  margin-right: 10px;
+}
+.seatmap-stats span:last-child {
+  margin-right: 0;
+}
+
+/* DynamicSeatMapDisplayForAdmin styling */
+.dynamic-seat-map-admin {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db; /* Viền nhẹ cho khu vực ghế */
+  flex-grow: 1; /* Cho phép khu vực sơ đồ ghế co giãn */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Căn giữa nội dung sơ đồ ghế */
+  overflow-x: auto; /* Scroll ngang nếu ghế quá nhiều */
+  overflow-y: hidden; /* Không cần scroll dọc ở đây, body đã scroll */
+}
+
+.dynamic-seat-map-admin .screen-indicator {
+  background-color: #34495e; /* Màu tối cho màn hình */
+  color: white;
+  padding: 8px 0;
+  text-align: center;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  width: 60%;
+  min-width: 180px;
+  max-width: 280px;
+}
+
+.dynamic-seat-map-admin .seat-row-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.dynamic-seat-map-admin .row-label-display {
+  font-weight: 600;
+  color: #555;
+  width: 28px;
+  text-align: center;
+  font-size: 0.85rem;
+}
+.dynamic-seat-map-admin .seats-in-row-actual {
+    display: flex;
+    gap: 6px; /* Khoảng cách giữa các ghế */
+}
+
+.dynamic-seat-map-admin .seat-item {
+  width: 26px; /* Kích thước ghế */
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px; /* Bo góc ghế */
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: default;
+  border: 1px solid; /* Sẽ được định nghĩa màu bởi status */
+  transition: transform 0.1s ease;
+}
+.dynamic-seat-map-admin .seat-placeholder-display {
+  width: 26px;
+  height: 26px;
+}
+
+/* Màu trạng thái ghế */
+.dynamic-seat-map-admin .seat-available {
+  background-color: #a7f3d0; /* Xanh lá mint */
+  color: #047857;
+  border-color: #6ee7b7;
+}
+.dynamic-seat-map-admin .seat-booked {
+  background-color: #fca5a5; /* Đỏ nhạt */
+  color: #b91c1c;
+  border-color: #f87171;
+}
+.dynamic-seat-map-admin .seat-unavailable {
+  background-color: #e5e7eb; /* Xám nhạt */
+  color: #4b5563;
+  border-color: #d1d5db;
+}
+.dynamic-seat-map-admin .seat-vip {
+  border-width: 2px;
+  border-color: #f59e0b; /* Viền vàng cho VIP */
+}
+/* .dynamic-seat-map-admin .seat-thuong {} - không cần style đặc biệt */
+
+/* Chú thích ghế */
+.seat-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 20px; /* Khoảng cách giữa các mục chú thích */
+  padding-top: 15px;
+  margin-top: 20px; /* Khoảng cách với sơ đồ ghế */
+  border-top: 1px solid #e0e0e0;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+  color: #34495e;
+}
+
+.legend-item .seat-item { /* Dùng lại style ghế cho ô màu chú thích */
+  width: 18px;
+  height: 18px;
+  margin-right: 7px;
+  font-size: 0; /* Ẩn số ghế trong chú thích */
+}
+.legend-item .available { background-color: #a7f3d0; border-color: #6ee7b7;}
+.legend-item .booked { background-color: #fca5a5; border-color: #f87171;}
+.legend-item .unavailable { background-color: #e5e7eb; border-color: #d1d5db;}
+.legend-item .vip { border-width: 2px; border-color: #f59e0b; background-color: #fff;}
+.legend-item .thuong { background-color: #f3f4f6; border-color: #d1d5db;} /* Ví dụ màu ghế thường */
+
+
+/* Responsive */
+@media (max-width: 900px) {
+  .showtime-detail-modal-body {
+    flex-direction: column; /* Xếp chồng trên màn hình nhỏ */
+  }
+  .showtime-detail-info-pane {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+    min-height: auto; /* Cho phép co lại theo nội dung */
+  }
+  .showtime-detail-seatmap-pane {
+    width: 100%;
+  }
+  .info-section-scrollable {
+      max-height: 300px; /* Giới hạn chiều cao cho phần thông tin khi xếp chồng */
+  }
+}
+
+@media (max-width: 480px) {
+  .showtime-detail-modal-header h1 {
+    font-size: 1.25rem;
+  }
+  .info-value, .info-label, .seatmap-stats span, .legend-item, .time-slot-btn {
+    font-size: smaller;
+  }
+  .dynamic-seat-map-admin .seat-item, .dynamic-seat-map-admin .seat-placeholder-display {
+      width: 22px; height: 22px; font-size: 0.7rem;
+  }
+  .dynamic-seat-map-admin .row-label-display { width: 22px; font-size: 0.75rem;}
+  .showtime-detail-actions { flex-direction: column; }
+}
+
+.seatmap-loading-info, .no-seatmap-info, .seatmap-error-info {
+    text-align: center;
+    padding: 30px 15px;
+    font-size: 1rem;
+    color: #7f8c8d;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.seatmap-error-info {
+    color: #e74c3c;
 }

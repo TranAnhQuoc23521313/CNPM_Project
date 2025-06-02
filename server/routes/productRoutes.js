@@ -9,5 +9,6 @@ router.post('/', uploadProductImage.single('HINHANHSP_FILE'), productController.
 router.get('/:id', productController.getProductById);
 router.put('/:id', uploadProductImage.single('HINHANHSP_FILE'), productController.updateProduct);
 router.delete('/:id', productController.deleteProduct);
+router.get('/:masp/check-stock', productController.checkProductStock);
 
 module.exports = router;

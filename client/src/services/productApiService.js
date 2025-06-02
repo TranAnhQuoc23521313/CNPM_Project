@@ -62,3 +62,14 @@ export const deleteProductApi = async (productId) => {
         throw new Error(typeof serverError === "object" ? JSON.stringify(serverError) : serverError);
     }
 };
+
+export const checkProductStockApi = async (masp, quantityRequested) => {
+  try {
+    const response = await axios.get(`${PRODUCT_API_ENDPOINT}/${masp}/check-stock?quantityRequested=${quantityRequested}`);
+    return response.data; // Trả về { available: boolean, message: string, currentStock?: number, maxAllowed?: number, reason?: string, productStatus?: string }
+  } catch (error) {
+    // Xử lý lỗi từ API (ví dụ: server sập, network error)
+    console.error(`API Error checking stock for ${masp} (qty: ${quantityRequested}):`, error.response?.data || error.message);
+    throw error.response?.data || new Error("Lỗi kết nối khi kiểm tra tồn kho sản phẩm.");
+  }
+};

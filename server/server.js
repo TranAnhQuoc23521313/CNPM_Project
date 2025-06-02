@@ -16,6 +16,11 @@ const accountRoutes = require('./routes/accountRoutes');
 const authRoutes = require('./routes/authRoutes');
 const equipmentRoutes = require('./routes/equipmentRoutes'); // Nếu có route cho thiết bị, import ở đây
 const transactionhistoryRoutes = require('./routes/transactionhistoryRoutes');
+
+const customerRoutes = require('./routes/customerRoutes'); // << MỚI
+const orderRoutes =require('./routes/orderRoutes');         // << MỚI
+const seatRoutes = require('./routes/seatRoutes');           // << MỚI
+
 // Ví dụ:
 // const showtimeRoutes = require('./routes/showtimeRoutes');
 // const userRoutes = require('./routes/userRoutes');
@@ -66,6 +71,11 @@ app.use('/api/accounts', accountRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/equipment', equipmentRoutes); // Gắn equipmentRoutes vào đường dẫn /api/equipment
 app.use('/api/transactionhistory',transactionhistoryRoutes);
+
+app.use('/api/customers', customerRoutes);     // << MỚI
+app.use('/api/orders', orderRoutes);           // << MỚI
+app.use('/api/seats', seatRoutes);             // << MỚI
+
 // Ví dụ gắn các routes khác:
 // app.use('/api/showtimes', showtimeRoutes);
 // app.use('/api/auth', userRoutes); // Cho đăng nhập, đăng ký

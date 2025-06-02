@@ -136,5 +136,21 @@ class ProductController {
             next(error);
         }
     }
+
+    async checkProductStock(req, res, next) {
+        try {
+            const { masp } = req.params;
+            const quantityRequested = parseInt(req.query.quantityRequested, 10);
+
+            if (isNaN(quantityRequested) || quantityRequested < 0) { // Cho phép quantityRequested = 0 để reset
+                return res.status(400).json({ message: "Số lượng yêu cầu không hợp lệ." });
+            }
+            // Gọi service để kiểm tra
+            const result = await productService.checkProductAvailability(masp, quantityRequested);
+            res.json(result);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 module.exports = new ProductController();

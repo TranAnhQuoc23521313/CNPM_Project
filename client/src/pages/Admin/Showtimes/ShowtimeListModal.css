@@ -1,0 +1,169 @@
+/* client/src/pages/Showtimes/ShowtimeListModal.css (hoặc tên file CSS bạn đang dùng) */
+
+.showtime-list-modal-overlay { /* Đổi tên class để phân biệt nếu cần */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1040; /* Thấp hơn Detail/Edit modal một chút nếu chúng có thể mở chồng lên */
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+.showtime-list-modal-content { /* Đổi tên class để phân biệt */
+  background: #ffffff;
+  padding: 0; /* Bỏ padding cũ để header và body tự quản lý */
+  border-radius: 8px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 800px; /* Độ rộng cho modal danh sách */
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column; /* Để header, body, footer (nếu có) xếp chồng */
+  overflow: hidden; /* Để border-radius áp dụng đúng */
+  animation: fadeInListModal 0.3s ease-out;
+}
+
+@keyframes fadeInListModal {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.showtime-list-modal-header {
+  background-color: #f8f9fa; /* Màu nền sáng cho header */
+  color: #343a40; /* Màu chữ tối */
+  padding: 18px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #dee2e6; /* Viền nhẹ */
+  flex-shrink: 0;
+}
+
+.showtime-list-modal-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+.showtime-list-modal-header .movie-title-highlight {
+    color: #007bff; /* Màu nhấn cho tên phim */
+    font-weight: 700;
+}
+
+.showtime-list-modal-close-button {
+  background: none;
+  border: none;
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+.showtime-list-modal-close-button:hover {
+  color: #343a40;
+}
+
+.showtime-list-modal-body {
+  padding: 20px 25px;
+  overflow-y: auto; /* Scroll cho body nếu bảng quá dài */
+  flex-grow: 1;
+}
+
+.showtimes-table-container {
+  overflow-x: auto; /* Cho phép cuộn ngang nếu bảng quá rộng */
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+}
+
+.showtimes-table {
+  width: 100%;
+  border-collapse: collapse; /* Gộp viền các ô */
+  font-size: 0.9rem;
+}
+
+.showtimes-table th,
+.showtimes-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #e9ecef; /* Viền ngang cho mỗi hàng */
+  vertical-align: middle;
+}
+
+.showtimes-table thead th {
+  background-color: #f1f3f5; /* Nền cho header của bảng */
+  color: #495057;
+  font-weight: 600;
+  position: sticky; /* Header dính khi cuộn */
+  top: 0;
+  z-index: 1; /* Để header bảng nổi trên các dòng khác khi cuộn */
+}
+
+.showtimes-table tbody tr:hover {
+  background-color: #f8f9fa; /* Highlight hàng khi hover */
+}
+
+.showtimes-table td:last-child { /* Căn giữa cho cột "Chi tiết" */
+  text-align: center;
+}
+
+.showtimes-table .status-badge {
+  padding: 4px 8px;
+  border-radius: 12px; /* Bo tròn badge */
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: inline-block;
+  min-width: 70px; /* Độ rộng tối thiểu cho badge */
+  text-align: center;
+}
+
+.status-badge.sap-chieu {
+  background-color: #cfe2ff; /* Xanh dương nhạt (Bootstrap info) */
+  color: #052c65;
+}
+.status-badge.dang-chieu {
+  background-color: #d1e7dd; /* Xanh lá nhạt (Bootstrap success) */
+  color: #0a3622;
+}
+.status-badge.da-chieu {
+  background-color: #e2e3e5; /* Xám nhạt (Bootstrap secondary) */
+  color: #41464b;
+}
+.status-badge.da-huy {
+  background-color: #f8d7da; /* Đỏ nhạt (Bootstrap danger) */
+  color: #58151c;
+}
+
+
+.detail-button-list { /* Style cho nút "Detail" dùng component Button */
+  /* Bạn có thể dùng prop `variant` và `size` của component Button */
+  /* Ví dụ: <Button variant="info" size="small" ... > */
+  padding: 6px 12px !important; /* Override nếu cần */
+  font-size: 0.8rem !important;
+}
+
+.loading-message-list,
+.error-message-list,
+.no-showtimes-message {
+  text-align: center;
+  padding: 30px 15px;
+  font-size: 1rem;
+  color: #6c757d;
+}
+.error-message-list {
+  color: #dc3545;
+}
+
+.showtime-list-modal-footer {
+  padding: 15px 25px;
+  border-top: 1px solid #dee2e6;
+  display: flex;
+  justify-content: flex-end; /* Nút thêm suất chiếu sẽ ở bên phải */
+  background-color: #f8f9fa;
+  flex-shrink: 0;
+}
