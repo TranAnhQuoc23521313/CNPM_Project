@@ -1,0 +1,82 @@
+/* src/pages/Staff/Facilities/DeviceListTab.css (hoặc thêm vào StaffFacilitiesManagement.css) */
+
+.device-list-tab-content h3 {
+  font-size: 1.6rem;
+  color: #2c3e50;
+  margin-top: 0;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e9ecef;
+  text-align: center;
+  font-weight: 500;
+}
+
+.device-list-search-bar {
+  margin-bottom: 20px;
+  display: flex; /* Để input chiếm toàn bộ chiều rộng nếu cần */
+}
+
+.device-list-search-bar input {
+  width: 100%; /* Hoặc đặt max-width */
+  padding: 10px 14px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+}
+.device-list-search-bar input:focus {
+  outline: none;
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.2);
+}
+
+.device-list-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* Thêm shadow nhẹ cho bảng */
+}
+
+.device-list-table th,
+.device-list-table td {
+  border: 1px solid #e0e0e0; /* Viền nhạt hơn một chút */
+  padding: 12px 15px; /* Tăng padding */
+  text-align: left;
+  vertical-align: middle;
+}
+
+.device-list-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+  position: sticky; /* Giữ header bảng khi cuộn (nếu bảng dài) */
+  top: 0; /* Đi kèm với sticky */
+  z-index: 1; /* Đảm bảo header ở trên */
+}
+
+.device-list-table tbody tr:nth-child(even) {
+  background-color: #fdfdfd;
+}
+.device-list-table tbody tr:hover {
+  background-color: #f1f3f5; /* Hiệu ứng hover cho hàng */
+}
+
+/* Style cho các trạng thái */
+.status-active { color: #198754; font-weight: bold; } /* Xanh lá */
+.status-maintenance { color: #ffc107; font-weight: bold; } /* Vàng */
+.status-repairing { color: #fd7e14; font-weight: bold; } /* Cam */
+.status-broken { color: #dc3545; font-weight: bold; } /* Đỏ */
+
+.loading-text-tab,
+.error-text-tab,
+.no-items-found-tab {
+    text-align: center;
+    padding: 30px 20px;
+    color: #6c757d;
+    font-size: 1rem;
+}
+.error-text-tab {
+    color: #dc3545;
+    font-weight: 500;
+}
