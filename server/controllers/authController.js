@@ -32,6 +32,38 @@ class AuthController {
         }
     }
 
+    async getCurrentUserProfile(req, res, next) {
+        try {
+            // Thông tin người dùng đã được middleware verifyToken giải mã
+            // và lưu vào req.user (ví dụ: { id: MANV, username, role })
+            const userProfile = req.user;
+
+            if (!userProfile) {
+                // Trường hợp này ít khi xảy ra nếu verifyToken hoạt động đúng
+                return res.status(404).json({ message: "User profile not found after token verification." });
+            }
+
+            // Bạn có thể muốn trả về một object user đã được "làm sạch"
+            // hoặc lấy thêm thông tin từ DB dựa trên userProfile.id (MANV) nếu cần
+            // Ví dụ, chỉ trả về những thông tin cần thiết cho client:
+            const clientSafeUserProfile = {
+                id: userProfile.id, // Hoặc manv: userProfile.id
+                username: userProfile.username,
+                role: userProfile.role,
+                // Thêm các trường khác nếu có trong payload token và bạn muốn trả về
+                // Ví dụ: nếu AuthService đã thêm Tên Nhân Viên vào payload token
+                // name: userProfile.name 
+            };
+            
+            console.log("AuthController: Sending current user profile:", clientSafeUserProfile);
+            res.status(200).json(clientSafeUserProfile);
+
+        } catch (error) {
+            console.error("AuthController getCurrentUserProfile error:", error);
+            next(error);
+        }
+    }
+
     // (Tùy chọn) Thêm API cho OTP nếu cần
     // async verifyOtp(req, res, next) { ... }
 }

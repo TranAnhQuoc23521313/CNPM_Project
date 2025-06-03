@@ -11,6 +11,8 @@ import SuccessMessageModal from '../../../components/common/SuccessMessageModal.
 import ErrorMessageModal from '../../../components/common/ErrorMessageModal.jsx';
 
 import { getAllTransactionHistory, createTransactionHistory } from '../../../services/transactionhistoryApiService.js';
+import { getAllOrdersApi } from '../../../services/orderApiService'; // <<<<===== IMPORT API LẤY HÓA ĐƠN
+
 
 // Helper functions
 const formatCurrency = (costs) => Number(costs || 0).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
@@ -60,6 +62,43 @@ const mapTransactionHistoryApiToClient = (apiTransactionHistory) => ({
     : null
 });
 
+const mapApiOrderToCustomerInvoiceForDisplay = (apiOrder) => {
+  // apiOrder từ OrderService.getAllOrders có dạng:
+  // { MAHOADON, NGAYTAOHD, TONGTIEN, TRANGTHAITHANHTOAN, HINHTHUCTHANHTOAN, MANV, MAKH,
+  //   KhachHang: { HOTEN, SODT },
+  //   Phim: { TENPHIM },
+  //   SuatChieu: { PhongChieu: { TENPHONG }, THOIGIAN }
+  // }
+  // Bạn cần map nó sang dạng CustomerInvoiceDetailModal mong đợi:
+  // { id, date, customerName, customerId, employeeName (cần fetch thêm), totalAmount, items, paymentMethod, status }
+
+  // Tạm thời, 'items' sẽ là tên phim và phòng chiếu, 'employeeName' sẽ là MANV
+  // Để có employeeName đầy đủ, bạn cần join hoặc fetch thêm ở backend, hoặc map ở client nếu có danh sách nhân viên
+  let itemsDescription = 'N/A';
+  if (apiOrder.Phim?.TENPHIM && apiOrder.SuatChieu?.PhongChieu?.TENPHONG) {
+    itemsDescription = `${apiOrder.Phim.TENPHIM} (Phòng: ${apiOrder.SuatChieu.PhongChieu.TENPHONG})`;
+  } else if (apiOrder.Phim?.TENPHIM) {
+    itemsDescription = apiOrder.Phim.TENPHIM;
+  }
+  // Để lấy tên nhân viên, chúng ta sẽ dùng getEmployeeNameDisplay đã có
+  // nhưng nó cần danh sách employeesList. Trong hàm map này, chúng ta chưa có.
+  // Vì vậy, handleViewCustomerInvoiceDetail sẽ phải bổ sung tên nhân viên.
+
+  return {
+    id: apiOrder.MAHOADON,
+    date: apiOrder.NGAYTAOHD, // NGAYTAOHD là ngày hóa đơn được tạo
+    customerName: apiOrder.KhachHang?.HOTEN || 'Khách vãng lai',
+    customerId: apiOrder.MAKH || null,
+    employeeId: apiOrder.MANV, // Sẽ dùng để lấy tên nhân viên sau
+    employeeName: apiOrder.MANV, // Tạm thời hiển thị MANV, sẽ được cập nhật
+    totalAmount: apiOrder.TONGTIEN,
+    items: itemsDescription, // Mô tả chung về phim/suất chiếu
+    paymentMethod: apiOrder.HINHTHUCTHANHTOAN,
+    status: apiOrder.TRANGTHAITHANHTOAN,
+    // Thêm các trường gốc từ API nếu CustomerInvoiceDetailModal cần (ví dụ để gọi API chi tiết hơn sau này)
+    apiOrderData: apiOrder // Lưu lại dữ liệu gốc từ API nếu cần
+  };
+};
 
 const generateId = (prefix = 'TRX') => `${prefix}-${Date.now().toString().slice(-6)}${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
 
@@ -73,11 +112,11 @@ const generateId = (prefix = 'TRX') => `${prefix}-${Date.now().toString().slice(
   { id: generateId('DN'), date: '2023-11-05', type: 'income', description: 'Thu từ cho thuê mặt bằng quảng cáo', costs: 10000000, category: 'Thu khác', employeeId: 'NV003', employeeName: 'Lê Văn Cường', referenceId: 'HD-QC-1123', invoiceImageName: 'qc_invoice.jpg' },
 ]; */
 
-const INITIAL_CUSTOMER_INVOICES = [
+/* const INITIAL_CUSTOMER_INVOICES = [
   { id: 'HD00123', date: '2023-11-15T10:30:00Z', customerName: 'Nguyễn Văn A', customerId: 'KH001', employeeName: 'Trần Thị Bình', totalAmount: 250000, items: '2 vé John Wick, 1 Bắp rang bơ', paymentMethod: 'Tiền mặt', status: 'Đã thanh toán' },
   { id: 'HD00124', date: '2023-11-15T11:45:00Z', customerName: 'Lê Thị C (vãng lai)', customerId: null, employeeName: 'Trần Thị Bình', totalAmount: 180000, items: '2 vé Phim hoạt hình, 1 Nước ngọt', paymentMethod: 'Chuyển khoản', status: 'Đã thanh toán' },
 ];
-
+ */
 
 function TransactionHistory() {
   const [activeTab, setActiveTab] = useState('business'); // 'business' or 'customerOrders'
@@ -88,6 +127,12 @@ function TransactionHistory() {
   const [showAddBusinessModal, setShowAddBusinessModal] = useState(false);
   const [editingBusinessTransaction, setEditingBusinessTransaction] = useState(null);     // For Edit Modal
   const [viewingBusinessTransaction, setViewingBusinessTransaction] = useState(null); // For Detail Modal
+
+
+  const [customerInvoices, setCustomerInvoices] = useState([]); // Khởi tạo mảng rỗng
+  const [searchTermCustomer, setSearchTermCustomer] = useState('');
+  const [viewingCustomerInvoice, setViewingCustomerInvoice] = useState(null);
+  const [isLoadingCustomerInvoices, setIsLoadingCustomerInvoices] = useState(false); // Thêm state loading
 
   const [employeesList, setEmployeesList] = useState(null);
 
@@ -135,11 +180,33 @@ function TransactionHistory() {
     }
   }, []);
 
+  const fetchCustomerInvoicesFromApi = useCallback(async () => {
+    console.log('Fetching customer invoices from API /api/orders...');
+    setIsLoadingCustomerInvoices(true);
+    setErrorToDisplay(null); // Reset lỗi trước khi fetch
+    try {
+      // API getAllOrdersApi có thể nhận object { searchTerm }, nhưng ở đây ta tìm kiếm ở client
+      // nên có thể gọi không cần searchTerm hoặc searchTerm rỗng.
+      // Giả sử API của bạn cho phép không có searchTerm.
+      const apiOrders = await getAllOrdersApi({ searchTerm: searchTermCustomer }); // Gửi searchTermCustomer nếu API hỗ trợ
+      const mappedInvoices = apiOrders.map(mapApiOrderToCustomerInvoiceForDisplay);
+      setCustomerInvoices(mappedInvoices);
+      console.log('Fetched customer invoices:', mappedInvoices);
+    } catch (error) {
+      console.error('Error fetching customer invoices:', error);
+      setErrorToDisplay({message: error.message || 'Không thể tải danh sách hóa đơn khách hàng.'});
+      setCustomerInvoices([]); // Reset nếu lỗi
+    } finally {
+      setIsLoadingCustomerInvoices(false);
+    }
+  }, []); // Fetch lại khi searchTermCustomer thay đổi nếu API hỗ trợ search
+
   useEffect(() => {
     //localStorage.setItem('th_businessTransactions_v2', JSON.stringify(businessTransactions));
     fetchEmployeesFromApi();
     fecthTransactionHistoryFromApi();
-  }, [fecthTransactionHistoryFromApi, fetchEmployeesFromApi]);
+    fetchCustomerInvoicesFromApi();
+  }, [fecthTransactionHistoryFromApi, fetchEmployeesFromApi, fetchCustomerInvoicesFromApi]);
 
   const handleAddBusinessTx = async (newTxDataFromModal) => {
     const dataToPassToParent = new FormData();
@@ -209,7 +276,7 @@ function TransactionHistory() {
   );
 
   // --- State và logic cho Tab 2: Hóa đơn Khách hàng ---
-  const [customerInvoices, setCustomerInvoices] = useState(() => {
+  /* const [customerInvoices, setCustomerInvoices] = useState(() => {
     const saved = localStorage.getItem('th_customerInvoices_v2');
     return saved ? JSON.parse(saved) : INITIAL_CUSTOMER_INVOICES;
   });
@@ -222,7 +289,18 @@ function TransactionHistory() {
 
   const filteredCustomerInvoices = customerInvoices.filter(inv =>
     Object.values(inv).some(val => String(val).toLowerCase().includes(searchTermCustomer.toLowerCase()))
+  ); */
+
+  
+
+  const filteredCustomerInvoices = customerInvoices.filter(inv =>
+    Object.values(inv).some(val => String(val).toLowerCase().includes(searchTermCustomer.toLowerCase()))
   );
+
+  const handleViewCustomerInvoiceDetail = (invoice) => {
+    const employeeName = getEmployeeNameDisplay(invoice.employeeId);
+    setViewingCustomerInvoice({ ...invoice, employeeName });
+  };
 
   // --- Render ---
   return (
@@ -320,8 +398,9 @@ function TransactionHistory() {
                     {filteredCustomerInvoices.map(inv => (
                       <tr key={inv.id}>
                         <td>{inv.id}</td><td>{formatDate(inv.date, true)}</td>
-                        <td>{inv.customerName} {inv.customerId ? `(${inv.customerId})` : ''}</td>
-                        <td>{inv.employeeName}</td>
+                        {/* <td>{inv.customerName} {inv.customerId ? `(${inv.customerId})` : ''}</td> */}
+                        <td>{inv.customerName}</td>
+                        <td>{getEmployeeNameDisplay(inv.employeeId)}</td>
                         <td style={{ textAlign: 'right' }}>{formatCurrency(inv.totalAmount)}</td>
                         <td><span className={`status-badge status-${inv.status.toLowerCase().replace(/\s+/g, '-')}`}>{inv.status}</span></td>
                         <td className="actions-cell">

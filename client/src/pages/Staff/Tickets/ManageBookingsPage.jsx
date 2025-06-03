@@ -220,9 +220,9 @@ const ManageBookingsPage = () => {
                     <td><span className={`status-badge status-${bookingItem.statusColor}`}>{bookingItem.paymentStatus}</span></td>
                     <td className="actions-cell">
                       <Button variant="info" size="small" onClick={() => handleViewBookingDetails(bookingItem)} disabled={isFetchingDetail}>Chi tiết</Button>
-                      {bookingItem.paymentStatus !== 'Đã hủy' && (
+                      {/* {bookingItem.paymentStatus !== 'Đã hủy' && (
                         <Button variant="danger" size="small" onClick={() => handleCancelBooking(bookingItem)} style={{ marginLeft: '5px' }}>Hủy HĐ</Button>
-                      )}
+                      )} */}
                     </td>
                   </tr>
                 ))
