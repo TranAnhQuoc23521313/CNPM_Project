@@ -67,4 +67,6 @@ router.get(
     facilityRepairController.getIncidentRepairs
 );
 
+router.put('/facilities/issues/:masuco/resolve', verifyToken, facilityIssueController.resolveFacilityIncident);
+
 module.exports = router;

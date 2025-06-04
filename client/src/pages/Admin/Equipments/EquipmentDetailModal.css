@@ -246,9 +246,10 @@
 .status-incident-dang-xu-ly { background-color: #81d4fa; color: #01579b; } /* Light Blue */
 .status-incident-cho-sua-chua { background-color: #ffcc80; color: #e65100; } /* Light Orange */
 .status-incident-dang-sua-chua { background-color: #ffab91; color: #bf360c; } /* Light Red/Orange */
-.status-incident-da-giai-quyet { background-color: #a5d6a7; color: #1b5e20; } /* Light Green */
+.status-incident-đã-giải-quyết { background-color: #a5d6a7; color: #1b5e20; } /* Light Green */
 .status-incident-khong-the-sua { background-color: #ef9a9a; color: #b71c1c; } /* Light Red */
 .status-incident-da-huy { background-color: #bdbdbd; color: #424242; } /* Grey */
+.status-incident-chưa-giải-quyết { background-color: #ffc107; color: #212529; border-color: #e0a800; }
 .status-incident-unknown, .status-incident- { background-color: #f0f0f0; color: #555; }
 
 /* Repair Statuses (similar to equipment statuses or define new ones) */

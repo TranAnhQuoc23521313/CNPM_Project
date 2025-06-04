@@ -96,7 +96,7 @@ class OrderRepository {
             sql += ` WHERE (hd.MAHOADON LIKE ? OR kh.SODT LIKE ? OR kh.HOTEN LIKE ? OR p.TENPHIM LIKE ?) `;
             params.push(likeSearchTerm, likeSearchTerm, likeSearchTerm, likeSearchTerm);
         }
-        sql += ` ORDER BY hd.NGAYTAOHD DESC`;
+        /* sql += ` ORDER BY hd.NGAYTAOHD DESC`; */
 
         try {
             const [rows] = await connection.query(sql, params);

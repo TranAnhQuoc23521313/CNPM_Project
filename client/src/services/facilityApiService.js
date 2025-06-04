@@ -67,6 +67,18 @@ export const getDeviceIssuesApi = async (mathietbi) => {
     }
 };
 
+export const resolveIncidentApi = async (masuco) => {
+    try {
+        const response = await axios.put(`${API_BASE_URL}/facilities/issues/${masuco}/resolve`, {}, { // payload rỗng nếu API không cần
+            headers: getAuthHeaders()
+        });
+        return response.data; // API trả về { success: true, message: '...', data: { MASUCO, TRANGTHAI_SUCO } }
+    } catch (error) {
+        console.error(`API Error - Resolving incident ${masuco}:`, error.response?.data || error.message);
+        throw error.response?.data || error;
+    }
+};
+
 
 // --- Facility Repair (Sửa chữa Thiết bị) APIs ---
 

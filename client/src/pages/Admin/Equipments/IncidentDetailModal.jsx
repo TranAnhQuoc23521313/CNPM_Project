@@ -51,14 +51,14 @@ const IncidentDetailModal = ({ incident, onClose, formatDate, formatCurrency }) 
                 </span>
               </p>
             </div>
-            {/* <div className="detail-item">
+            <div className="detail-item">
               <strong>Trạng Thái Sự Cố:</strong>
               <p>
                 <span className={`status-badge status-incident-${String(incident.TRANGTHAI_SUCO || '').toLowerCase().replace(/\s+/g, '-')}`}>
                     {incident.TRANGTHAI_SUCO || 'Không rõ'}
                 </span>
               </p>
-            </div> */}
+            </div>
             <div className="detail-item detail-item-full-width">
               <strong>Mô Tả Sự Cố:</strong>
               <p className="notes-paragraph">{incident.MOTA || 'Không có mô tả'}</p>

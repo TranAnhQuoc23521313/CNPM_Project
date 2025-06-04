@@ -171,16 +171,17 @@
 }
 
 .equipments-page .priority-badge {
-    padding: 0.3em 0.6em; /* Kích thước tương tự status-badge */
-    font-size: .75em;
-    font-weight: 700;
-    line-height: 1;
-    text-align: center;
-    white-space: nowrap;
-    vertical-align: baseline;
-    border-radius: .25rem;
-    display: inline-block;
-    color: white; /* Mặc định màu chữ là trắng */
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 0.85em;
+  font-weight: 500;
+  color: white; /* Màu chữ mặc định */
+  text-align: center;
+  display: inline-block;
+  min-width: 100px; /* Điều chỉnh nếu cần */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border: 1px solid transparent;
+  line-height: 1.4; /* Cải thiện hiển thị trên một số trình duyệt */
 }
 
 .equipments-page .status-badge.status-equipment-đang-hoạt-động { background-color: #28a745; color: white; }
@@ -225,38 +226,69 @@
   border-radius: 6px; 
 }
 
-/* --- Status Badges - ĐIỀU CHỈNH MÀU SẮC --- */
+/* --- EQUIPMENT STATUSES (status-equipment-...) --- */
+.equipments-page .status-equipment-dang-hoat-dong { background-color: #28a745; border-color: #1e7e34; } /* Xanh lá */
+.equipments-page .status-equipment-can-bao-tri   { background-color: #ffc107; color: #212529; border-color: #e0a800;} /* Vàng */
+.equipments-page .status-equipment-dang-sua-chua { background-color: #17a2b8; border-color: #117a8b;} /* Xanh dương nhạt */
+.equipments-page .status-equipment-hong-hoc      { background-color: #dc3545; border-color: #bd2130;} /* Đỏ */
+.equipments-page .status-equipment-khong-su-dung { background-color: #6c757d; border-color: #5a6268;} /* Xám */
+.equipments-page .status-equipment-unknown     { background-color: #adb5bd; border-color: #98a0a7;} /* Xám nhạt */
 
-/* --- Status Badges cho Thiết bị (status-equipment-xxx) --- */
-.equipments-page .status-badge.status-equipment-đang-hoạt-động { background-color: #28a745; color: white; } /* Xanh lá cây - Tốt */
-.equipments-page .status-badge.status-equipment-cần-bảo-trì { background-color: #ffc107; color: #212529; } /* Vàng - Cảnh báo */
-.equipments-page .status-badge.status-equipment-đang-sửa-chữa { background-color: #17a2b8; color: white; } /* Xanh dương nhạt - Thông tin */
-.equipments-page .status-badge.status-equipment-hỏng-hóc { background-color: #dc3545; color: white; } /* Đỏ - Nguy hiểm/Lỗi */
-.equipments-page .status-badge.status-equipment-không-sử-dụng { background-color: #6c757d; color: white; } /* Xám - Không hoạt động */
-.equipments-page .status-badge.status-equipment-unknown { background-color: #adb5bd; color: white; } /* Xám nhạt - Không rõ */
+/* --- INCIDENT STATUSES (status-incident-...) --- */
+/* 
+  LƯU Ý: Tên class ở đây phải khớp với kết quả của:
+  `String(TRANGTHAI_SUCO_TU_DB)
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")`
+  Ví dụ: "Chưa giải quyết" -> "chua-giai-quyet"
+*/
+.equipments-page .status-incident-moi-bao-cao      { background-color: #007bff; border-color: #0056b3;} /* Xanh dương đậm */
+.equipments-page .status-incident-da-tiep-nhan    { background-color: #17a2b8; border-color: #117a8b;} /* Xanh ngọc */
+.equipments-page .status-incident-dang-xu-ly       { background-color: #ffc107; color: #212529; border-color: #e0a800;} /* Vàng */
+.equipments-page .status-incident-chờ-sửa-chữa    { background-color: #fd7e14; border-color: #d3640a;} /* Cam */
+.equipments-page .status-incident-đang-sửa-chữa    { background-color: #6f42c1; border-color: #59369a;} /* Tím */
+.equipments-page .status-incident-đã-giải-quyết    { background-color: #28a745; border-color: #1e7e34;} /* Xanh lá */
+.equipments-page .status-incident-khong-the-sua    { background-color: #dc3545; border-color: #bd2130;} /* Đỏ */
+.equipments-page .status-incident-da-huy           { background-color: #6c757d; border-color: #5a6268;} /* Xám */
+.equipments-page .status-incident-unknown          { background-color: #adb5bd; border-color: #98a0a7;} /* Xám nhạt */
+
+/* Thêm riêng cho 2 trạng thái bạn dùng nhiều */
+.equipments-page .status-incident-chưa-giải-quyết { background-color: #ffc107; color: #212529; border-color: #e0a800;} /* Vàng */
+/* .status-incident-da-giai-quyet đã có ở trên (Xanh lá) */
 
 
-/* --- Status Badges cho Sự cố (status-incident-xxx) --- */
-.equipments-page .status-badge.status-incident-mới-báo-cáo { background-color: #007bff; color: white; } /* Xanh dương đậm - Mới */
-.equipments-page .status-badge.status-incident-đã-tiếp-nhận { background-color: #17a2b8; color: white; } /* Xanh ngọc - Đã xem xét */
-.equipments-page .status-badge.status-incident-đang-xử-lý { background-color: #ffc107; color: #212529; } /* Vàng - Đang tiến hành */
-.equipments-page .status-badge.status-incident-chờ-sửa-chữa { background-color: #fd7e14; color: white; } /* Cam - Chờ đợi */
-.equipments-page .status-badge.status-incident-đang-sửa-chữa { background-color: #6f42c1; color: white; } /* Tím - Đang thực hiện (khác với thiết bị) */
-.equipments-page .status-badge.status-incident-đã-giải-quyết { background-color: #28a745; color: white; } /* Xanh lá - Hoàn thành */
-.equipments-page .status-badge.status-incident-không-thể-sửa { background-color: #dc3545; color: white; } /* Đỏ - Thất bại */
-.equipments-page .status-badge.status-incident-đã-hủy { background-color: #6c757d; color: white; } /* Xám - Đã hủy */
-.equipments-page .status-badge.status-incident-unknown { background-color: #adb5bd; color: white; } /* Xám nhạt - Không rõ */
-
-.equipments-page .status-badge.status-repair-đã-sửa-chữa---hoạt-động-tốt { background-color: #28a745; color: white; } /* Xanh lá */
-.equipments-page .status-badge.status-repair-tạm-thời-sửa-chữa---cần-theo-dõi-thêm { background-color: #ffc107; color: #212529; } /* Vàng */
-.equipments-page .status-badge.status-repair-không-thể-sửa-chữa---đề-xuất-thay-thế { background-color: #dc3545; color: white; } /* Đỏ */
-.equipments-page .status-badge.status-repair-chờ-linh-kiện { background-color: #17a2b8; color: white; } /* Xanh dương nhạt */
-/* Thêm các trạng thái khác nếu có từ CSDL của bạn cho cột TINHTRANG_SAU_SC */
-.equipments-page .status-badge.status-repair-unknown { background-color: #adb5bd; color: white; } /* Trạng thái mặc định nếu không khớp */
+/* --- REPAIR STATUSES (status-repair-...) --- */
+/* 
+  LƯU Ý: Tên class ở đây phải khớp với kết quả của:
+  `String(TINHTRANG_SAU_SC_TU_DB)
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")`
+  Ví dụ: "Đã sửa chữa - Hoạt động tốt" -> "da-sua-chua---hoat-dong-tot"
+*/
+.equipments-page .status-repair-đã-sửa-chữa---hoạt-động-tốt        { background-color: #28a745; border-color: #1e7e34;} /* Xanh lá */
+.equipments-page .status-repair-tam-thoi-sua-chua---can-theo-doi-them { background-color: #ffc107; color: #212529; border-color: #e0a800;} /* Vàng */
+.equipments-page .status-repair-khong-the-sua-chua---de-xuat-thay-the { background-color: #dc3545; border-color: #bd2130;} /* Đỏ */
+.equipments-page .status-repair-cho-linh-kien                       { background-color: #17a2b8; border-color: #117a8b;} /* Xanh dương nhạt */
+.equipments-page .status-repair-unknown                             { background-color: #adb5bd; border-color: #98a0a7;} /* Xám nhạt */
 
 
-.equipments-page .priority-badge.priority-thấp { background-color: #28a745; } /* Xanh lá - Thấp */
-.equipments-page .priority-badge.priority-trung-bình { background-color: #17a2b8; } /* Xanh dương nhạt - Trung bình */
-.equipments-page .priority-badge.priority-cao { background-color: #ffc107; color: #212529; } /* Vàng - Cao (chữ tối) */
-.equipments-page .priority-badge.priority-khẩn-cấp { background-color: #dc3545; } /* Đỏ - Khẩn cấp */
-.equipments-page .priority-badge.priority-unknown { background-color: #adb5bd; } /* Xám - Không rõ */
+/* --- PRIORITY BADGES (priority-...) --- */
+/* 
+  LƯU Ý: Tên class ở đây phải khớp với kết quả của:
+  `String(MUCDO_UUTIEN_TU_DB)
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")`
+  Ví dụ: "Khẩn cấp" -> "khan-cap"
+*/
+.equipments-page .priority-badge {
+  min-width: 80px; /* Độ rộng riêng cho priority badge nếu muốn */
+  color: white; /* Đảm bảo màu chữ là trắng nếu không có override */
+}
+.equipments-page .priority-thap      { background-color: #28a745; } /* Xanh lá */
+.equipments-page .priority-trung-binh { background-color: #17a2b8; } /* Xanh dương nhạt */
+.equipments-page .priority-cao        { background-color: #ffc107; color: #212529; } /* Vàng */
+.equipments-page .priority-khan-cap   { background-color: #dc3545; } /* Đỏ */
+.equipments-page .priority-unknown    { background-color: #adb5bd; } /* Xám */

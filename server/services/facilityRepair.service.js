@@ -1,43 +1,77 @@
 // src/services/facilityRepair.service.js
 const facilityRepairRepository = require('../repositories/facilityRepair.repository');
-const facilityIssueRepository = require('../repositories/facilityIssue.repository'); // Để kiểm tra MASUCO
+//const facilityIssueRepository = require('../repositories/facilityIssue.repository'); // Để kiểm tra MASUCO
+const facilityIssueService = require('./facilityIssue.service');
 const { generateNewRepairId } = require('../utils/issue_fix_id_Generator');
+const equipmentService = require('./equipmentService'); // IMPORT EquipmentService
+const { DEVICE_STATUS } = require('./equipmentService'); // Import hằng số trạng thái
 
 class FacilityRepairService {
     async recordRepair(repairDetails, userId) {
-        // repairDetails từ controller: MASUCO, NGAYSUACHUA, TINHTRANG_SAU_SC, CHIPHI, MOTA, HINHANH_SUACHUA (tên file)
-        // userId là MANV của người thực hiện sửa chữa
+        // repairDetails: MASUCO, NGAYSUACHUA, TINHTRANG_SAU_SC, CHIPHI, MOTA, HINHANH_SUACHUA
+        // userId: MANV người sửa
 
-        // Kiểm tra sự cố (MASUCO) có tồn tại không
-        const incidentExists = await facilityIssueRepository.findById(repairDetails.MASUCO);
+        const incidentExists = await facilityIssueService.getIssueById(repairDetails.MASUCO);
         if (!incidentExists) {
-            throw new Error(`Incident with ID ${repairDetails.MASUCO} not found. Cannot record repair.`);
+            throw new Error(`Sự cố với mã ${repairDetails.MASUCO} không tồn tại. Không thể ghi nhận sửa chữa.`);
         }
-        // TODO: Kiểm tra xem sự cố có đang ở trạng thái cho phép sửa chữa không (ví dụ: không phải "Đã giải quyết")
+        if (incidentExists.TRANGTHAI_SUCO === 'Đã giải quyết') {
+            throw new Error(`Sự cố ${repairDetails.MASUCO} đã được giải quyết trước đó. Không thể ghi nhận sửa chữa mới cho sự cố đã giải quyết.`);
+        }
 
-        const masuachua = await generateNewRepairId();
+        const masuachua = await generateNewRepairId(); // Tạo mã sửa chữa mới
         const currentDate = new Date().toISOString().split('T')[0];
 
         const repairDataToSave = {
             MASUACHUA: masuachua,
             MASUCO: repairDetails.MASUCO,
-            MANV: userId, // MANV người sửa
+            MANV: userId,
             NGAYSUACHUA: repairDetails.NGAYSUACHUA || currentDate,
             TINHTRANG_SAU_SC: repairDetails.TINHTRANG_SAU_SC,
-            CHIPHI: repairDetails.CHIPHI || 0,
+            CHIPHI: repairDetails.CHIPHI === '' || repairDetails.CHIPHI === null || repairDetails.CHIPHI === undefined ? null : Number(repairDetails.CHIPHI),
             MOTA: repairDetails.MOTA,
             HINHANH_SUACHUA: repairDetails.HINHANH_SUACHUA || null,
         };
 
         try {
             const createdRepair = await facilityRepairRepository.create(repairDataToSave);
-            
-            // TODO: Cập nhật TRANGTHAI_SUCO trong bảng THIETBI_SUCO nếu cần
-            // Ví dụ: nếu TINHTRANG_SAU_SC là "Đã sửa chữa - Hoạt động tốt"
-            // thì cập nhật TRANGTHAI_SUCO của incidentExists thành "Đã giải quyết"
-            // await facilityIssueRepository.updateStatus(repairDetails.MASUCO, 'Đã giải quyết');
 
-            return createdRepair;
+            // Sau khi ghi nhận sửa chữa thành công, cập nhật TRANGTHAI_SUCO của sự cố thành "Đã giải quyết"
+            // Và chỉ làm điều này nếu tình trạng sau sửa chữa là tích cực
+            if (createdRepair) {
+                // 1. Cập nhật TRANGTHAI_SUCO của sự cố thành "Đã giải quyết"
+                // (Chỉ khi tình trạng sau sửa chữa là các trạng thái kết thúc)
+                const repairConcludesIncident = [
+                    'Đã sửa chữa - Hoạt động tốt',
+                    'Không thể sửa chữa - Đề xuất thay thế'
+                    // Thêm các tình trạng khác nếu nó đồng nghĩa với việc sự cố đã kết thúc
+                ].includes(repairDetails.TINHTRANG_SAU_SC);
+
+                if (repairConcludesIncident) {
+                    try {
+                        await facilityIssueService.resolveIncident(repairDetails.MASUCO);
+                        console.log(`[RepairService] Sự cố ${repairDetails.MASUCO} đã được cập nhật thành "Đã giải quyết".`);
+
+                        // 2. CẬP NHẬT TRẠNG THÁI THIẾT BỊ thành "Đang hoạt động"
+                        // (Chỉ khi tình trạng sau sửa chữa là "Hoạt động tốt")
+                        if (repairDetails.TINHTRANG_SAU_SC === 'Đã sửa chữa - Hoạt động tốt' && incidentExists.MATHIETBI) {
+                            try {
+                                await equipmentService.updateDeviceStatus(incidentExists.MATHIETBI, DEVICE_STATUS.ACTIVE); // 'Đang hoạt động'
+                            } catch (deviceStatusError) {
+                                console.error(`[RepairService] Lỗi khi cập nhật trạng thái thiết bị ${incidentExists.MATHIETBI} thành "Đang hoạt động":`, deviceStatusError.message);
+                            }
+                        } else if (repairDetails.TINHTRANG_SAU_SC === 'Không thể sửa chữa - Đề xuất thay thế' && incidentExists.MATHIETBI) {
+                            // Nếu không thể sửa, thiết bị vẫn là "Hỏng hóc" hoặc một trạng thái khác tùy logic
+                            // await equipmentService.updateDeviceStatus(incidentExists.MATHIETBI, DEVICE_STATUS.BROKEN); 
+                            // hoặc một trạng thái như "Cần thay thế" nếu bạn có
+                        }
+
+                    } catch (resolveError) {
+                        console.error(`[RepairService] Lỗi khi cập nhật trạng thái sự cố ${repairDetails.MASUCO}:`, resolveError.message);
+                    }
+                }
+            }
+            return createdRepair; // Trả về bản ghi sửa chữa đã tạo
         } catch (error) {
             console.error('Service Error: Could not record repair.', error);
             throw new Error('Failed to record facility repair.');
@@ -54,7 +88,7 @@ class FacilityRepairService {
             throw new Error('Failed to retrieve facility repair.');
         }
     }
-    
+
     async getRepairsByIncident(masuco) {
         try {
             return await facilityRepairRepository.findAllByIncidentId(masuco);

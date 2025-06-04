@@ -102,6 +102,31 @@ class FacilityIssueController {
             });
         }
     }
+
+    async resolveFacilityIncident(req, res, next) {
+        try {
+            const { masuco } = req.params;
+            if (!masuco) {
+                return res.status(400).json({ success: false, message: "Mã sự cố là bắt buộc." });
+            }
+
+            const result = await facilityIssueService.resolveIncident(masuco);
+
+            res.status(200).json({
+                success: true,
+                message: result.message || `Sự cố ${masuco} đã được đánh dấu là "Đã giải quyết".`,
+                data: result,
+            });
+
+        } catch (error) {
+            console.error("Controller Error - resolveFacilityIncident:", error.message, error.stack);
+            const statusCode = error.message.toLowerCase().includes("không tồn tại") ? 404 : 500;
+            res.status(statusCode).json({
+                success: false,
+                message: error.message || 'Lỗi khi đánh dấu sự cố đã giải quyết.'
+            });
+        }
+    }
 }
 
 module.exports = new FacilityIssueController();
