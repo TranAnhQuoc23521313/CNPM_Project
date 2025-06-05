@@ -175,3 +175,123 @@
     font-size: 1.6em;
   }
 }
+
+/*  Test */
+
+.modal-content.equipment-detail-modal-content .modal-body {
+  max-height: 70vh; /* Or your preferred max height */
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive columns */
+  gap: 15px 20px; /* row-gap column-gap */
+}
+
+.detail-item {
+  background-color: #f9f9f9;
+  padding: 10px 15px;
+  border-radius: 5px;
+  border: 1px solid #eee;
+  word-wrap: break-word; /* Ensure long text wraps */
+}
+
+.detail-item strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #333;
+  font-size: 0.9em;
+}
+
+.detail-item p {
+  margin: 0;
+  color: #555;
+  font-size: 1em;
+}
+
+.detail-item-full-width {
+  grid-column: 1 / -1; /* Span all columns */
+}
+
+.notes-paragraph {
+  white-space: pre-wrap; /* Preserve line breaks and spaces */
+  line-height: 1.6;
+}
+
+/* Style for images in detail modals */
+.detail-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin-top: 10px;
+  border: 1px solid #ddd;
+}
+
+/* Status and Priority Badges (you might have these already, ensure they cover new cases) */
+.status-badge, .priority-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 500;
+  display: inline-block;
+  text-align: center;
+  min-width: 80px; /* Ensure some minimum width */
+}
+
+/* Incident Statuses */
+.status-incident-moi-bao-cao { background-color: #e0e0e0; color: #333; }
+.status-incident-da-tiep-nhan { background-color: #fff59d; color: #5d4037; } /* Light Yellow */
+.status-incident-dang-xu-ly { background-color: #81d4fa; color: #01579b; } /* Light Blue */
+.status-incident-cho-sua-chua { background-color: #ffcc80; color: #e65100; } /* Light Orange */
+.status-incident-dang-sua-chua { background-color: #ffab91; color: #bf360c; } /* Light Red/Orange */
+.status-incident-đã-giải-quyết { background-color: #a5d6a7; color: #1b5e20; } /* Light Green */
+.status-incident-khong-the-sua { background-color: #ef9a9a; color: #b71c1c; } /* Light Red */
+.status-incident-da-huy { background-color: #bdbdbd; color: #424242; } /* Grey */
+.status-incident-chưa-giải-quyết { background-color: #ffc107; color: #212529; border-color: #e0a800; }
+.status-incident-unknown, .status-incident- { background-color: #f0f0f0; color: #555; }
+
+/* Repair Statuses (similar to equipment statuses or define new ones) */
+.status-repair-dang-hoat-dong { background-color: #a5d6a7; color: #1b5e20; } /* Light Green */
+.status-repair-can-bao-tri { background-color: #ffcc80; color: #e65100; } /* Light Orange */
+.status-repair-dang-sua-chua { background-color: #ffab91; color: #bf360c; } /* Light Red/Orange */
+.status-repair-hong-hoc { background-color: #ef9a9a; color: #b71c1c; } /* Light Red */
+.status-repair-khong-su-dung { background-color: #bdbdbd; color: #424242; } /* Grey */
+.status-repair-tot { background-color: #a5d6a7; color: #1b5e20; } /* Same as đang hoạt động */
+.status-repair-unknown, .status-repair- { background-color: #f0f0f0; color: #555; }
+
+
+/* Priority Badges */
+.priority-badge.priority-cao, .priority-badge.priority-khẩn-cấp { background-color: #ffcdd2; color: #c62828; }
+.priority-badge.priority-trung-bình { background-color: #fff9c4; color: #f9a825; }
+.priority-badge.priority-thấp { background-color: #c8e6c9; color: #2e7d32; }
+.priority-badge.priority-unknown { background-color: #e0e0e0; color: #333; }
+
+/* Equipment Statuses (If not already defined) */
+.status-equipment-dang-hoat-dong { background-color: #a5d6a7; color: #1b5e20; }
+.status-equipment-can-bao-tri { background-color: #ffcc80; color: #e65100; }
+.status-equipment-dang-sua-chua { background-color: #ffab91; color: #bf360c; }
+.status-equipment-hong-hoc { background-color: #ef9a9a; color: #b71c1c; }
+.status-equipment-khong-su-dung { background-color: #bdbdbd; color: #424242; }
+.status-equipment-unknown { background-color: #f0f0f0; color: #555; }
+
+/* Cell specific styling */
+.notes-cell {
+  max-width: 200px; /* Adjust as needed */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.equipment-name-cell {
+  max-width: 150px; /* Adjust as needed */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.currency-cell {
+  text-align: right;
+}
+.actions-cell {
+  text-align: center;
+}

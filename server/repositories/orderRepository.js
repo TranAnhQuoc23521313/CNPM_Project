@@ -96,11 +96,11 @@ class OrderRepository {
             sql += ` WHERE (hd.MAHOADON LIKE ? OR kh.SODT LIKE ? OR kh.HOTEN LIKE ? OR p.TENPHIM LIKE ?) `;
             params.push(likeSearchTerm, likeSearchTerm, likeSearchTerm, likeSearchTerm);
         }
-        sql += ` ORDER BY hd.NGAYTAOHD DESC`;
+        /* sql += ` ORDER BY hd.NGAYTAOHD DESC`; */
 
         try {
             const [rows] = await connection.query(sql, params);
-            console.log("SQL ROWS FROM OrderRepository.getAllOrders (JOIN via HOADON.MASUATCHIEU):", JSON.stringify(rows, null, 2));
+            //console.log("SQL ROWS FROM OrderRepository.getAllOrders (JOIN via HOADON.MASUATCHIEU):", JSON.stringify(rows, null, 2));
             return rows;
         } catch (error) {
             console.error('Error in OrderRepository.getAllOrders:', error);
@@ -206,6 +206,53 @@ class OrderRepository {
                 return { success: false, message: "Hóa đơn này đã được hủy trước đó." };
             }
             return { success: false, message: "Không thể hủy hóa đơn hoặc không có gì thay đổi." };
+        }
+    }
+
+    async findTicketsByOrderIdWithDetails(maHoaDon, connection = pool) {
+        // *** KHOANG CODE CHỜ YÊU CẦU TỪ TÔI (OrderRepository.findTicketsByOrderIdWithDetails - SQL Query) ***
+        // Yêu cầu 3: Viết câu SQL để lấy thông tin chi tiết của tất cả các vé
+        //            thuộc một mã hóa đơn.
+        //
+        // Câu SQL cần JOIN các bảng: VE, SUATCHIEU, PHIM, PHONGCHIEU, GHENGOI.
+        // Các cột cần lấy ví dụ:
+        // VE.MAVE, VE.GIABAN, VE.MAHOADON
+        // PHIM.TENPHIM
+        // SUATCHIEU.THOIGIAN (đổi tên thành THOIGIANSUATCHIEU nếu cần)
+        // PHONGCHIEU.TENPHONG
+        // GHENGOI.DAYGHE, GHENGOI.VITRIGHE, GHENGOI.LOAIGHE
+
+        const sql = `
+            SELECT
+                v.MAVE,
+                v.GIABAN,
+                v.MAHOADON,
+                p.TENPHIM,
+                sc.THOIGIAN AS THOIGIANSUATCHIEU,
+                pc.TENPHONG,
+                gn.DAYGHE,
+                gn.VITRIGHE,
+                gn.LOAIGHE
+            FROM VE v
+            JOIN SUATCHIEU sc ON v.MASUATCHIEU = sc.MASUATCHIEU
+            JOIN PHIM p ON sc.MAPHIM = p.MAPHIM
+            JOIN PHONGCHIEU pc ON v.MAPHONG = pc.MAPHONG  -- Hoặc sc.MAPHONG tùy theo cấu trúc DB
+            JOIN GHENGOI gn ON v.MAGHE = gn.MAGHE AND v.MAPHONG = gn.MAPHONG -- Đảm bảo join đúng GHENGOI của phòng đó
+            WHERE v.MAHOADON = ? AND v.TRANGTHAIVE != 'Đã hủy'; -- Chỉ lấy vé không bị hủy
+        `;
+        // Lưu ý: Điều kiện v.MAPHONG = gn.MAPHONG là quan trọng nếu MAGHE không phải là unique toàn hệ thống.
+
+        try {
+            const [rows] = await connection.query(sql, [maHoaDon]);
+            if (rows.length === 0) {
+                console.log(`OrderRepository: No tickets found for orderId ${maHoaDon}`);
+            } else {
+                console.log(`OrderRepository: Found ${rows.length} tickets for orderId ${maHoaDon}`);
+            }
+            return rows; // Trả về mảng các đối tượng vé thô từ DB
+        } catch (error) {
+            console.error(`Error in OrderRepository.findTicketsByOrderIdWithDetails for order ${maHoaDon}:`, error);
+            throw error;
         }
     }
 }

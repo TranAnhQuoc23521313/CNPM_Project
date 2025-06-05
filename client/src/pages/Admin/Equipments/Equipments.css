@@ -6,6 +6,15 @@
   min-height: calc(100vh - 70px); /* Giả sử header app cao 70px */
 }
 
+/* Tiêu đề lớn chung cho trang */
+.equipments-page .main-page-header {
+  font-size: 28px;
+  font-weight: 500;
+  color: #1f1f1f;
+  margin-bottom: 15px;
+  padding-left: 5px;
+}
+
 .equipments-page .content-card {
   background-color: #ffffff;
   padding: 25px 30px;
@@ -13,29 +22,61 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
+/* Styling cho các nút Tab chuyển đổi view */
+.equipments-page .view-tabs {
+  display: flex;
+  margin-bottom: 20px; /* Khoảng cách với tiêu đề bên dưới */
+  /* border-bottom: 2px solid #e0e0e0; */ /* Tùy chọn: đường kẻ dưới */
+}
+
+.equipments-page .view-tab-button {
+  padding: 10px 20px;
+  font-size: 16px; /* Kích thước chữ cho tab */
+  font-weight: 500;
+  color: #555;
+  background-color: transparent;
+  border: none;
+  border-bottom: 3px solid transparent; /* Quan trọng cho hiệu ứng active */
+  cursor: pointer;
+  margin-right: 10px;
+  transition: color 0.2s ease, border-bottom-color 0.2s ease;
+  outline: none;
+}
+
+.equipments-page .view-tab-button:hover {
+  color: #007bff;
+}
+
+.equipments-page .view-tab-button.active {
+  color: #007bff; /* Màu chữ khi active */
+  font-weight: 600; /* Đậm hơn khi active */
+  border-bottom-color: #007bff; /* Gạch chân màu xanh khi active */
+}
+
+/* Tiêu đề cụ thể của card, ví dụ: "Danh sách thiết bị" */
 .equipments-page .page-title {
   color: #333;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
   margin-bottom: 25px;
-  text-align: center;
+  text-align: left;
 }
 
 /* Controls bar */
-.equipments-page .equipments-controls { /* Class riêng để tránh xung đột */
+.equipments-page .equipments-controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  gap: 15px; /* Thêm gap cho các control items */
+  gap: 15px;
 }
 
 .equipments-page .search-input {
   padding: 10px 15px;
   border: 1px solid #d2d6dc;
   border-radius: 6px;
-  flex-grow: 1; /* Cho phép search input co giãn */
-  min-width: 250px; /* Độ rộng tối thiểu */
+  flex-grow: 2;
+  min-width: 250px;
   font-size: 14px;
 }
 .equipments-page .search-input:focus {
@@ -67,7 +108,7 @@
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  white-space: nowrap; /* Không xuống dòng text của nút */
+  white-space: nowrap;
 }
 .equipments-page .btn-add-new:hover {
   background-color: #0056b3;
@@ -75,21 +116,21 @@
 
 /* Table Styling */
 .equipments-page .table-responsive-wrapper {
-    overflow-x: auto; /* Cho phép cuộn ngang nếu bảng quá rộng */
+    overflow-x: auto;
     margin-bottom: 20px;
 }
-.equipments-page .equipments-table { /* Class riêng cho bảng */
+.equipments-page .equipments-table {
   width: 100%;
-  min-width: 1000px; /* Đảm bảo bảng có độ rộng tối thiểu để các cột không bị quá hẹp */
+  min-width: 1000px;
   border-collapse: collapse;
   font-size: 13.5px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
-/* ... (style cho th, td, thead, tbody, actions-cell, action-button giống TransactionHistory.css) ... */
+
 .equipments-page .equipments-table th, 
 .equipments-page .equipments-table td {
   border: 1px solid #e9ecef;
-  padding: 10px 12px;
+  padding: 12px 15px;
   text-align: left;
   vertical-align: middle;
 }
@@ -103,26 +144,151 @@
   background-color: #f0f4f8;
 }
 
+.equipments-page .equipments-table td.currency-cell {
+  text-align: right;
+}
+
 .equipments-page .equipment-name-cell,
 .equipments-page .notes-cell {
-    max-width: 200px; /* Giới hạn chiều rộng */
+    max-width: 200px; 
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-
 /* Status Badges cho Thiết bị */
+.equipments-page .status-badge {
+    padding: 0.35em 0.65em;
+    font-size: .75em;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25rem;
+    display: inline-block;
+}
+
+.equipments-page .priority-badge {
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 0.85em;
+  font-weight: 500;
+  color: white; /* Màu chữ mặc định */
+  text-align: center;
+  display: inline-block;
+  min-width: 100px; /* Điều chỉnh nếu cần */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border: 1px solid transparent;
+  line-height: 1.4; /* Cải thiện hiển thị trên một số trình duyệt */
+}
+
 .equipments-page .status-badge.status-equipment-đang-hoạt-động { background-color: #28a745; color: white; }
 .equipments-page .status-badge.status-equipment-cần-bảo-trì { background-color: #ffc107; color: #212529;}
 .equipments-page .status-badge.status-equipment-đang-sửa-chữa { background-color: #17a2b8; color: white;}
 .equipments-page .status-badge.status-equipment-hỏng-hóc { background-color: #dc3545; color: white;}
 .equipments-page .status-badge.status-equipment-không-sử-dụng { background-color: #6c757d; color: white;}
-/* ... (style cho .no-data-message, .action-button (view, edit, delete) giống TransactionHistory.css) ... */
+.equipments-page .status-badge.status-equipment-unknown { background-color: #adb5bd; color: white;}
+
+
 .equipments-page .actions-cell { display: flex; gap: 6px; white-space: nowrap; }
-.equipments-page .action-button { padding: 5px 10px; font-size: 12.5px; border-radius: 4px; color: white; border: none; cursor: pointer; transition: filter 0.15s ease; }
-.equipments-page .action-button:hover { filter: brightness(90%); }
-.equipments-page .view-button { background-color: #17a2b8; } 
+
+.equipments-page .btn-action {
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 4px;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: filter 0.15s ease, background-color 0.15s ease;
+  font-weight: 500;
+}
+.equipments-page .btn-action:hover { filter: brightness(90%); }
+
+.equipments-page .btn-action.btn-view {
+  background-color: #007bff;
+  color: white;
+}
+.equipments-page .btn-action.btn-view:hover {
+  background-color: #0056b3;
+}
+
 .equipments-page .edit-button { background-color: #ffc107; color: #212529; }
 .equipments-page .delete-button { background-color: #dc3545; }
-.equipments-page .no-data-message { text-align: center; padding: 25px; color: #6c757d; font-style: italic; background-color: #f8f9fa; border-radius: 6px; }
+
+.equipments-page .no-data-message { 
+  text-align: center; 
+  padding: 25px; 
+  color: #6c757d; 
+  font-style: italic; 
+  background-color: #f8f9fa; 
+  border-radius: 6px; 
+}
+
+/* --- EQUIPMENT STATUSES (status-equipment-...) --- */
+.equipments-page .status-equipment-dang-hoat-dong { background-color: #28a745; border-color: #1e7e34; } /* Xanh lá */
+.equipments-page .status-equipment-can-bao-tri   { background-color: #ffc107; color: #212529; border-color: #e0a800;} /* Vàng */
+.equipments-page .status-equipment-dang-sua-chua { background-color: #17a2b8; border-color: #117a8b;} /* Xanh dương nhạt */
+.equipments-page .status-equipment-hong-hoc      { background-color: #dc3545; border-color: #bd2130;} /* Đỏ */
+.equipments-page .status-equipment-khong-su-dung { background-color: #6c757d; border-color: #5a6268;} /* Xám */
+.equipments-page .status-equipment-unknown     { background-color: #adb5bd; border-color: #98a0a7;} /* Xám nhạt */
+
+/* --- INCIDENT STATUSES (status-incident-...) --- */
+/* 
+  LƯU Ý: Tên class ở đây phải khớp với kết quả của:
+  `String(TRANGTHAI_SUCO_TU_DB)
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")`
+  Ví dụ: "Chưa giải quyết" -> "chua-giai-quyet"
+*/
+.equipments-page .status-incident-moi-bao-cao      { background-color: #007bff; border-color: #0056b3;} /* Xanh dương đậm */
+.equipments-page .status-incident-da-tiep-nhan    { background-color: #17a2b8; border-color: #117a8b;} /* Xanh ngọc */
+.equipments-page .status-incident-dang-xu-ly       { background-color: #ffc107; color: #212529; border-color: #e0a800;} /* Vàng */
+.equipments-page .status-incident-chờ-sửa-chữa    { background-color: #fd7e14; border-color: #d3640a;} /* Cam */
+.equipments-page .status-incident-đang-sửa-chữa    { background-color: #6f42c1; border-color: #59369a;} /* Tím */
+.equipments-page .status-incident-đã-giải-quyết    { background-color: #28a745; border-color: #1e7e34;} /* Xanh lá */
+.equipments-page .status-incident-khong-the-sua    { background-color: #dc3545; border-color: #bd2130;} /* Đỏ */
+.equipments-page .status-incident-da-huy           { background-color: #6c757d; border-color: #5a6268;} /* Xám */
+.equipments-page .status-incident-unknown          { background-color: #adb5bd; border-color: #98a0a7;} /* Xám nhạt */
+
+/* Thêm riêng cho 2 trạng thái bạn dùng nhiều */
+.equipments-page .status-incident-chưa-giải-quyết { background-color: #ffc107; color: #212529; border-color: #e0a800;} /* Vàng */
+/* .status-incident-da-giai-quyet đã có ở trên (Xanh lá) */
+
+
+/* --- REPAIR STATUSES (status-repair-...) --- */
+/* 
+  LƯU Ý: Tên class ở đây phải khớp với kết quả của:
+  `String(TINHTRANG_SAU_SC_TU_DB)
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")`
+  Ví dụ: "Đã sửa chữa - Hoạt động tốt" -> "da-sua-chua---hoat-dong-tot"
+*/
+.equipments-page .status-repair-đã-sửa-chữa---hoạt-động-tốt        { background-color: #28a745; border-color: #1e7e34;} /* Xanh lá */
+.equipments-page .status-repair-tam-thoi-sua-chua---can-theo-doi-them { background-color: #ffc107; color: #212529; border-color: #e0a800;} /* Vàng */
+.equipments-page .status-repair-khong-the-sua-chua---de-xuat-thay-the { background-color: #dc3545; border-color: #bd2130;} /* Đỏ */
+.equipments-page .status-repair-cho-linh-kien                       { background-color: #17a2b8; border-color: #117a8b;} /* Xanh dương nhạt */
+.equipments-page .status-repair-unknown                             { background-color: #adb5bd; border-color: #98a0a7;} /* Xám nhạt */
+
+
+/* --- PRIORITY BADGES (priority-...) --- */
+/* 
+  LƯU Ý: Tên class ở đây phải khớp với kết quả của:
+  `String(MUCDO_UUTIEN_TU_DB)
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")`
+  Ví dụ: "Khẩn cấp" -> "khan-cap"
+*/
+.equipments-page .priority-badge {
+  min-width: 80px; /* Độ rộng riêng cho priority badge nếu muốn */
+  color: white; /* Đảm bảo màu chữ là trắng nếu không có override */
+}
+.equipments-page .priority-thap      { background-color: #28a745; } /* Xanh lá */
+.equipments-page .priority-trung-binh { background-color: #17a2b8; } /* Xanh dương nhạt */
+.equipments-page .priority-cao        { background-color: #ffc107; color: #212529; } /* Vàng */
+.equipments-page .priority-khan-cap   { background-color: #dc3545; } /* Đỏ */
+.equipments-page .priority-unknown    { background-color: #adb5bd; } /* Xám */

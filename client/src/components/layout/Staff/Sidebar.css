@@ -14,14 +14,12 @@
   .sidebar-header {
     padding: 20px;
     border-bottom: 1px solid #e5e7eb;
-    /* Style the logo */
   }
   
   .sidebar-logo {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #3a6be7; /* Purple color like example logo */
-    /* Add logo image styles if using an image */
+    color: #3a6be7; 
   }
   
   .sidebar-nav {
@@ -60,14 +58,24 @@
     font-weight: 500;
   }
   
+  /* CSS cho các icon SVG từ react-icons */
+  .nav-link svg {
+    margin-right: 12px; /* Khoảng cách giữa icon và text */
+    flex-shrink: 0; /* Ngăn icon bị co lại nếu text dài */
+    /* Kích thước của icon được đặt bằng prop 'size' trong component JSX */
+    /* Màu sắc của icon sẽ kế thừa từ .nav-link hoặc .nav-link.active */
+  }
+  
+  /* Class .icon-placeholder cũ đã được xóa hoặc comment lại */
+  /*
   .nav-link .icon-placeholder {
     margin-right: 12px;
-    width: 20px; /* Placeholder size */
+    width: 20px; 
     height: 20px;
     display: inline-block;
-    /* Add icon styling here */
-    background-color: #ccc; /* Temporary */
+    background-color: #ccc; 
   }
+  */
   
   .sidebar-footer {
     padding: 15px 10px;
@@ -78,14 +86,14 @@
     display: flex;
     align-items: center;
     padding: 10px;
-    margin-top: 10px; /* Space above user profile */
+    margin-top: 10px; 
   }
   
   .user-avatar-placeholder {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background-color: #ccc; /* Placeholder */
+    background-color: #ccc; 
     margin-right: 10px;
   }
   
@@ -109,5 +117,4 @@
   .user-menu-icon {
     color: #6b7280;
     cursor: pointer;
-    /* Style as needed */
   }

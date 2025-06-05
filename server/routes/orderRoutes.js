@@ -22,5 +22,12 @@ router.get('/:id', /* verifyToken, authorizeRoles(['staff','admin']), */ OrderCo
 // PUT /api/orders/:id/cancel (Hoặc DELETE /api/orders/:id nếu muốn coi là xóa)
 router.put('/:id/cancel', verifyToken, /* authorizeRoles(['staff','admin']), */ OrderController.cancelOrder);
 
+router.get(
+    '/:orderId/print-tickets',
+    verifyToken, // Bảo vệ route nếu cần
+    // authMiddleware.checkRole(['NhanVien', 'QuanLy']), // Giới hạn quyền truy cập nếu cần
+    OrderController.getTicketsForPrintingController // Hàm controller mới
+);
+
 
 module.exports = router;

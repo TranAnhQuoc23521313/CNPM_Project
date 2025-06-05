@@ -5,8 +5,11 @@ import Button from '../../../../components/common/Button';
 import './CreateTicketWorkflow.css';
 import './SeatMap.css'; // Đổi tên CSS cho phù hợp hơn nếu cần
 import { getSeatLayoutForShowtimeApi } from '../../../../services/seatApiService'; // API Service mới
+import AlertDialog from '../../../../components/common/AlertDialog';
 
 const STAFF_BASE_PATH = "/staff";
+
+const MAX_SEATS_SELECTABLE = 10;
 
 const SelectSeatsPage = () => {
   const navigate = useNavigate();
@@ -52,6 +55,27 @@ const SelectSeatsPage = () => {
     });
     setRoomLayout({ rows: rowsArray, maxCols, roomId: fetchedRoomId });
   }, []);
+
+  // State cho AlertDialog
+  const [alertDialogState, setAlertDialogState] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info', // default type
+    buttonText: 'Đã hiểu',
+    onClose: () => setAlertDialogState(prev => ({ ...prev, isOpen: false })),
+  });
+
+  const showAlertDialog = (title, message, type = 'info', buttonText = 'Đã hiểu') => {
+    setAlertDialogState({
+      isOpen: true,
+      title,
+      message,
+      type,
+      buttonText,
+      onClose: () => setAlertDialogState(prev => ({ ...prev, isOpen: false })),
+    });
+  };
 
 
   useEffect(() => {
@@ -103,7 +127,11 @@ const SelectSeatsPage = () => {
       } else {
         // Có thể thêm giới hạn số lượng ghế được chọn (ví dụ: 10 ghế)
         if (prevSelected.length >= 10) {
-          alert("Bạn chỉ có thể chọn tối đa 10 ghế.");
+          showAlertDialog(
+            'Thông Báo Giới Hạn Ghế',
+            `Bạn chỉ có thể chọn tối đa ${MAX_SEATS_SELECTABLE} ghế.`,
+            'warning' // Loại cảnh báo
+          );
           return prevSelected;
         }
         return [...prevSelected, seatObject];
@@ -222,6 +250,14 @@ const SelectSeatsPage = () => {
           Tiếp tục: Chọn Sản Phẩm
         </Button>
       </div>
+      <AlertDialog
+        isOpen={alertDialogState.isOpen}
+        title={alertDialogState.title}
+        message={alertDialogState.message}
+        buttonText={alertDialogState.buttonText}
+        type={alertDialogState.type}
+        onClose={alertDialogState.onClose}
+      />
     </div>
   );
 };

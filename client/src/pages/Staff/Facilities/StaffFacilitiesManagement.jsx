@@ -4,35 +4,29 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Button from '../../../components/common/Button';
 import ErrorMessageModal from '../../../components/common/ErrorMessageModal';
 import SuccessMessageModal from '../../../components/common/SuccessMessageModal';
-import AutocompleteDeviceInput from '../../../components/common/AutoCompleteDeviceInput'; // Component Autocomplete
+import AutocompleteDeviceInput from '../../../components/common/AutoCompleteDeviceInput';
 import './StaffFacilitiesManagement.css';
 
-// --- DỮ LIỆU GIẢ LẬP CHO DANH SÁCH THIẾT BỊ ---
-const MOCK_DEVICES_LIST = [
-  { MA_THIET_BI: "PROJ001", TEN_THIET_BI: "Máy chiếu Laser Phòng 1", LOAI_THIET_BI: "Máy chiếu", VI_TRI: "Phòng chiếu 1", TINH_TRANG_API: "Hoạt động tốt" },
-  { MA_THIET_BI: "PROJ002", TEN_THIET_BI: "Máy chiếu LED Phòng 2", LOAI_THIET_BI: "Máy chiếu", VI_TRI: "Phòng chiếu 2", TINH_TRANG_API: "Cần bảo trì" },
-  { MA_THIET_BI: "SOUND01", TEN_THIET_BI: "Hệ thống Âm thanh Dolby Atmos - Phòng 1", LOAI_THIET_BI: "Âm thanh", VI_TRI: "Phòng chiếu 1", TINH_TRANG_API: "Đang sửa chữa" },
-  { MA_THIET_BI: "SOUND02", TEN_THIET_BI: "Loa Surround 7.1 - Phòng 2", LOAI_THIET_BI: "Âm thanh", VI_TRI: "Phòng chiếu 2", TINH_TRANG_API: "Hoạt động tốt" },
-  { MA_THIET_BI: "CAM001", TEN_THIET_BI: "Camera An Ninh - Lối vào", LOAI_THIET_BI: "Camera", VI_TRI: "Sảnh chính", TINH_TRANG_API: "Hỏng - Chờ thay thế" },
-  { MA_THIET_BI: "POS001", TEN_THIET_BI: "Máy POS Quầy vé 1", LOAI_THIET_BI: "POS", VI_TRI: "Quầy vé", TINH_TRANG_API: "Hoạt động tốt" },
-  { MA_THIET_BI: "LIGHT01", TEN_THIET_BI: "Đèn chiếu sáng sân khấu", LOAI_THIET_BI: "Ánh sáng", VI_TRI: "Sân khấu", TINH_TRANG_API: "Cần bảo trì" },
-  { MA_THIET_BI: "AC001", TEN_THIET_BI: "Máy lạnh trung tâm Sảnh", LOAI_THIET_BI: "Điều hòa", VI_TRI: "Sảnh chính", TINH_TRANG_API: "Hoạt động tốt" },
-];
+import { getAllEquipmentApi } from '../../../services/equipmentApiService';
+import { getCurrentUserApi } from '../../../services/authApiService';
 
-// Hàm giả lập gọi API lấy danh sách thiết bị
-const fetchMockDevicesApi = () => {
-  console.log("Fetching mock devices list...");
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      console.log("Mock devices list fetched.");
-      resolve([...MOCK_DEVICES_LIST]);
-    }, 700);
-  });
-};
-// --- KẾT THÚC DỮ LIỆU GIẢ LẬP ---
+// IMPORT CÁC HÀM API THẬT
+import {
+  reportFacilityIssueApi,
+  // getAllFacilityIncidentsApi, // Dùng nếu muốn lấy tất cả sự cố một lần
+  getDeviceIssuesApi,      // Dùng để lấy sự cố theo thiết bị
+  recordFacilityRepairApi
+} from '../../../services/facilityApiService'; // Đảm bảo đường dẫn đúng
+
+
+// --- XÓA CÁC HÀM MOCK API ---
+// const getAllIncidentsApiMock = ... (XÓA)
+// const createRepairLogApiMock = ... (XÓA)
+// const createIncidentReportApiMock = ... (XÓA)
 
 
 // --- COMPONENT CHO TAB DANH SÁCH THIẾT BỊ ---
+// (Giữ nguyên DeviceListTab)
 const DeviceListTab = ({ devices, isLoading, errorLoading }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -53,12 +47,14 @@ const DeviceListTab = ({ devices, isLoading, errorLoading }) => {
   );
 
   const getStatusClassName = (status) => {
-    if (!status) return '';
-    switch (status.toLowerCase()) {
-      case 'hoạt động tốt': return 'status-active';
-      case 'cần bảo trì': return 'status-maintenance';
-      case 'đang sửa chữa': return 'status-repairing';
-      case 'hỏng - chờ thay thế': return 'status-broken';
+    if (!status) return 'status-unknown';
+    const normalizedStatus = status.toLowerCase().replace(/\s+/g, '-');
+    switch (normalizedStatus) {
+      case 'đang-hoạt-động': return 'status-active';
+      case 'cần-bảo-trì': return 'status-maintenance';
+      case 'đang-sửa-chữa': return 'status-repairing';
+      case 'hỏng-hóc': return 'status-broken';
+      case 'không-sử-dụng': return 'status-unused';
       default: return 'status-unknown';
     }
   };
@@ -75,7 +71,7 @@ const DeviceListTab = ({ devices, isLoading, errorLoading }) => {
         />
       </div>
       {filteredDevices.length > 0 ? (
-        <div className="table-responsive-wrapper"> {/* Bọc bảng để cuộn ngang nếu cần */}
+        <div className="table-responsive-wrapper">
           <table className="device-list-table">
             <thead>
               <tr>
@@ -109,7 +105,6 @@ const DeviceListTab = ({ devices, isLoading, errorLoading }) => {
     </div>
   );
 };
-
 DeviceListTab.propTypes = {
   devices: PropTypes.array.isRequired,
   isLoading: PropTypes.bool.isRequired,
@@ -120,12 +115,47 @@ DeviceListTab.propTypes = {
 // --- COMPONENT CHO FORM SỬA CHỮA THIẾT BỊ (BM9.2) ---
 const RepairLogForm = ({ currentUser, devicesList, isLoadingDevices, onSubmitSuccess, onSubmitError }) => {
   const [selectedDeviceId, setSelectedDeviceId] = useState('');
+  const [selectedSuCoId, setSelectedSuCoId] = useState('');
+  // const [allIncidents, setAllIncidents] = useState([]); // Không cần nữa nếu fetch theo device
+  const [filteredIncidentsForDevice, setFilteredIncidentsForDevice] = useState([]);
+  const [isLoadingIncidents, setIsLoadingIncidents] = useState(false);
+
   const [repairDate, setRepairDate] = useState(new Date().toISOString().split('T')[0]);
   const [statusAfterRepair, setStatusAfterRepair] = useState('Đã sửa chữa - Hoạt động tốt');
   const [cost, setCost] = useState('');
   const [solutionDescription, setSolutionDescription] = useState('');
   const [repairImageFile, setRepairImageFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Lọc sự cố khi thiết bị được chọn thay đổi
+  useEffect(() => {
+    const fetchIncidentsForDevice = async () => {
+      if (selectedDeviceId) {
+        setIsLoadingIncidents(true);
+        setFilteredIncidentsForDevice([]); // Xóa danh sách cũ
+        setSelectedSuCoId(''); // Reset lựa chọn sự cố cũ
+        try {
+          // Gọi API thật để lấy sự cố cho thiết bị đã chọn
+          const incidentsData = await getDeviceIssuesApi(selectedDeviceId);
+          // Lọc các sự cố chưa được giải quyết (Backend nên có filter này, hoặc client tự lọc)
+          // Giả sử backend trả về cột TRANGTHAI_SUCO
+          const unresolvedIncidents = (incidentsData || []).filter(
+            (inc) => inc.TRANGTHAI_SUCO !== 'Đã giải quyết' // Cần có cột này từ API
+          );
+          setFilteredIncidentsForDevice(unresolvedIncidents);
+        } catch (error) {
+          console.error(`Error fetching incidents for device ${selectedDeviceId}:`, error);
+          onSubmitError(`Lỗi: Không thể tải danh sách sự cố cho thiết bị ${selectedDeviceId}.`);
+        } finally {
+          setIsLoadingIncidents(false);
+        }
+      } else {
+        setFilteredIncidentsForDevice([]);
+        setSelectedSuCoId('');
+      }
+    };
+    fetchIncidentsForDevice();
+  }, [selectedDeviceId, onSubmitError]);
 
   const handleDeviceSelectionChange = useCallback((deviceIdValue) => {
     setSelectedDeviceId(deviceIdValue);
@@ -140,37 +170,95 @@ const RepairLogForm = ({ currentUser, devicesList, isLoadingDevices, onSubmitSuc
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedDeviceId || !repairDate || !statusAfterRepair) {
-      onSubmitError("Vui lòng chọn Mã thiết bị và điền các trường bắt buộc (*).");
+    if (!selectedDeviceId || !selectedSuCoId || !repairDate || !statusAfterRepair) {
+      onSubmitError("Vui lòng chọn Thiết bị, Sự cố cần sửa và điền các trường bắt buộc (*).");
       return;
     }
     setIsSubmitting(true);
-    console.log("Submitting Repair Log (BM9.2):", { MA_THIET_BI: selectedDeviceId, NGAY_SUA_CHUA: repairDate, TINH_TRANG_SAU_SUA: statusAfterRepair, CHI_PHI_SUA_CHUA: cost || 0, MO_TA_GIAI_PHAP: solutionDescription, HINH_ANH_SUA_CHUA_FILE_NAME: repairImageFile ? repairImageFile.name : null, MA_NHAN_VIEN_SUA: currentUser.employeeId || 'STAFF_TECH_MOCK', });
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    const selectedDeviceForMessage = devicesList.find(d => d.MA_THIET_BI === selectedDeviceId);
-    onSubmitSuccess(`Thông tin sửa chữa cho "${selectedDeviceForMessage?.TEN_THIET_BI || selectedDeviceId}" đã lưu.`);
-    setSelectedDeviceId(''); setRepairDate(new Date().toISOString().split('T')[0]);
-    setStatusAfterRepair('Đã sửa chữa - Hoạt động tốt'); setCost(''); setSolutionDescription(''); setRepairImageFile(null);
-    setIsSubmitting(false);
+
+    const repairDataForApi = {
+      MASUCO: selectedSuCoId,
+      // MANV sẽ được backend lấy từ token
+      NGAYSUACHUA: repairDate,
+      TINHTRANG_SAU_SC: statusAfterRepair,
+      CHIPHI: cost ? parseInt(cost, 10) : null, // Gửi null nếu rỗng để backend xử lý (hoặc 0)
+      MOTA: solutionDescription || null, // Gửi null nếu rỗng
+    };
+
+    try {
+      // Gọi API thật, truyền repairDataForApi và repairImageFile (nếu có)
+      const createdRepair = await recordFacilityRepairApi(repairDataForApi, repairImageFile);
+      
+      const selectedDeviceForMessage = devicesList.find(d => d.MA_THIET_BI === selectedDeviceId);
+      onSubmitSuccess(`Thông tin sửa chữa cho sự cố ${selectedSuCoId} của thiết bị "${selectedDeviceForMessage?.TEN_THIET_BI || selectedDeviceId}" đã lưu. Mã sửa chữa: ${createdRepair.MASUACHUA}`);
+      
+      // Reset form và tải lại danh sách sự cố cho thiết bị (nếu cần)
+      setSelectedDeviceId(''); // Điều này sẽ trigger useEffect để fetch lại
+      setSelectedSuCoId(''); // (Không cần thiết vì selectedDeviceId rỗng sẽ xóa)
+      setRepairDate(new Date().toISOString().split('T')[0]);
+      setStatusAfterRepair('Đã sửa chữa - Hoạt động tốt'); 
+      setCost(''); 
+      setSolutionDescription(''); 
+      setRepairImageFile(null);
+      // Tải lại danh sách sự cố cho thiết bị vừa sửa (nếu muốn cập nhật dropdown ngay)
+      // Tuy nhiên, khi setSelectedDeviceId('') ở trên, useEffect đã chạy và setFilteredIncidentsForDevice([])
+      // Có thể cần logic khác nếu muốn giữ selectedDeviceId và cập nhật danh sách sự cố.
+
+    } catch (error) {
+      console.error("Error submitting repair log:", error);
+      const errorMessage = (error.data?.message || error.message) || "Lỗi khi lưu thông tin sửa chữa. Vui lòng thử lại.";
+      onSubmitError(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="device-form repair-log-form">
       <h3>Cập Nhật Thông Tin Sửa Chữa Thiết Bị</h3>
       <div className="form-group">
-        <AutocompleteDeviceInput label="Mã thiết bị *" devices={devicesList} value={selectedDeviceId} onChange={handleDeviceSelectionChange} placeholder="Nhập hoặc chọn mã/tên thiết bị..." required disabled={isLoadingDevices} />
-        {isLoadingDevices && <p className="loading-text">Đang tải...</p>}
+        <AutocompleteDeviceInput label="Thiết bị cần sửa chữa *" devices={devicesList} value={selectedDeviceId} onChange={handleDeviceSelectionChange} placeholder="Nhập hoặc chọn mã/tên thiết bị..." required disabled={isLoadingDevices} />
+        {isLoadingDevices && <p className="loading-text-inline">Đang tải DS thiết bị...</p>}
       </div>
+
+      <div className="form-group">
+        <label htmlFor="repairLogSuCo">Sự cố được giải quyết *</label>
+        <select
+            id="repairLogSuCo"
+            value={selectedSuCoId}
+            onChange={(e) => setSelectedSuCoId(e.target.value)}
+            required
+            disabled={!selectedDeviceId || isLoadingIncidents || (filteredIncidentsForDevice.length === 0 && !!selectedDeviceId)}
+        >
+            <option value="">-- Chọn sự cố --</option>
+            {filteredIncidentsForDevice.map(suco => (
+                <option key={suco.MASUCO} value={suco.MASUCO}>
+                    {`${suco.MASUCO} - ${suco.MOTA ? suco.MOTA.substring(0,50) : 'Không có mô tả'}... (${suco.NGAY_BAOCAO})`}
+                </option>
+            ))}
+        </select>
+        {!selectedDeviceId && <p className="form-text-muted">Vui lòng chọn thiết bị ở trên trước.</p>}
+        {selectedDeviceId && filteredIncidentsForDevice.length === 0 && !isLoadingIncidents && <p className="form-text-muted">Không có sự cố nào (chưa giải quyết) cho thiết bị này.</p>}
+        {isLoadingIncidents && <p className="loading-text-inline">Đang tải DS sự cố...</p>}
+      </div>
+      
+      <div className="form-group"><label htmlFor="repairLogEmployeeId">Nhân viên sửa chữa</label><input type="text" id="repairLogEmployeeId" value={currentUser.name || currentUser.employeeId || currentUser.id || 'N/A'} readOnly disabled /></div>
       <div className="form-group"><label htmlFor="repairLogDate">Ngày sửa chữa *</label><input type="date" id="repairLogDate" value={repairDate} onChange={(e) => setRepairDate(e.target.value)} required /></div>
-      <div className="form-group"><label htmlFor="repairLogStatus">Tình trạng sau sửa chữa *</label><select id="repairLogStatus" value={statusAfterRepair} onChange={(e) => setStatusAfterRepair(e.target.value)} required><option value="Đã sửa chữa - Hoạt động tốt">Đã sửa chữa - Hoạt động tốt</option><option value="Tạm thời sửa chữa - Cần theo dõi thêm">Tạm thời sửa chữa - Cần theo dõi thêm</option><option value="Không thể sửa chữa - Đề xuất thay thế">Không thể sửa chữa - Đề xuất thay thế</option></select></div>
+      <div className="form-group"><label htmlFor="repairLogStatus">Tình trạng sau sửa chữa *</label><select id="repairLogStatus" value={statusAfterRepair} onChange={(e) => setStatusAfterRepair(e.target.value)} required><option value="Đã sửa chữa - Hoạt động tốt">Đã sửa chữa - Hoạt động tốt</option><option value="Tạm thời sửa chữa - Cần theo dõi thêm">Tạm thời sửa chữa - Cần theo dõi thêm</option><option value="Không thể sửa chữa - Đề xuất thay thế">Không thể sửa chữa - Đề xuất thay thế</option><option value="Chờ linh kiện">Chờ linh kiện</option></select></div>
       <div className="form-group"><label htmlFor="repairLogCost">Chi phí sửa chữa (VND)</label><input type="number" id="repairLogCost" value={cost} onChange={(e) => setCost(e.target.value)} placeholder="Ví dụ: 500000" min="0" /></div>
-      <div className="form-group"><label htmlFor="repairLogSolutionDescription">Mô tả giải pháp/Linh kiện thay thế</label><textarea id="repairLogSolutionDescription" value={solutionDescription} onChange={(e) => setSolutionDescription(e.target.value)} rows="3" /></div>
+      <div className="form-group"><label htmlFor="repairLogSolutionDescription">Mô tả công việc sửa chữa/Linh kiện thay thế</label><textarea id="repairLogSolutionDescription" value={solutionDescription} onChange={(e) => setSolutionDescription(e.target.value)} rows="3" /></div>
       <div className="form-group"><label htmlFor="repairLogImage">Hình ảnh (minh họa sửa chữa)</label><input type="file" id="repairLogImage" onChange={handleRepairImageChange} accept="image/*" />{repairImageFile && <p className="file-name-display">Đã chọn: {repairImageFile.name}</p>}</div>
-      <div className="form-actions"><Button type="submit" variant="primary" disabled={isSubmitting || isLoadingDevices || !selectedDeviceId}>{isSubmitting ? 'Đang lưu...' : 'Lưu Thông Tin'}</Button></div>
+      <div className="form-actions"><Button type="submit" variant="primary" disabled={isSubmitting || isLoadingDevices || isLoadingIncidents || !selectedSuCoId}>{isSubmitting ? 'Đang lưu...' : 'Lưu Thông Tin Sửa Chữa'}</Button></div>
     </form>
   );
 };
-RepairLogForm.propTypes = { /* ... thêm propTypes nếu cần ... */ };
+RepairLogForm.propTypes = { 
+    currentUser: PropTypes.object.isRequired,
+    devicesList: PropTypes.array.isRequired,
+    isLoadingDevices: PropTypes.bool.isRequired,
+    onSubmitSuccess: PropTypes.func.isRequired,
+    onSubmitError: PropTypes.func.isRequired,
+};
 
 
 // --- COMPONENT CHO FORM BÁO CÁO SỰ CỐ (BM9.3) ---
@@ -201,27 +289,48 @@ const ReportIssueForm = ({ currentUser, devicesList, isLoadingDevices, onSubmitS
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedDeviceId || !description.trim()) {
-      onSubmitError("Vui lòng chọn/nhập Mã thiết bị và điền Mô tả sự cố.");
+      onSubmitError("Vui lòng chọn Mã thiết bị và điền Mô tả sự cố.");
       return;
     }
     setIsSubmitting(true);
-    console.log("Submitting Issue Report (BM9.3):", { MA_THIET_BI: selectedDeviceId, MA_NHAN_VIEN_BC: currentUser.employeeId || 'STAFF_REPORT_MOCK', NGAY_BAO_CAO: reportDate, MO_TA_SU_CO: description, MUC_DO_UU_TIEN: priority, HINH_ANH_FILES: imageFiles.map(f => f.name), });
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    const selectedDeviceForMessage = devicesList.find(d => d.MA_THIET_BI === selectedDeviceId);
-    onSubmitSuccess(`Báo cáo sự cố cho "${selectedDeviceForMessage?.TEN_THIET_BI || selectedDeviceId}" đã gửi.`);
-    setSelectedDeviceId(''); setDescription(''); setImageFiles([]);
-    setReportDate(new Date().toISOString().split('T')[0]); setPriority('Trung bình');
-    setIsSubmitting(false);
+
+    const incidentDataForApi = {
+      MATHIETBI: selectedDeviceId,
+      // MANV sẽ được backend lấy từ token
+      NGAY_BAOCAO: reportDate,
+      MOTA: description,
+      MUCDO_UUTIEN: priority,
+    };
+    
+    try {
+        const newIncident = await reportFacilityIssueApi(incidentDataForApi, imageFiles);
+
+        const selectedDeviceForMessage = devicesList.find(d => d.MA_THIET_BI === selectedDeviceId);
+        onSubmitSuccess(`Báo cáo sự cố ${newIncident.MASUCO} cho thiết bị "${selectedDeviceForMessage?.TEN_THIET_BI || selectedDeviceId}" đã gửi thành công.`);
+        
+        setSelectedDeviceId(''); 
+        setDescription(''); 
+        setImageFiles([]);
+        setReportDate(new Date().toISOString().split('T')[0]); 
+        setPriority('Trung bình');
+
+    } catch (error) {
+        console.error("Error submitting issue report:", error);
+        const errorMessage = (error.data?.message || error.message) || "Lỗi khi gửi báo cáo sự cố. Vui lòng thử lại.";
+        onSubmitError(errorMessage);
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="device-form report-issue-form">
       <h3>Báo Cáo Sự Cố Thiết Bị</h3>
       <div className="form-group">
-        <AutocompleteDeviceInput label="Mã thiết bị *" devices={devicesList} value={selectedDeviceId} onChange={handleDeviceSelectionChange} placeholder="Nhập hoặc chọn mã/tên thiết bị..." required disabled={isLoadingDevices}/>
-        {isLoadingDevices && <p className="loading-text">Đang tải...</p>}
+        <AutocompleteDeviceInput label="Mã thiết bị *" devices={devicesList} value={selectedDeviceId} onChange={handleDeviceSelectionChange} placeholder="Nhập hoặc chọn mã/tên thiết bị..." required disabled={isLoadingDevices} />
+        {isLoadingDevices && <p className="loading-text-inline">Đang tải DS thiết bị...</p>}
       </div>
-      <div className="form-group"><label htmlFor="reportIssueEmployeeId">Mã nhân viên báo cáo</label><input type="text" id="reportIssueEmployeeId" value={currentUser.employeeId || 'STAFF_000'} readOnly disabled /></div>
+      <div className="form-group"><label htmlFor="reportIssueEmployeeId">Nhân viên báo cáo</label><input type="text" id="reportIssueEmployeeId" value={currentUser.name || currentUser.employeeId || currentUser.id || 'N/A'} readOnly disabled /></div>
       <div className="form-group"><label htmlFor="reportIssueDate">Ngày báo cáo</label><input type="date" id="reportIssueDate" value={reportDate} onChange={(e) => setReportDate(e.target.value)} /></div>
       <div className="form-group"><label htmlFor="reportIssueDescription">Mô tả sự cố *</label><textarea id="reportIssueDescription" value={description} onChange={(e) => setDescription(e.target.value)} rows="4" required /></div>
       <div className="form-group"><label htmlFor="reportIssueImages">Hình ảnh minh họa (tối đa 3 ảnh)</label><input type="file" id="reportIssueImages" multiple onChange={handleImageChange} accept="image/png, image/jpeg, image/gif" disabled={imageFiles.length >= 3} />
@@ -242,39 +351,98 @@ const ReportIssueForm = ({ currentUser, devicesList, isLoadingDevices, onSubmitS
     </form>
   );
 };
-ReportIssueForm.propTypes = { /* ... thêm propTypes nếu cần ... */ };
+ReportIssueForm.propTypes = { 
+    currentUser: PropTypes.object.isRequired,
+    devicesList: PropTypes.array.isRequired,
+    isLoadingDevices: PropTypes.bool.isRequired,
+    onSubmitSuccess: PropTypes.func.isRequired,
+    onSubmitError: PropTypes.func.isRequired,
+};
 
 
 // --- COMPONENT CHÍNH CỦA TRANG ---
-const StaffFacilitiesManagementPage = ({ currentUser }) => {
+// (Giữ nguyên StaffFacilitiesManagementPage, chỉ đảm bảo nó truyền đúng props)
+const StaffFacilitiesManagementPage = ({ currentUser: currentUserFromProps }) => {
   const [activeTab, setActiveTab] = useState('list');
   const [errorToDisplay, setErrorToDisplay] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
   const [devicesList, setDevicesList] = useState([]);
   const [isLoadingDevices, setIsLoadingDevices] = useState(false);
 
-  const effectiveCurrentUser = currentUser || { employeeId: 'STAFF_DEMO_007' };
+  const [userToDisplay, setUserToDisplay] = useState(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
+  const [userFetchError, setUserFetchError] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      setIsLoadingUser(true);
+      setUserFetchError(null);
+      if (currentUserFromProps) {
+        const formattedPropUser = {
+          ...currentUserFromProps,
+          id: currentUserFromProps.id || currentUserFromProps.employeeId, 
+          name: currentUserFromProps.name || currentUserFromProps.username,
+        };
+        setUserToDisplay(formattedPropUser);
+        setIsLoadingUser(false);
+      } else {
+        try {
+          const token = localStorage.getItem('authToken');
+          if (token) {
+            const userDataFromApi = await getCurrentUserApi();
+            const formattedApiUser = userDataFromApi ? {
+              ...userDataFromApi,
+              id: userDataFromApi.id, 
+              employeeId: userDataFromApi.id, 
+              name: userDataFromApi.name || userDataFromApi.username,
+            } : null;
+            setUserToDisplay(formattedApiUser);
+          } else {
+            setUserFetchError("Không tìm thấy phiên đăng nhập. Vui lòng đăng nhập lại.");
+            setUserToDisplay(null);
+          }
+        } catch (error) {
+          console.error("Error fetching current user in FacilitiesPage:", error);
+          setUserFetchError(error.message || "Lỗi khi tải thông tin người dùng.");
+          setUserToDisplay(null);
+        } finally {
+          setIsLoadingUser(false);
+        }
+      }
+    };
+    fetchUser();
+  }, [currentUserFromProps]);
 
   useEffect(() => {
     const loadDevices = async () => {
       setIsLoadingDevices(true);
-      setErrorToDisplay(null);
       try {
-        const data = await fetchMockDevicesApi();
-        setDevicesList(data || []);
+        const apiData = await getAllEquipmentApi();
+        const mappedData = apiData.map(device => ({
+          MA_THIET_BI: device.MATHIETBI,
+          TEN_THIET_BI: device.TENTHIETBI,
+          LOAI_THIET_BI: device.LOAITHIETBI,
+          VI_TRI: device.VITRITHIETBI,
+          TINH_TRANG_API: device.TRANGTHAI,
+        }));
+        setDevicesList(mappedData || []);
+        if (errorToDisplay && errorToDisplay.includes("Không thể tải danh sách thiết bị")) {
+            setErrorToDisplay(null);
+        }
       } catch (error) {
         console.error("Error loading devices in Page:", error);
-        setErrorToDisplay("Không thể tải danh sách thiết bị. Vui lòng thử làm mới trang.");
+        const errorMessageContent = error.message || "Không thể tải danh sách thiết bị. Vui lòng thử làm mới trang.";
+        setErrorToDisplay(errorMessageContent);
         setDevicesList([]);
       } finally {
         setIsLoadingDevices(false);
       }
     };
     loadDevices();
-  }, []);
+  }, [errorToDisplay]);
 
-  const handleShowSuccess = useCallback((message) => { setSuccessMessage(message);}, []);
-  const handleShowError = useCallback((message) => { setErrorToDisplay(message);}, []);
+  const handleShowSuccess = useCallback((message) => { setSuccessMessage(message); setErrorToDisplay(null); }, []);
+  const handleShowError = useCallback((message) => { setErrorToDisplay(message); setSuccessMessage(null); }, []);
 
   useEffect(() => {
     let successTimer, errorTimer;
@@ -283,10 +451,31 @@ const StaffFacilitiesManagementPage = ({ currentUser }) => {
     return () => { clearTimeout(successTimer); clearTimeout(errorTimer); };
   }, [successMessage, errorToDisplay]);
 
+  if (isLoadingUser) {
+    return (
+      <div className="page-container staff-facilities-management-page">
+        <p className="loading-text-tab">Đang tải thông tin người dùng...</p>
+      </div>
+    );
+  }
+
+  if (!userToDisplay) {
+    return (
+      <div className="page-container staff-facilities-management-page">
+        <p className="error-text-tab">
+          {userFetchError || "Không thể xác định người dùng. Vui lòng đăng nhập lại."}
+        </p>
+      </div>
+    );
+  }
+
+  const effectiveCurrentUser = userToDisplay;
+
   return (
     <div className="page-container staff-facilities-management-page">
       <div className="page-header">
-        <h1>Quản Lý Sự Cố Thiết Bị</h1>
+        <h1>Quản Lý Sự Cố và Sửa Chữa Thiết Bị</h1>
+        {/* {effectiveCurrentUser?.name && <p className="current-user-greeting">Nhân viên: {effectiveCurrentUser.name} ({effectiveCurrentUser.id})</p>} */}
         <div className="tab-navigation">
           <Button variant={activeTab === 'list' ? "primary" : "light"} onClick={() => setActiveTab('list')} size="medium">Danh Sách Thiết Bị</Button>
           <Button variant={activeTab === 'report_issue' ? "primary" : "light"} onClick={() => setActiveTab('report_issue')} size="medium">Báo Cáo Sự Cố </Button>
@@ -295,9 +484,10 @@ const StaffFacilitiesManagementPage = ({ currentUser }) => {
       </div>
 
       <div className="tab-content">
-        {isLoadingDevices && devicesList.length === 0 && <p className="loading-text-tab">Đang tải dữ liệu thiết bị...</p> }
-        {!isLoadingDevices && devicesList.length === 0 && !errorToDisplay && <p className="no-items-found-tab">Không có dữ liệu thiết bị nào để hiển thị.</p>}
-
+        {isLoadingDevices && devicesList.length === 0 && <p className="loading-text-tab">Đang tải dữ liệu thiết bị...</p>}
+        {errorToDisplay && !userFetchError && devicesList.length === 0 && activeTab === 'list' && <p className="error-text-tab">Lỗi: {errorToDisplay}</p>}
+        {!isLoadingDevices && devicesList.length === 0 && !errorToDisplay && activeTab === 'list' && <p className="no-items-found-tab">Không có dữ liệu thiết bị nào.</p>}
+        
         <div style={{ display: activeTab === 'list' ? 'block' : 'none' }}>
           <DeviceListTab devices={devicesList} isLoading={isLoadingDevices} errorLoading={errorToDisplay && errorToDisplay.includes("Không thể tải danh sách thiết bị") ? errorToDisplay : null} />
         </div>
@@ -318,7 +508,10 @@ const StaffFacilitiesManagementPage = ({ currentUser }) => {
 StaffFacilitiesManagementPage.propTypes = {
   currentUser: PropTypes.shape({
     employeeId: PropTypes.string,
-    // các trường khác của currentUser nếu có
+    id: PropTypes.string,
+    name: PropTypes.string,
+    username: PropTypes.string,
+    role: PropTypes.string,
   }),
 };
 

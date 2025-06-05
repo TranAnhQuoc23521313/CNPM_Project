@@ -1,6 +1,6 @@
 /* src/components/Sidebar.css */
 .sidebar {
-    width: 260px; /* Fixed width like example */
+    width: 300px; /* Fixed width like example */
     flex-shrink: 0; /* Prevent shrinking */
     background-color: #ffffff; /* White background */
     border-right: 1px solid #e5e7eb; /* Subtle border */
@@ -60,14 +60,25 @@
     font-weight: 500;
   }
   
+  /* CSS cho các icon SVG */
+  .nav-link svg {
+    margin-right: 12px; /* Khoảng cách giữa icon và text */
+    flex-shrink: 0; /* Ngăn icon bị co lại nếu text dài */
+    /* Kích thước của icon được đặt bằng prop 'size' trong component JSX */
+    /* Ví dụ: <FaFilm size={20} /> */
+    /* Màu sắc của icon sẽ kế thừa từ .nav-link hoặc .nav-link.active */
+  }
+  
+  /* Bạn có thể xóa hoặc bình luận class .icon-placeholder cũ nếu không dùng nữa */
+  /*
   .nav-link .icon-placeholder {
     margin-right: 12px;
-    width: 20px; /* Placeholder size */
+    width: 20px; 
     height: 20px;
     display: inline-block;
-    /* Add icon styling here */
-    background-color: #ccc; /* Temporary */
+    background-color: #ccc;
   }
+  */
   
   .sidebar-footer {
     padding: 15px 10px;

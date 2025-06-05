@@ -1,0 +1,408 @@
+/* src/pages/Staff/Tickets/TicketPrintPreview.css */
+
+/* ==========================================================================
+   Style cho Custom Modal (Tích hợp)
+   ========================================================================== */
+.custom-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.65); /* Nền mờ đậm hơn chút */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1040;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out, visibility 0s linear 0.3s;
+  overflow-y: auto; /* Cho phép cuộn nếu nội dung modal quá cao so với viewport */
+  padding: 20px; /* Padding để modal không dính sát cạnh màn hình nhỏ */
+  box-sizing: border-box;
+}
+
+.custom-modal-overlay.modal-open {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.custom-modal-dialog {
+  background-color: #fff;
+  border-radius: 10px; /* Bo góc lớn hơn */
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  z-index: 1050;
+  transform: translateY(-40px) scale(0.98);
+  opacity: 0;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 40px); /* Chiều cao tối đa, trừ padding của overlay */
+  width: 90%; /* Chiều rộng mặc định */
+  overflow: hidden; /* Quan trọng để bo góc áp dụng cho header/footer */
+}
+
+.custom-modal-overlay.modal-open .custom-modal-dialog {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+/* Kích thước cho dialog của modal in vé */
+.ticket-print-modal-dialog-size {
+  max-width: 1200px; /* Chiều rộng tối đa */
+}
+@media (max-width: 1200px) {
+  .ticket-print-modal-dialog-size {
+    max-width: 95vw;
+  }
+}
+@media (max-width: 768px) {
+    .ticket-print-modal-dialog-size {
+        max-width: 100%;
+        max-height: calc(100vh - 20px); /* Cho màn hình rất nhỏ */
+        border-radius: 0; /* Bỏ bo góc trên màn hình rất nhỏ nếu muốn full */
+    }
+}
+
+
+.custom-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e0e0e0;
+  flex-shrink: 0;
+  background-color: #f7f7f7; /* Nền nhẹ cho header */
+  border-top-left-radius: 10px; /* Bo góc theo dialog */
+  border-top-right-radius: 10px;
+}
+
+.custom-modal-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+  color: #333;
+}
+
+.custom-modal-close-button {
+  background: transparent;
+  border: none;
+  font-size: 1.8rem;
+  font-weight: 300;
+  cursor: pointer;
+  color: #888;
+  padding: 0.5rem;
+  line-height: 1;
+  margin: -0.5rem -0.8rem -0.5rem auto; /* Điều chỉnh để căn nút đóng đẹp hơn */
+}
+.custom-modal-close-button:hover {
+  color: #000;
+}
+
+.custom-modal-body {
+  padding: 0; /* Nội dung sẽ có padding riêng */
+  overflow-y: auto;
+  flex-grow: 1;
+  background-color: #f0f2f5; /* Nền cho vùng chứa vé */
+}
+
+/* ==========================================================================
+   Style cho Nội dung Preview Vé (Bên trong .custom-modal-body)
+   ========================================================================== */
+.ticket-print-preview-modal-content {
+    /* Không cần style gì đặc biệt ở đây vì .custom-modal-body đã xử lý */
+}
+
+.loading-text, .no-tickets-message {
+    text-align: center;
+    padding: 50px 20px;
+    font-size: 1.15rem;
+    color: #666;
+}
+
+#printable-ticket-area-modal {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 25px; /* Khoảng cách lớn hơn chút giữa các vé */
+    padding: 25px; /* Padding cho vùng vé */
+}
+.ticket-wrapper-for-preview {
+    /* Hiện tại không cần style gì cho wrapper này */
+}
+
+
+/* ==========================================================================
+   Style cho MỘT VÉ ("modern-ticket" design)
+   ========================================================================== */
+.modern-ticket {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: #ffffff;
+    color: #333;
+    border-radius: 8px;
+    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.1); /* Shadow nhẹ nhàng hơn */
+    width: 480px; /* Chiều rộng vé (main + stub) khi xem preview */
+    display: flex;
+    position: relative;
+    overflow: hidden; /* Quan trọng cho bo góc */
+}
+
+/* Phần nội dung chính của vé */
+.ticket-main-content {
+    padding: 20px;
+    flex-grow: 1;
+    min-width: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.ticket-main-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 18px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #eaeaea;
+}
+
+.cinema-logo {
+    width: 65px; /* Logo to hơn chút */
+    height: auto;
+    margin-right: 18px;
+    object-fit: contain;
+}
+
+.cinema-info .cinema-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0056b3; /* Màu xanh đậm hơn */
+    margin: 0 0 4px 0;
+}
+
+.cinema-info .cinema-address {
+    font-size: 11px;
+    color: #555;
+}
+
+.movie-details-section .movie-title {
+    font-size: 21px;
+    font-weight: 700;
+    color: #111;
+    text-align: center;
+    margin: 0 0 18px 0;
+}
+
+.showtime-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 12px;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    padding: 12px 15px;
+    margin-bottom: 18px;
+    text-align: center;
+}
+
+.showtime-info .info-block .label {
+    display: block;
+    font-size: 10px;
+    color: #666;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.showtime-info .info-block .data {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111;
+}
+.showtime-info .info-block .data.time-data {
+    font-size: 17px;
+}
+
+.seat-info-block {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+    padding-top: 12px;
+    border-top: 1px solid #eaeaea;
+}
+
+.seat-info-block .seat-item .label {
+    display: block;
+    font-size: 10px;
+    color: #666;
+    margin-bottom: 3px;
+}
+.seat-info-block .seat-item .data {
+    font-size: 14px;
+    font-weight: 600;
+}
+.seat-info-block .seat-item .data.seat-number {
+    font-size: 20px;
+    color: #c82333; /* Màu đỏ đậm hơn */
+}
+.seat-info-block .seat-item.price-item .data {
+    font-size: 13px;
+    color: #218838; /* Màu xanh lá đậm hơn */
+}
+
+.ticket-regulations {
+    font-size: 9.5px;
+    color: #555;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid #eaeaea;
+    line-height: 1.5;
+}
+.ticket-regulations h4 {
+    font-size: 10.5px;
+    margin: 0 0 6px 0;
+    color: #111;
+    font-weight: 600;
+}
+.ticket-regulations ul { list-style: none; padding-left: 0; margin: 0; }
+.ticket-regulations ul li { margin-bottom: 3.5px; }
+
+/* --- Phần Cuống Vé (Stub Section) --- */
+.ticket-stub {
+    width: 170px; /* Chiều rộng cuống vé trên web preview */
+    min-width: 170px;
+    flex-shrink: 0;
+    background-color: #f9fafb; /* Màu nền sáng hơn chút */
+    padding: 20px 15px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    font-size: 10.5px;
+    color: #333;
+    border-left: 2px dashed #cccccc;
+}
+
+.stub-qr-code {
+    margin-bottom: 12px;
+    width: 110px; /* Kích thước vùng QR */
+    height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 5px;
+}
+.stub-qr-code img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.stub-qr-code .stub-qr-code-placeholder { width: 100%; height: 100%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 9pt; color: #777; border-radius: 3px; }
+
+.ticket-stub p { margin: 2.5px 0; line-height: 1.4; }
+.ticket-stub .ticket-id { font-size: 10pt; font-weight: bold; letter-spacing: 0.5px; margin-top: 6px; word-break: break-all; }
+.ticket-stub .order-id { font-size: 8.5pt; color: #555; }
+.ticket-stub .stub-movie-title { font-weight: 600; font-size: 10pt; margin-top: 10px; }
+.ticket-stub .stub-seat-info { font-size: 9pt; }
+.ticket-stub .stub-showtime { font-size: 9pt; color: #333; }
+.stub-footer-brand { margin-top: auto; font-size: 10pt; font-weight: bold; color: #0056b3; padding-top: 12px; }
+
+/* Các nút hành động trong modal */
+.modal-actions-print {
+    text-align: right;
+    padding: 15px 24px;
+    background-color: #f7f7f7; /* Đồng bộ nền với header */
+    border-top: 1px solid #e0e0e0;
+    flex-shrink: 0; /* Đảm bảo action bar luôn ở dưới */
+    border-bottom-left-radius: 10px; /* Bo góc theo dialog */
+    border-bottom-right-radius: 10px;
+}
+
+
+/* ==========================================================================
+   CSS cho việc In Ấn Chung
+   ========================================================================== */
+.print-page-break {
+    display: none;
+}
+
+@media print {
+    body {
+        margin: 0 !important; padding: 0 !important; background-color: white !important;
+        -webkit-print-color-adjust: exact !important; color-adjust: exact !important;
+        font-size: 9pt; /* Font size cơ bản cho in */
+    }
+
+    /* Ẩn các phần tử không mong muốn */
+    .custom-modal-overlay, /* Ẩn toàn bộ modal overlay khi in */
+    .no-print-modal,
+    .custom-modal-header,
+    .modal-actions-print,
+    header, nav, footer, aside, /* Các thành phần layout chung của web */
+    .controls, #error-message, #loading-message /* Các phần tử điều khiển trên trang */
+    {
+        display: none !important;
+        visibility: hidden !important; /* Đảm bảo ẩn hoàn toàn */
+    }
+    
+    /* Vùng chứa vé khi in từ iframe */
+    body.iframe-print-body { /* Style cho body của iframe khi in */
+        margin: 0 !important; padding: 0 !important;
+    }
+    body.iframe-print-body > *:not(.print-only-wrapper) {
+        display: none !important;
+    }
+    .print-only-wrapper {
+        margin:0 !important; padding:0 !important;
+    }
+    #printable-ticket-area-modal { /* Trong iframe, nó sẽ là con của print-only-wrapper */
+        display: block !important; margin: 0 !important; padding: 0 !important; gap: 0 !important;
+        background-color: white !important;
+    }
+    .ticket-wrapper-for-preview { margin: 0 !important; padding: 0 !important; }
+
+
+    .modern-ticket {
+        width: 195mm !important; /* Kích thước vé khi in (chiều rộng gần bằng A4 trừ lề) */
+        /* height: 85mm !important; */ /* Hoặc để auto */
+        min-height: 0 !important;
+        box-shadow: none !important;
+        border: 0.5mm solid #222 !important; /* Border mảnh hơn nhưng rõ */
+        margin: 6mm auto !important; /* Lề trên trang giấy, canh giữa */
+        border-radius: 3mm !important;
+        display: flex !important;
+        /* page-break-inside: avoid !important; */ /* Dùng .print-page-break tốt hơn */
+    }
+
+    .ticket-main-content {
+        padding: 6mm 8mm !important;
+        border-right: 0.5mm dashed #777 !important;
+        font-size: 7.5pt !important;
+    }
+    .ticket-stub {
+        padding: 6mm 5mm !important;
+        width: 70mm !important;
+        min-width: 70mm !important;
+        border-left: none !important; /* Đường cắt đã có ở main-content */
+        font-size: 7pt !important;
+    }
+
+    /* Điều chỉnh font size cho dễ đọc khi in */
+    .cinema-info .cinema-name { font-size: 12pt !important; }
+    .movie-details-section .movie-title { font-size: 14pt !important; margin-bottom: 2mm !important; }
+    .showtime-info { padding: 1.5mm 2.5mm !important; margin-bottom: 2mm !important; }
+    .showtime-info .info-block .data { font-size: 9pt !important; }
+    .showtime-info .info-block .data.time-data { font-size: 10pt !important; }
+    .seat-info-block .seat-item .data.seat-number { font-size: 13pt !important; }
+    .ticket-regulations { font-size: 6.5pt !important; }
+    .stub-qr-code { width: 45mm !important; height: 45mm !important; margin-bottom: 1.5mm !important; }
+    .ticket-stub .ticket-id { font-size: 8pt !important; margin-top: 1mm !important; }
+
+
+    .print-page-break {
+        display: block !important;
+        page-break-after: always !important;
+        height: 0 !important; line-height: 0 !important;
+        visibility: hidden !important; clear: both !important;
+        margin: 0 !important; padding: 0 !important; border: none !important;
+    }
+}

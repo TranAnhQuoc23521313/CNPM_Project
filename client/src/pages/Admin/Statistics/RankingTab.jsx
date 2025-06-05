@@ -58,9 +58,9 @@ function RankingTab({ data, formatCurrency }) {
     { label: "STT", key: "stt" },
     { label: "Tên khách hàng", key: "name" },
     { label: "Số điện thoại", key: "phone" },
-    { label: "Email", key: "email" }, 
-    { label: "Ngày sinh", key: "birthDate" }, 
-    { label: "Ngày đăng ký thành viên", key: "joinDate" }, 
+    { label: "Email", key: "email" },
+    /* { label: "Ngày sinh", key: "birthDate" },  */
+    { label: "Ngày đăng ký thành viên", key: "joinDate" },
     { label: "Tổng chi tiêu (VND)", key: "amount" } // Key 'amount' sẽ được format sau
   ];
   const topSpendingCustomersCSVData = data.topSpendingCustomers.map(cust => ({
@@ -86,8 +86,8 @@ function RankingTab({ data, formatCurrency }) {
     // Giả sử bạn muốn các cột này, có thể cần thêm dữ liệu vào MOCK_DATA hoặc API
     { label: "Tên khách hàng", key: "name" },
     { label: "SĐT", key: "phone" },
-    { label: "Email", key: "email" }, 
-    { label: "Ngày sinh", key: "birthDate" }, 
+    { label: "Email", key: "email" },
+    /* { label: "Ngày sinh", key: "birthDate" },  */
     { label: "Ngày đăng ký thành viên", key: "joinDate" },
     { label: "Số tiền đã chi (VND)", key: "amount" }
   ];
@@ -96,7 +96,7 @@ function RankingTab({ data, formatCurrency }) {
     name: cust.name,
     phone: cust.phone,
     email: cust.email || 'N/A', // Thêm từ dữ liệu gốc
-    birthDate: cust.birthDate ? formatDate(cust.birthDate) : 'N/A', // Thêm và format
+    /* birthDate: cust.birthDate ? formatDate(cust.birthDate) : 'N/A', */ // Thêm và format
     joinDate: cust.joinDate ? formatDate(cust.joinDate) : 'N/A', // Thêm và format
     amount: cust.amount
   }));
@@ -129,18 +129,32 @@ function RankingTab({ data, formatCurrency }) {
           </div>
           <table className="ranking-table">
             <thead>
-              <tr><th>STT</th><th>Tên khách hàng</th><th>Số điện thoại</th><th>Email</th><th>Ngày sinh</th><th>Ngày đăng ký thành viên</th><th>Chi tiêu</th></tr>
+              <tr>
+                <th>STT</th>
+                <th>Tên khách hàng</th>
+                <th>Số điện thoại</th>
+                <th>Email</th>
+                {/* <th>Ngày sinh</th> */}
+                <th>Ngày đăng ký thành viên</th>
+                <th>Chi tiêu</th>
+              </tr>
             </thead>
             <tbody>
               {data.topSpendingCustomers.map(cust => (
                 <tr key={cust.stt}>
-                  <td>{cust.stt}</td><td>{cust.name}</td><td>{cust.phone}</td><td>{cust.email}</td><td>{cust.birthDate}</td><td>{cust.joinDate}</td><td>{formatCurrency(cust.amount)}</td>
+                  <td>{cust.stt}</td>
+                  <td>{cust.name}</td>
+                  <td>{cust.phone}</td>
+                  <td>{cust.email}</td>
+                  {/* <td>{cust.birthDate}</td> */}
+                  <td>{cust.joinDate}</td>
+                  <td>{formatCurrency(cust.amount)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
 
-          
+
         </div>
 
         {/* Card Nhân viên đóng góp */}
@@ -156,9 +170,9 @@ function RankingTab({ data, formatCurrency }) {
               Xuất báo cáo nhân viên
             </CSVLink>
           </div>
-        
+
           <div className="ranking-chart-container">
-             <Pie data={staffPerformanceData} options={pieChartOptions} />
+            <Pie data={staffPerformanceData} options={pieChartOptions} />
           </div>
           <table className="ranking-table">
             <thead>

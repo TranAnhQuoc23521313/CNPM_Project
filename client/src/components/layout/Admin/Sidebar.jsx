@@ -1,31 +1,43 @@
+// src/components/Sidebar.jsx
 import React from 'react';
-// Assuming you're using react-router-dom for navigation
 import { NavLink } from 'react-router-dom';
-import './Sidebar.css'; // We'll need this CSS file for styling
+import './Sidebar.css'; // Đảm bảo bạn đã tạo file CSS này để định dạng sidebar
 
-// Placeholder for icons - replace with actual icon components (e.g., from react-icons)
-const IconPlaceholder = ({ name }) => <span className="icon-placeholder">{/* {name} */}</span>;
+// Import các icon từ react-icons (ví dụ sử dụng Font Awesome icons)
+import {
+  FaFilm,
+  FaCalendarAlt,
+  FaBoxOpen,
+  FaUserTie,
+  FaUsers,
+  FaHistory,
+  FaChartLine,
+  FaTools,
+/*   FaCog,
+  FaSignOutAlt */
+} from 'react-icons/fa';
 
 const Sidebar = () => {
-  // Define navigation items for Cinema Management
+  // Kích thước mặc định cho các icon
+  const iconSize = 20;
+
   const navItems = [
-    { path: '/admin/movies', icon: 'movie', label: 'Quản lý phim' },
-    { path: '/admin/showtimes', icon: 'Showtimes', label: 'Quản lý suất chiếu' },
-    { path: '/admin/items', icon: 'Items', label: 'Quản lý sản phẩm' },
-    { path: '/admin/staffs', icon: 'Staffs', label: 'Quản lý nhân viên' },
-    { path: '/admin/customers', icon: 'Customers', label: 'Quản lý khách hàng' },
-    { path: '/admin/payments', icon: 'Payments', label: 'Quản lý lịch sử giao dịch' },
-    { path: '/admin/statistics', icon: 'Statistics', label: 'Thống kê' },
-    { path: '/admin/facilities', icon: 'Facilities', label: 'Quản lý thiết bị' },
-    // Add more relevant items here
+    { path: '/admin/movies', icon: <FaFilm size={iconSize} />, label: 'Quản lý phim' },
+    { path: '/admin/showtimes', icon: <FaCalendarAlt size={iconSize} />, label: 'Quản lý suất chiếu' },
+    { path: '/admin/items', icon: <FaBoxOpen size={iconSize} />, label: 'Quản lý sản phẩm' },
+    { path: '/admin/staffs', icon: <FaUserTie size={iconSize} />, label: 'Quản lý nhân viên' },
+    { path: '/admin/customers', icon: <FaUsers size={iconSize} />, label: 'Quản lý khách hàng' },
+    { path: '/admin/payments', icon: <FaHistory size={iconSize} />, label: 'Quản lý lịch sử giao dịch' },
+    { path: '/admin/statistics', icon: <FaChartLine size={iconSize} />, label: 'Thống kê' },
+    { path: '/admin/facilities', icon: <FaTools size={iconSize} />, label: 'Quản lý thiết bị' },
   ];
 
-  const bottomNavItems = []
+  // Thêm các mục cho menu dưới cùng (ví dụ)
+  const bottomNavItems = [];
 
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
-        {/* Replace with your actual Logo */}
         <div className="sidebar-logo">CinemaSys</div>
       </div>
 
@@ -37,7 +49,7 @@ const Sidebar = () => {
                 to={item.path}
                 className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
               >
-                <IconPlaceholder name={item.icon} />
+                {item.icon} {/* Hiển thị component icon trực tiếp */}
                 <span>{item.label}</span>
               </NavLink>
             </li>
@@ -54,23 +66,20 @@ const Sidebar = () => {
                      to={item.path}
                      className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
                    >
-                     <IconPlaceholder name={item.icon} />
+                     {item.icon} 
                      <span>{item.label}</span>
                    </NavLink>
                  </li>
                ))}
              </ul>
          </nav>
-        {/* User profile section - similar to the example */}
         <div className="user-profile-section">
-           {/* Replace with actual user avatar and info */}
-           <div className="user-avatar-placeholder"></div>
+           <div className="user-avatar-placeholder"></div> {/* Có thể thay bằng icon user hoặc ảnh */}
            <div className="user-info">
              <span className="user-name">Admin User</span>
-             <span className="user-email">admin@cinemasys.com</span>
+             {/* <span className="user-email">admin@cinemasys.com</span> */}
            </div>
-           {/* Add dropdown icon/button if needed */}
-           <span className="user-menu-icon">⋮</span>
+           {/* <span className="user-menu-icon">⋮</span> */}
         </div>
       </div>
     </aside>

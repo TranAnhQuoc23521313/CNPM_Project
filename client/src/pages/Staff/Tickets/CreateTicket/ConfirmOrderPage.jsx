@@ -6,12 +6,20 @@ import './CreateTicketWorkflow.css';
 import './ConfirmOrderPage.css';
 import { createOrderApi } from '../../../../services/orderApiService'; // API Service mới
 
+import SuccessMessageModal from '../../../../components/common/SuccessMessageModal'; // THÊM IMPORT
+import ErrorMessageModal from '../../../../components/common/ErrorMessageModal';   // THÊM IMPORT
+
 const STAFF_BASE_PATH = "/staff";
 
 const ConfirmOrderPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [pendingNavigation, setPendingNavigation] = useState(null);
+
 
   const {
     movieId, // Không dùng trực tiếp trong payload nhưng để kiểm tra
@@ -70,15 +78,31 @@ const ConfirmOrderPage = () => {
     console.log('Order confirmed, payload to API (WITH SHOWTIMEID):', JSON.stringify(orderPayload, null, 2));
     try {
       const result = await createOrderApi(orderPayload); // API tạo hóa đơn
-      alert(`Đã tạo hóa đơn ${result.MaHoaDon} thành công! Tổng tiền: ${finalTotalAmount.toLocaleString('vi-VN')} đ`);
+      //alert(`Đã tạo hóa đơn ${result.MaHoaDon} thành công! Tổng tiền: ${finalTotalAmount.toLocaleString('vi-VN')} đ`);
       // Điều hướng về trang quản lý vé hoặc trang thành công
-      navigate(`${STAFF_BASE_PATH}/tickets`, { replace: true });
+      setSuccessMessage('Thêm hóa đơn thành công !');
+      setPendingNavigation({ // THÊM ĐOẠN NÀY
+        path: `${STAFF_BASE_PATH}/tickets`,
+        options: { replace: true }
+      });
     } catch (error) {
       console.error("Lỗi khi tạo đơn hàng:", error);
-      alert(`Lỗi khi tạo đơn hàng: ${error.message || 'Vui lòng thử lại.'}`);
+      setErrorMessage(`Lỗi khi tạo đơn hàng: ${error.message || 'Vui lòng thử lại.'}`);
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handleCloseSuccessModal = () => {
+  setSuccessMessage('');
+  if (pendingNavigation) {
+    navigate(pendingNavigation.path, pendingNavigation.options);
+    setPendingNavigation(null); 
+  }
+};
+
+  const handleCloseErrorModal = () => {
+    setErrorMessage('');
   };
 
   // Kiểm tra lại điều kiện hiển thị loading
@@ -138,6 +162,16 @@ const ConfirmOrderPage = () => {
           </Button>
         </div>
       </div>
+      <SuccessMessageModal
+        isOpen={!!successMessage}
+        onClose={handleCloseSuccessModal}
+        successMessage={successMessage}
+      />
+      <ErrorMessageModal
+        isOpen={!!errorMessage}
+        onClose={handleCloseErrorModal}
+        errorMessage={errorMessage}
+      />
     </div>
   );
 };

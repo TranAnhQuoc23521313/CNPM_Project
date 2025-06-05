@@ -1,20 +1,11 @@
-import React, { use, useCallback, useState, useEffect } from 'react';
-import Button from '../../../components/common/Button.jsx'; // Đảm bảo đường dẫn đúng
+import React, { useCallback, useState, useEffect } from 'react';
+// import Button from '../../../components/common/Button.jsx'; // Không dùng trực tiếp Button này nữa
 import './Items.css'; // Import CSS cho trang này
 import EditItemModal from './EditItemModal.jsx'; // Import Edit Modal
-import AddItemModal from './AddItemModal.jsx'; // Import Add Modal (nếu bạn đã tạo)
+import AddItemModal from './AddItemModal.jsx'; // Import Add Modal
 import { getAllProductsApi, createProductApi, updateProductApi, deleteProductApi } from '../../../services/productApiService.js';
 import SuccessMessageModal from '../../../components/common/SuccessMessageModal.jsx';
 import ErrorMessageModal from '../../../components/common/ErrorMessageModal.jsx';
-
-// --- DỮ LIỆU GIẢ LẬP BAN ĐẦU ---
-// const initialItemsData = [
-//   { id: 1, name: 'Bắp Rang Bơ Caramel', price: 55000, status: 'Còn hàng', posterUrl: null, posterPlaceholder: 'Poster Bắp' },
-//   { id: 2, name: 'Nước ngọt Coca-Cola', price: 25000, status: 'Hết hàng', posterUrl: null, posterPlaceholder: 'Poster Coca' },
-//   { id: 3, name: 'Combo 2 Nước 1 Bắp', price: 95000, status: 'Ngừng bán', posterUrl: null, posterPlaceholder: 'Poster Combo' },
-//   { id: 4, name: 'Vé xem phim 2D (Cuối tuần)', price: 120000, status: 'Còn hàng', posterUrl: null, posterPlaceholder: 'Poster Vé' },
-//   { id: 5, name: 'Snack Khoai Tây Vị BBQ', price: 30000, status: 'Ngừng bán', posterUrl: null, posterPlaceholder: 'Poster Snack' },
-// ];
 
 const mapProductApiToClient = (apiProduct) => ({
   id: apiProduct.MASP,
@@ -25,80 +16,82 @@ const mapProductApiToClient = (apiProduct) => ({
   status: apiProduct.TRANGTHAISP,
   posterUrl: apiProduct.HINHANHSP ? `${process.env.REACT_APP_API_URL}${apiProduct.HINHANHSP}` : null,
   posterPlaceholder: apiProduct.HINHANHSP ? null : `Poster ${apiProduct.TENSP.split(' ')[0] || 'Item'}`,
-  // ... các trường gốc nếu cần
+  // Giữ lại các trường gốc nếu modal cần (EditItemModal có thể đang dùng)
   MASP: apiProduct.MASP,
   LOAISP: apiProduct.LOAISP,
   GIASP: apiProduct.GIASP,
   SOLUONG: apiProduct.SOLUONG,
   TRANGTHAISP: apiProduct.TRANGTHAISP,
   HINHANHSP: apiProduct.HINHANHSP,
-  TENSP: apiProduct.TENSP,
+  TENSP: apiProduct.TENSP, // Dù đã có name, giữ lại để tương thích nếu modal dùng trực tiếp
 });
 
 
 const ItemsPage = () => {
-  const pageTitle = 'Sản phẩm';
+  const pageTitle = 'Sản phẩm'; // Có thể dùng cho document.title nếu muốn
   const [items, setItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [itemToDelete, setItemToDelete] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [itemToEdit, setItemToEdit] = useState(null);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false); // State cho Add Modal
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const [errorToDisplay, setErrorToDisplay] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchProductsFromApi = async () => {
+  const fetchProductsFromApi = useCallback(async () => {
     console.log('Fetching products from API...');
     setIsLoading(true);
+    setErrorToDisplay(null); // Clear previous errors
     try {
       const products = await getAllProductsApi();
       const mappedProducts = products.map(mapProductApiToClient);
       setItems(mappedProducts);
-      setFilteredItems(mappedProducts);
+      // Áp dụng bộ lọc tìm kiếm hiện tại nếu có
+      if (searchQuery) {
+        const filtered = mappedProducts.filter(item =>
+          item.name.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setFilteredItems(filtered);
+      } else {
+        setFilteredItems(mappedProducts);
+      }
       console.log('Fetched products:', mappedProducts);
     } catch (error) {
       console.error('Error fetching products:', error);
-      setErrorToDisplay(error.message || 'Failed to fetch products');
+      setErrorToDisplay(error.message || 'Không thể tải danh sách sản phẩm.');
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [searchQuery]); // Thêm searchQuery vào dependencies của useCallback
 
   useEffect(() => {
     fetchProductsFromApi();
-  }, []);
+  }, []); // Chỉ fetchProductsFromApi là dependency
 
   // --- HÀM HANDLER ---
   const handleSearchChange = (event) => {
     const query = event.target.value.toLowerCase();
     setSearchQuery(query);
-    const currentItems = items;
+    const currentItems = items; // Luôn lọc từ danh sách gốc
     const filtered = currentItems.filter(item =>
-      item.name.toLowerCase().includes(query)
+      item.name.toLowerCase().includes(query) ||
+      (item.id && item.id.toString().toLowerCase().includes(query)) || // Tìm theo ID
+      (item.type && item.type.toLowerCase().includes(query)) // Tìm theo loại
     );
     setFilteredItems(filtered);
   };
 
   const handleAddItemClick = () => {
-    setIsAddModalOpen(true); // Mở AddItemModal
+    setIsAddModalOpen(true);
   };
-  const handleCloseAddItemModal = () => {
+  const handleCloseAddItemModal = useCallback(() => {
     setIsAddModalOpen(false);
-  };
+  }, []);
+
   const handleAddItemSubmit = useCallback(async (formDataFromModal) => {
-    // const newItemId = Date.now();
-    // const itemToAdd = {
-    //   ...newItemData, id: newItemId, posterUrl: null,
-    //   posterPlaceholder: `Poster ${newItemData.name.split(' ')[0] || 'Item'}`
-    // };
-    // const newItemsList = [itemToAdd, ...items];
-    // setItems(newItemsList);
-    // setFilteredItems(newItemsList.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase())));
-    // alert('Thêm sản phẩm thành công!');
-    // handleCloseAddItemModal();
     console.log('Adding new item:', formDataFromModal);
     setIsLoading(true);
     setErrorToDisplay(null);
@@ -108,35 +101,29 @@ const ItemsPage = () => {
     dataPayload.append('GIASP', formDataFromModal.price);
     dataPayload.append('SOLUONG', formDataFromModal.quantity);
     dataPayload.append('TRANGTHAISP', formDataFromModal.status);
-    if (formDataFromModal.imageFile) { // TẠM THỜI BỎ instanceof File
-      console.log('ItemsPage: formDataFromModal.imageFile is truthy. Type:', typeof formDataFromModal.imageFile, 'Is File instance:', formDataFromModal.imageFile instanceof File);
-      if (formDataFromModal.imageFile instanceof File) { // Kiểm tra lại instanceof ở đây
-        dataPayload.append('HINHANHSP_FILE', formDataFromModal.imageFile, formDataFromModal.imageFile.name);
-        console.log('ItemsPage: Successfully appended HINHANHSP_FILE:', formDataFromModal.imageFile.name);
-      } else {
-        console.error('ItemsPage: formDataFromModal.imageFile is truthy BUT NOT an instance of File. Actual object:', formDataFromModal.imageFile);
-        // Có thể nó là một object thường có cấu trúc giống File?
-      }
-    } else {
-      console.warn('ItemsPage: formDataFromModal.imageFile is falsy or missing.');
+    if (formDataFromModal.imageFile && formDataFromModal.imageFile instanceof File) {
+      dataPayload.append('HINHANHSP_FILE', formDataFromModal.imageFile, formDataFromModal.imageFile.name);
+      console.log('ItemsPage: Successfully appended HINHANHSP_FILE:', formDataFromModal.imageFile.name);
+    } else if (formDataFromModal.imageFile) {
+      console.warn('ItemsPage: formDataFromModal.imageFile is present but not an instance of File. Type:', typeof formDataFromModal.imageFile);
     }
 
     try {
-      const newItem = await createProductApi(dataPayload);
-      console.log('New item created:', newItem);
+      await createProductApi(dataPayload);
       setSuccessMessage('Thêm sản phẩm thành công!');
       handleCloseAddItemModal();
-      fetchProductsFromApi(); // Fetch lại danh sách sản phẩm sau khi thêm mới
+      fetchProductsFromApi(); // Fetch lại danh sách
     } catch (error) {
       console.error('Error adding new item:', error);
-      setErrorToDisplay(error.message || 'Failed to add new item');
+      setErrorToDisplay(error.response?.data?.message || error.message || 'Không thể thêm sản phẩm mới.');
     } finally {
       setIsLoading(false);
     }
   }, [fetchProductsFromApi, handleCloseAddItemModal]);
 
   const handleEditItemClick = (item) => { setItemToEdit(item); setIsEditModalOpen(true); };
-  const handleCloseEditModal = () => { setIsEditModalOpen(false); setItemToEdit(null); };
+  const handleCloseEditModal = useCallback(() => { setIsEditModalOpen(false); setItemToEdit(null); }, []);
+
   const handleUpdateItemSubmit = useCallback(async (itemId, updatedData) => {
     console.log('Updating item:', itemId, 'with data:', updatedData);
     setIsLoading(true);
@@ -147,163 +134,186 @@ const ItemsPage = () => {
     dataPayload.append('GIASP', updatedData.price);
     dataPayload.append('SOLUONG', updatedData.quantity);
     dataPayload.append('TRANGTHAISP', updatedData.status);
-    if (updatedData.newPosterFile) {
+    if (updatedData.newPosterFile && updatedData.newPosterFile instanceof File) {
       dataPayload.append('HINHANHSP_FILE', updatedData.newPosterFile, updatedData.newPosterFile.name);
-      console.log('ItemsPage: Successfully appended HINHANHSP:', updatedData.newPosterFile.name);
     }
+
     try {
-      const updatedItem = await updateProductApi(itemId, dataPayload);
-      console.log('Item updated:', updatedItem);
-      fetchProductsFromApi(); // Fetch lại danh sách sản phẩm sau khi cập nhật
+      await updateProductApi(itemId, dataPayload);
       setSuccessMessage('Cập nhật sản phẩm thành công!');
       handleCloseEditModal();
+      fetchProductsFromApi(); // Fetch lại danh sách
     } catch (error) {
       console.error('Error updating item:', error);
-      setErrorToDisplay(error.message || 'Failed to update item');
+      setErrorToDisplay(error.response?.data?.message || error.message || 'Không thể cập nhật sản phẩm.');
     } finally {
       setIsLoading(false);
     }
-  }, [items, fetchProductsFromApi, handleCloseEditModal]);
+  }, [fetchProductsFromApi, handleCloseEditModal]);
 
   const handleDeleteClick = (item) => { setItemToDelete(item); };
   const confirmDelete = useCallback(async () => {
     if (!itemToDelete) return;
-
-    console.log('Deleting item:', itemToDelete);
     setIsLoading(true);
     setErrorToDisplay(null);
     try {
       await deleteProductApi(itemToDelete.id);
-      console.log('Item deleted:', itemToDelete.id);
-      fetchProductsFromApi(); // Fetch lại danh sách sản phẩm sau khi xóa
       setSuccessMessage('Xóa sản phẩm thành công!');
+      fetchProductsFromApi(); // Fetch lại danh sách
     } catch (error) {
       console.error('Error deleting item:', error);
-      setErrorToDisplay(error.message || 'Failed to delete item');
+      setErrorToDisplay(error.response?.data?.message || error.message || 'Không thể xóa sản phẩm.');
     } finally {
       setIsLoading(false);
-      setItemToDelete(null); // Đóng modal xác nhận xóa
+      setItemToDelete(null);
     }
   }, [itemToDelete, fetchProductsFromApi]);
-  const cancelDelete = () => { setItemToDelete(null); };
 
-  // Error Modal
-  const handleCloseErrorModal = useCallback(() => {
-    setErrorToDisplay(null);
-  }, []);
-
-  // Success Modal
-  const handleCloseSuccessModal = useCallback(() => {
-    setSuccessMessage(null);
-  }, []);
-  // --- KẾT THÚC HÀM HANDLER ---
+  const cancelDelete = useCallback(() => { setItemToDelete(null); }, []);
+  const handleCloseErrorModal = useCallback(() => { setErrorToDisplay(null); }, []);
+  const handleCloseSuccessModal = useCallback(() => { setSuccessMessage(null); }, []);
 
   const itemsToDisplay = filteredItems;
 
   return (
-    <div className="items-page page-container"> {/* Thêm page-container */}
-      <div className="content-card"> {/* Card trắng bao ngoài */}
+    <div className="items-page page-container">
+      <div className="content-card">
+        {isLoading && (
+          <div className="loading-spinner-overlay">
+            <div className="loading-spinner"></div>
+            <p>Đang tải dữ liệu...</p>
+          </div>
+        )}
 
-        <h1 className="page-main-title">Quản Lý Sản Phẩm</h1> {/* Tiêu đề chính của trang */}
+        <h1 className="page-main-title">Quản Lý Sản Phẩm</h1>
 
-        <div className="items-page-header"> {/* Thanh controls */}
-          <div className="search-input-container"> {/* Bọc ô tìm kiếm */}
+        <div className="items-page-header">
+          <div className="search-input-container">
             <input
               type="text"
               placeholder="Tìm kiếm sản phẩm (tên, mã, loại...)"
-              className="items-search-input" // Class cho input
+              className="items-search-input"
               value={searchQuery}
               onChange={handleSearchChange}
+              disabled={isLoading} // Disable khi đang tải
             />
           </div>
-
           <button
-            className="btn-add-new-item" // Class mới cho nút
+            className="btn-add-new-item"
             onClick={handleAddItemClick}
+            disabled={isLoading} // Disable khi đang tải
           >
-            + Add New Item
+            {/* Có thể thêm icon ở đây nếu muốn, ví dụ: <i className="fas fa-plus"></i> */}
+            + Thêm Sản Phẩm
           </button>
         </div>
 
-        {/* Khu vực hiển thị danh sách sản phẩm */}
         <div className="items-list-container item-row-layout">
-          {/* ... các item sản phẩm ... */}
+          {itemsToDisplay.length > 0 ? (
+            itemsToDisplay.map((item) => {
+              let statusDisplayClasses = 'item-detail-field';
+              if (item.status === 'Hết hàng') {
+                statusDisplayClasses += ' status-out-of-stock';
+              } else if (item.status === 'Ngừng bán') {
+                statusDisplayClasses += ' status-discontinued';
+              }
+
+              const formattedPrice = item.price != null ? item.price.toLocaleString('vi-VN') + ' đ' : 'N/A';
+              const displayQuantity = item.quantity != null ? item.quantity : 'N/A';
+
+              return (
+                <div key={item.id} className="item-row">
+                  <div className="item-poster-container">
+                    <div className="item-poster-placeholder">
+                      {item.posterUrl ? (
+                        <img src={item.posterUrl} alt={item.name} className="item-actual-poster" />
+                      ) : (
+                        item.posterPlaceholder || 'Poster'
+                      )}
+                    </div>
+                  </div>
+                  <div className="item-info-container">
+                    <div className="item-name" title={item.name}>{item.name}</div>
+                    <div className="item-details">
+                      <div className="item-detail-field price-field" title={`Giá: ${formattedPrice}`}>
+                        <span className="item-detail-label">Giá:</span>
+                        <span className="item-detail-value">{formattedPrice}</span>
+                      </div>
+                      <div className={statusDisplayClasses} title={`Trạng thái: ${item.status || 'N/A'}`}>
+                        <span className="item-detail-label">Trạng thái:</span>
+                        <span className="item-detail-value">{item.status || 'N/A'}</span>
+                      </div>
+                      <div className="item-detail-field quantity-field" title={`Số lượng: ${displayQuantity}`}>
+                        <span className="item-detail-label">SL:</span>
+                        <span className="item-detail-value">{displayQuantity}</span>
+                      </div>
+                      <div className="item-detail-field type-field" title={`Loại sản phẩm: ${item.type || 'N/A'}`}>
+                        <span className="item-detail-label">Loại:</span>
+                        <span className="item-detail-value">{item.type || 'N/A'}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="item-actions-container">
+                    <button
+                      onClick={() => handleEditItemClick(item)}
+                      className="item-action-text-btn edit-text-btn"
+                      title="Chỉnh sửa"
+                      disabled={isLoading} // Disable khi đang tải
+                    >
+                      Sửa
+                    </button>
+                    <button
+                      onClick={() => handleDeleteClick(item)}
+                      className="item-action-text-btn delete-text-btn"
+                      title="Xóa"
+                      disabled={isLoading} // Disable khi đang tải
+                    >
+                      Xóa
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            // Chỉ hiển thị "Không có sản phẩm" nếu không phải đang loading
+            !isLoading && (
+              <p className="no-items-found">
+                {searchQuery ? 'Không tìm thấy sản phẩm nào phù hợp.' : 'Chưa có sản phẩm nào.'}
+              </p>
+            )
+          )}
         </div>
-
-        {/* Thông báo không có sản phẩm */}
-        {/* ... */}
-
-      </div> {/* Đóng content-card */}
-
-      {/* Item List Container */}
-      <div className="items-list-container item-row-layout">
-        {itemsToDisplay.length > 0 ? (
-          itemsToDisplay.map((item) => {
-            let statusInputClasses = 'item-field-input status-input';
-            if (item.status === 'Hết hàng') {
-              statusInputClasses += ' status-out-of-stock-input';
-            } else if (item.status === 'Ngừng bán') {
-              statusInputClasses += ' status-discontinued-input';
-            }
-            return (
-              <div key={item.id} className="item-row">
-                <div className="item-poster-container">
-                  <div className="item-poster-placeholder">
-                    {item.posterUrl ? (<img src={item.posterUrl} alt={item.name} className="item-actual-poster" />) : (item.posterPlaceholder || 'Poster')}
-                  </div>
-                </div>
-                <div className="item-info-container">
-                  <div className="item-name">{item.TENSP}</div>
-                  <div className="item-details">
-                    <input id={`price-${item.id}`} type="text" className="item-field-input price-input" value={item.price ? item.price.toLocaleString('vi-VN') + ' đ' : ''} placeholder="Nhập giá" readOnly title={`Giá: ${item.price ? item.price.toLocaleString('vi-VN') + ' đ' : 'N/A'}`} />
-                    <input id={`status-${item.id}`} type="text" className={statusInputClasses} value={item.status || ''} placeholder="Nhập tình trạng" readOnly title={`Trạng thái: ${item.status || 'N/A'}`} />
-                    <input id={`quantity-${item.id}`} type="text" className="item-field-input quantity-input" value={item.quantity || ''} placeholder="Nhập số lượng" readOnly title={`Số lượng: ${item.quantity || 'N/A'}`} />
-                    <input id={`type-${item.id}`} type="text" className="item-field-input type-input" value={item.type || ''} placeholder="Nhập loại sản phẩm" readOnly title={`Loại sản phẩm: ${item.type || 'N/A'}`} />
-                  </div>
-                </div>
-                <div className="item-actions-container">
-                  <button onClick={() => handleEditItemClick(item)} className="item-action-text-btn edit-text-btn" title="Edit">Edit</button>
-                  <button onClick={() => handleDeleteClick(item)} className="item-action-text-btn delete-text-btn" title="Delete">Delete</button>
-                </div>
-              </div>
-            );
-          })
-        ) : (
-          <p className="no-items-found">{searchQuery ? 'No items found matching your search.' : 'No items available.'}</p>
-        )}
       </div>
 
-      {/* Modal Xác Nhận Xóa */}
       {itemToDelete && (
-        <div className="modal-overlay confirmation-overlay" onClick={cancelDelete}>
+        <div className="modal-overlay confirmation-overlay" onClick={!isLoading ? cancelDelete : undefined}>
           <div className="modal-content confirmation-modal" onClick={(e) => e.stopPropagation()}>
             <h3>Xác nhận xóa</h3>
             <p>Bạn có chắc chắn muốn xóa sản phẩm "{itemToDelete.name}"?</p>
             <div className="confirmation-actions">
-              <button onClick={cancelDelete} className="cancel-btn">Không</button>
-              <button onClick={confirmDelete} className="confirm-delete-btn">Xóa</button>
+              <button onClick={cancelDelete} className="cancel-btn" disabled={isLoading}>Không</button>
+              <button onClick={confirmDelete} className="confirm-delete-btn" disabled={isLoading}>
+                {isLoading ? 'Đang xóa...' : 'Xóa'}
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Modal Chỉnh Sửa Item */}
       <EditItemModal
         isOpen={isEditModalOpen}
         onClose={handleCloseEditModal}
         item={itemToEdit}
         onUpdateItem={handleUpdateItemSubmit}
+        isLoading={isLoading} // Truyền trạng thái loading cho modal
       />
 
-      {/* Modal Thêm Item Mới */}
       <AddItemModal
         isOpen={isAddModalOpen}
         onClose={handleCloseAddItemModal}
         onAddItem={handleAddItemSubmit}
-      // Không cần truyền movies/screens cho AddItemModal nếu nó không dùng
+        isLoading={isLoading} // Truyền trạng thái loading cho modal
       />
-
-      {/* Modal Thông Báo Thành Công */}
 
       <SuccessMessageModal
         isOpen={!!successMessage}
@@ -316,8 +326,6 @@ const ItemsPage = () => {
         onClose={handleCloseErrorModal}
         errorMessage={errorToDisplay}
       />
-
-      {/* Modal Thông Báo Lỗi */}
     </div>
   );
 };

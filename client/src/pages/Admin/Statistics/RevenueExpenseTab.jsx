@@ -1,9 +1,18 @@
+// client/src/components/Statistics/RevenueExpenseTab.jsx (hoặc đường dẫn của bạn)
+
 import React from 'react';
 import { Line } from 'react-chartjs-2';
 
 // Component này nhận data và hàm formatCurrency từ Statistics.jsx
 function RevenueExpenseTab({ data, formatCurrency }) {
   if (!data) return <div className="loading-indicator">Đang tải dữ liệu tổng thu chi...</div>;
+
+  // Helper function để làm tròn và hiển thị phần trăm
+  const formatPercentage = (value, decimalPlaces = 2) => {
+    if (value === undefined || value === null || isNaN(value)) return '0.00'; // Hoặc 'N/A'
+    if (value === Infinity || value === -Infinity) return '∞'; // Hoặc một ký hiệu khác cho vô cực
+    return parseFloat(value).toFixed(decimalPlaces);
+  };
 
   const chartData = {
     labels: data.dailyTrend.labels,
@@ -38,44 +47,89 @@ function RevenueExpenseTab({ data, formatCurrency }) {
     interaction: { mode: 'nearest', axis: 'x', intersect: false }
   };
 
+  // Kiểm tra sự tồn tại của các nested object trước khi truy cập
+  const ticketsRevenue = data.revenueBreakdown?.tickets;
+  const productsRevenue = data.revenueBreakdown?.products;
+  const productsExpense = data.expenseBreakdown?.products;
+  const repairsExpense = data.expenseBreakdown?.repairs;
+  const equipmentPurchaseExpense = data.expenseBreakdown?.equipmentPurchase;
+
   return (
     <div className="stats-content-grid">
       <div className="stats-cards-column">
         <div className="stat-card revenue-card">
           <div className="card-header">
-            <h4>Thu: 
-                <span className="trend-positive">{data.revenueBreakdown.tickets.trend?.toFixed(2)}%</span> & 
-                <span className="trend-positive">{data.revenueBreakdown.products.trend?.toFixed(2)}%</span>
+            <h4>
+              Thu:
+              {ticketsRevenue && ticketsRevenue.trend !== undefined && (
+                <span className="trend-positive">
+                  {formatPercentage(ticketsRevenue.trend, 2)}%
+                </span>
+              )}
+              {ticketsRevenue && productsRevenue && ticketsRevenue.trend !== undefined && productsRevenue.trend !== undefined && " & "} 
+              {productsRevenue && productsRevenue.trend !== undefined && (
+                <span className="trend-positive">
+                  {formatPercentage(productsRevenue.trend, 2)}%
+                </span>
+              )}
             </h4>
           </div>
           <div className="card-body breakdown-container">
             <div className="breakdown-item">
               <h5>Vé</h5>
-              <p className="percentage">{data.revenueBreakdown.tickets.percentage}%</p>
-              <p className="amount">{formatCurrency(data.revenueBreakdown.tickets.amount)}</p>
+              <p className="percentage">{formatPercentage(ticketsRevenue?.percentage, 2)}%</p>
+              <p className="amount">{formatCurrency(ticketsRevenue?.amount)}</p>
             </div>
             <div className="breakdown-item">
               <h5>Sản phẩm</h5>
-              <p className="percentage">{data.revenueBreakdown.products.percentage}%</p>
-              <p className="amount">{formatCurrency(data.revenueBreakdown.products.amount)}</p>
+              <p className="percentage">{formatPercentage(productsRevenue?.percentage, 2)}%</p>
+              <p className="amount">{formatCurrency(productsRevenue?.amount)}</p>
             </div>
           </div>
         </div>
 
         <div className="stat-card expense-card">
           <div className="card-header">
-            <h4>Chi: <span className="trend-negative">{data.expenseBreakdown.products.trend?.toFixed(2)}%</span></h4>
+            <h4>
+              Chi:
+              {equipmentPurchaseExpense && equipmentPurchaseExpense.trend !== undefined && (
+                <span className="trend-negative">
+                  {formatPercentage(equipmentPurchaseExpense.trend, 2)}%
+                </span>
+              )}
+              {/* Dấu & chỉ hiển thị nếu cả hai trend đều có */}
+              {equipmentPurchaseExpense?.trend !== undefined && repairsExpense?.trend !== undefined && " & "}
+              {repairsExpense && repairsExpense.trend !== undefined && (
+                <span className="trend-negative">
+                  {formatPercentage(repairsExpense.trend, 2)}%
+                </span>
+              )}
+              {/* (Tùy chọn) Nếu có operationalExpense trend:
+              {operationalExpense?.trend !== undefined && (repairsExpense?.trend !== undefined || equipmentPurchaseExpense?.trend !== undefined) && " & "}
+              {operationalExpense && operationalExpense.trend !== undefined && (
+                <span className="trend-negative">
+                  {formatPercentage(operationalExpense.trend, 2)}%
+                </span>
+              )}
+              */}
+            </h4>
           </div>
           <div className="card-body breakdown-container">
-            <div className="breakdown-item">
+            {/* <div className="breakdown-item">
               <h5>Sản phẩm</h5>
-              <p className="percentage">{data.expenseBreakdown.products.percentage}%</p>
-              <p className="amount">{formatCurrency(data.expenseBreakdown.products.amount)}</p>
+              <p className="percentage">{formatPercentage(productsExpense?.percentage, 2)}%</p>
+              <p className="amount">{formatCurrency(productsExpense?.amount)}</p>
+            </div> */}
+            <div className="breakdown-item">
+              {/* ĐỔI TÊN VÀ LẤY DỮ LIỆU MỚI */}
+              <h5>Thiết bị</h5> 
+              <p className="percentage">{formatPercentage(equipmentPurchaseExpense?.percentage, 2)}%</p>
+              <p className="amount">{formatCurrency(equipmentPurchaseExpense?.amount)}</p>
             </div>
             <div className="breakdown-item">
               <h5>Sửa chữa</h5>
-              <p className="percentage">{data.expenseBreakdown.repairs.percentage}%</p>
-              <p className="amount">{formatCurrency(data.expenseBreakdown.repairs.amount)}</p>
+              <p className="percentage">{formatPercentage(repairsExpense?.percentage, 2)}%</p>
+              <p className="amount">{formatCurrency(repairsExpense?.amount)}</p>
             </div>
           </div>
         </div>
@@ -99,10 +153,11 @@ function RevenueExpenseTab({ data, formatCurrency }) {
         </div>
 
         <div className="stat-card summary-card">
-             <div className="summary-item"><span>Chu kỳ:</span> <span>{data.summary.periodType}</span></div>
-             <div className="summary-item"><span>Thời gian:</span> <span>{data.summary.timeframe}</span></div>
-             <div className="summary-item"><span>Số hoá đơn:</span> <span>{data.summary.invoiceCount}</span></div>
-             <div className="summary-item profit"><span>Lợi nhuận:</span> <span>{formatCurrency(data.summary.profit)}</span></div>
+             <div className="summary-item"><span>Chu kỳ:</span> <span>{data.summary?.periodType}</span></div>
+             <div className="summary-item"><span>Thời gian:</span> <span>{data.summary?.timeframe}</span></div>
+             {/* Giả sử invoiceCount có thể không tồn tại, hiển thị N/A nếu không có */}
+             <div className="summary-item"><span>Số hoá đơn:</span> <span>{data.summary?.invoiceCount !== undefined ? data.summary.invoiceCount : 'N/A'}</span></div>
+             <div className="summary-item profit"><span>Lợi nhuận:</span> <span>{formatCurrency(data.summary?.profit)}</span></div>
         </div>
       </div>
 

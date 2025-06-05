@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác Nhận Đặt Vé Xem Phim</title>
+    <style type="text/css">
+        body { margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; font-size: 16px; line-height: 1.6; color: #333333; background-color: #f4f4f4; }
+        .container { width: 100%; max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .header { background-color: #007bff; color: #ffffff; padding: 20px; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px; }
+        .header h1 { margin: 0; font-size: 24px; }
+        .content { padding: 20px; }
+        .content p { margin-bottom: 15px; }
+        .order-details, .ticket-details, .concession-details { margin-bottom: 20px; border-collapse: collapse; width: 100%; }
+        .order-details th, .order-details td,
+        .ticket-details th, .ticket-details td,
+        .concession-details th, .concession-details td { border: 1px solid #dddddd; text-align: left; padding: 8px; }
+        .order-details th, .ticket-details th, .concession-details th { background-color: #f2f2f2; font-weight: bold; }
+        .total-row td { font-weight: bold; font-size: 18px; }
+        .footer { background-color: #eeeeee; color: #555555; padding: 20px; text-align: center; font-size: 12px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
+        /* .footer a { color: #007bff; text-decoration: none; } */ /* Bỏ comment nếu cần link */
+        /* .logo { max-width: 150px; margin-bottom: 10px; } */ /* Bỏ comment nếu có logo */
+
+        @media screen and (max-width: 600px) {
+            .container { width: 100% !important; margin: 0 auto !important; border-radius: 0 !important; }
+            .content { padding: 15px !important; }
+        }
+    </style>
+</head>
+<body>
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
+        <tr>
+            <td>
+                <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="container" style="width: 100%; max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                    <tr>
+                        <td class="header" style="background-color: #007bff; color: #ffffff; padding: 20px; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+                            <h1 style="margin: 0; font-size: 24px; font-family: Arial, Helvetica, sans-serif;">Đặt Vé Thành Công!</h1>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="content" style="padding: 20px; font-family: Arial, Helvetica, sans-serif; font-size: 16px; line-height: 1.6; color: #333333;">
+                            <p style="margin-bottom: 15px;">Chào Anh/Chị <strong>{{customerName}}</strong>,</p>
+                            <p style="margin-bottom: 15px;">Cảm ơn Anh/Chị đã đặt vé tại <strong>{{cinemaName}}</strong>. Dưới đây là thông tin chi tiết đơn hàng của Anh/Chị:</p>
+
+                            <h3 style="color: #007bff; margin-top: 20px; margin-bottom: 10px;">Thông Tin Đơn Hàng</h3>
+                            <table class="order-details" style="margin-bottom: 20px; border-collapse: collapse; width: 100%;">
+                                <tr>
+                                    <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2; font-weight: bold;">Mã hóa đơn:</th>
+                                    <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">{{orderId}}</td>
+                                </tr>
+                                <tr>
+                                    <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2; font-weight: bold;">Ngày đặt:</th>
+                                    <!-- SỬA: Sử dụng helper formatDate với orderDateRaw -->
+                                    <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">{{formatDate orderDateRaw "dd/MM/yyyy"}}</td>
+                                </tr>
+                                <tr>
+                                    <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2; font-weight: bold;">Phim:</th>
+                                    <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">{{movieTitle}}</td>
+                                </tr>
+                                <tr>
+                                    <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2; font-weight: bold;">Suất chiếu:</th>
+                                    <!-- SỬA: Sử dụng helper formatDate với showtimeDateTimeRaw -->
+                                    <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">
+                                        {{#if showtimeDateTimeRaw}}
+                                            {{formatDate showtimeDateTimeRaw "HH:mm"}} - {{formatDate showtimeDateTimeRaw "dd/MM/yyyy"}} (Phòng: {{roomName}})
+                                        {{else}}
+                                            N/A
+                                        {{/if}}
+                                    </td>
+                                </tr>
+                            </table>
+
+                            {{#if tickets.length}}
+                            <h3 style="color: #007bff; margin-top: 20px; margin-bottom: 10px;">Chi Tiết Vé</h3>
+                            <table class="ticket-details" style="margin-bottom: 20px; border-collapse: collapse; width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2; font-weight: bold;">Ghế</th>
+                                        <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2; font-weight: bold;">Loại vé</th>
+                                        <th style="border: 1px solid #dddddd; text-align: right; padding: 8px; background-color: #f2f2f2; font-weight: bold;">Giá vé</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each tickets}}
+                                    <tr>
+                                        <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">{{this.seatLabel}}</td>
+                                        <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">{{this.seatType}}</td>
+                                        <!-- SỬA: Sử dụng helper formatCurrency với price (không phải priceFormatted) và bỏ "đ" -->
+                                        <td style="border: 1px solid #dddddd; text-align: right; padding: 8px;">{{formatCurrency this.price}}</td>
+                                    </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                            {{/if}}
+
+                            {{#if concessions.length}}
+                            <h3 style="color: #007bff; margin-top: 20px; margin-bottom: 10px;">Sản Phẩm Kèm Theo</h3>
+                            <table class="concession-details" style="margin-bottom: 20px; border-collapse: collapse; width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2; font-weight: bold;">Sản phẩm</th>
+                                        <th style="border: 1px solid #dddddd; text-align: center; padding: 8px; background-color: #f2f2f2; font-weight: bold;">Số lượng</th>
+                                        <th style="border: 1px solid #dddddd; text-align: right; padding: 8px; background-color: #f2f2f2; font-weight: bold;">Thành tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each concessions}}
+                                    <tr>
+                                        <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">{{this.name}}</td>
+                                        <td style="border: 1px solid #dddddd; text-align: center; padding: 8px;">{{this.quantity}}</td>
+                                        <!-- SỬA: Sử dụng helper formatCurrency với totalPrice (không phải totalPriceFormatted) và bỏ "đ" -->
+                                        <td style="border: 1px solid #dddddd; text-align: right; padding: 8px;">{{formatCurrency this.totalPrice}}</td>
+                                    </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                            {{/if}}
+
+                            <table style="width: 100%; margin-top: 20px; border-top: 2px solid #007bff; padding-top: 10px;">
+                                <tr class="total-row">
+                                    <td style="font-weight: bold; font-size: 18px; text-align: right; padding: 8px 0;">TỔNG CỘNG:</td>
+                                    <!-- SỬA: Sử dụng helper formatCurrency với totalAmount (không phải totalAmountFormatted) và bỏ "đ" -->
+                                    <td style="font-weight: bold; font-size: 18px; text-align: right; padding: 8px 0; color: #d9534f;">{{formatCurrency totalAmount}}</td>
+                                </tr>
+                            </table>
+
+                            <p style="margin-top: 30px; margin-bottom: 15px;">Anh/Chị vui lòng đến sớm trước giờ chiếu phim khoảng 15-20 phút để nhận vé và ổn định chỗ ngồi.</p>
+                            <p style="margin-bottom: 15px;">Nếu có bất kỳ thắc mắc nào, vui lòng liên hệ hotline: <strong>{{cinemaHotline}}</strong> hoặc phản hồi lại email này.</p>
+                            <p style="margin-bottom: 15px;">Chúc Anh/Chị có những giây phút xem phim vui vẻ!</p>
+                            <p style="margin-bottom: 15px;">Trân trọng,<br/><strong>{{cinemaName}}</strong></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="footer" style="background-color: #eeeeee; color: #555555; padding: 20px; text-align: center; font-size: 12px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
+                            <p style="margin: 0;">Đây là email tự động, vui lòng không trả lời trực tiếp.</p>
+                            <p style="margin: 5px 0 0 0;">© {{currentYear}} {{cinemaName}}. Bảo lưu mọi quyền.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

@@ -100,3 +100,24 @@ export const cancelOrderApi = async (orderId) => {
         throw error.response?.data || new Error(`Failed to cancel order ${orderId}`);
     }
 };
+
+export const getTicketsForPrintingApi = async (orderId) => {
+  try {
+    // ĐẢM BẢO URL NÀY ĐÚNG VÀ BAO GỒM CẢ API_URL prefix
+    // Hiện tại nó đang là URL tương đối: `/orders/${orderId}/print-tickets`
+    // Nó nên là: `${ORDER_API_ENDPOINT}/${orderId}/print-tickets`
+    // HOẶC nếu apiClient của bạn đã cấu hình baseUrl: `apiClient.get(`/orders/${orderId}/print-tickets`)`
+    const response = await axios.get(`${ORDER_API_ENDPOINT}/${orderId}/print-tickets`, { // <--- SỬA LẠI URL
+         headers: { // <--- THÊM HEADERS NẾU CẦN XÁC THỰC
+             'Authorization': `Bearer ${getAuthToken()}` // Quan trọng nếu API yêu cầu token
+         }
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Lỗi khi gọi API lấy vé để in cho hóa đơn ${orderId}:`, error.response?.data || error.message);
+    // Ném lại lỗi để component có thể bắt và hiển thị thông báo
+    const errToThrow = error.response?.data || new Error("Không thể lấy dữ liệu vé để in.");
+    errToThrow.status = error.response?.status; // Gán thêm status code nếu có
+    throw errToThrow;
+  }
+};

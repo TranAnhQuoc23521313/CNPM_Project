@@ -1,36 +1,57 @@
+// src/pages/Admin/Equipments/Equipments.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import './Equipments.css';
 import Button from '../../../components/common/Button.jsx';
 import AddEquipmentModal from './AddEquipmentModal';
-import { getAllEquipmentApi, createEquipmentApi } from '../../../services/equipmentApiService';
 import EquipmentDetailModal from './EquipmentDetailModal';
+import IncidentDetailModal from './IncidentDetailModal';
+import RepairHistoryDetailModal from './RepairHistoryDetailModal'; // Quan trọng: Component này cần xử lý save và callback
+import SuccessMessageModal from '../../../components/common/SuccessMessageModal';
+import ErrorMessageModal from '../../../components/common/ErrorMessageModal';
 
-// Helper functions - Giữ nguyên
-const formatCurrency = (amount) => Number(amount || 0).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+import { getAllEquipmentApi, createEquipmentApi } from '../../../services/equipmentApiService';
+// recordFacilityRepairApi được dùng bởi RepairHistoryDetailModal, nhưng callback sẽ kích hoạt refresh ở đây
+import { 
+    getAllFacilityIncidentsApi, 
+    getAllRepairHistoryApi, 
+    resolveIncidentApi // Có thể dùng cho nút "Giải quyết nhanh"
+} from '../../../services/facilityApiService';
+
+const BACKEND_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
+
+const getFullImageUrl = (path) => {
+  if (!path) return null;
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:')) {
+    return path;
+  }
+  return `${BACKEND_BASE_URL.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
+};
+
+const formatCurrency = (amount) => {
+  if (amount === null || amount === undefined || isNaN(Number(amount))) return 'N/A';
+  return Number(amount).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+};
 const formatDate = (dateString) => {
   if (!dateString) return 'N/A';
   try {
     const date = new Date(dateString);
-    if (isNaN(date.getTime())) return 'N/A'; // Kiểm tra ngày hợp lệ
+    if (isNaN(date.getTime())) return 'N/A';
     return date.toLocaleDateString('vi-VN', { year: 'numeric', month: '2-digit', day: '2-digit' });
   } catch (e) { return 'N/A'; }
 };
-// Hàm generateEquipmentId cần prefix từ LOAITHIETBI
-/* const generateEquipmentId = (prefix = 'TB') => `${prefix}-${Date.now().toString().slice(-5)}${Math.random().toString(16).slice(2, 7).toUpperCase()}`; */
 
-// Dữ liệu mẫu - CẬP NHẬT KEYS
-/* const INITIAL_EQUIPMENTS_DATA = [
-  { MATHIETBI: generateEquipmentId('MP'), TENTHIETBI: 'Máy chiếu Laser Christie CP2309-RGB', LOAITHIETBI: 'Máy chiếu', VITRITHIETBI: 'Phòng chiếu 1', NGAYMUA: '2022-08-15', NGAYHETBAOHANH: '2025-08-14', TRANGTHAI: 'Đang hoạt động', NGAYBAOTRI: '2023-10-20', GHICHU: 'Độ sáng tốt, cần kiểm tra định kỳ 6 tháng.', GIA: 150000000 },
-  { MATHIETBI: generateEquipmentId('LOA'), TENTHIETBI: 'Hệ thống loa Dolby Atmos L-Acoustics', LOAITHIETBI: 'Âm thanh', VITRITHIETBI: 'Phòng chiếu 1', NGAYMUA: '2022-08-15', NGAYHETBAOHANH: '2024-08-14', TRANGTHAI: 'Đang hoạt động', NGAYBAOTRI: '2023-11-05', GHICHU: 'Âm thanh vòm chất lượng cao.', GIA: 250000000 },
-  { MATHIETBI: generateEquipmentId('MP'), TENTHIETBI: 'Máy chiếu Barco SP2K-15', LOAITHIETBI: 'Máy chiếu', VITRITHIETBI: 'Phòng chiếu 2', NGAYMUA: '2021-05-10', NGAYHETBAOHANH: '2023-05-09', TRANGTHAI: 'Cần bảo trì', NGAYBAOTRI: '2023-04-01', GHICHU: 'Độ sáng giảm, có điểm mờ nhỏ.', GIA: 120000000 },
-  { MATHIETBI: generateEquipmentId('POS'), TENTHIETBI: 'Máy POS bán vé Suno', LOAITHIETBI: 'Thiết bị bán vé', VITRITHIETBI: 'Quầy vé 1', NGAYMUA: '2023-01-20', NGAYHETBAOHANH: '2024-01-19', TRANGTHAI: 'Đang hoạt động', NGAYBAOTRI: 'N/A', GHICHU: '', GIA: 15000000 },
-  { MATHIETBI: generateEquipmentId('AC'), TENTHIETBI: 'Điều hòa trung tâm Daikin', LOAITHIETBI: 'Điều hòa', VITRITHIETBI: 'Toàn rạp', NGAYMUA: '2020-07-01', NGAYHETBAOHANH: '2022-06-30', TRANGTHAI: 'Hỏng hóc', NGAYBAOTRI: '2023-09-15', GHICHU: 'Block nén gặp sự cố, chờ thay thế.', GIA: 300000000 },
-]; */
+// Constants
+const EQUIPMENT_TYPES_OPTIONS = ['Tất cả', 'Máy chiếu', 'Âm thanh', 'Thiết bị bán vé', 'Điều hòa', 'Ghế ngồi', 'Khác'];
+const EQUIPMENT_STATUS_OPTIONS = ['Tất cả', 'Đang hoạt động', 'Cần bảo trì', 'Đang sửa chữa', 'Hỏng hóc', 'Không sử dụng'];
 
-// Các loại thiết bị và trạng thái để filter (ví dụ) - Giữ nguyên
-const EQUIPMENT_TYPES = ['Tất cả', 'Máy chiếu', 'Âm thanh', 'Thiết bị bán vé', 'Điều hòa', 'Ghế ngồi', 'Khác'];
-const EQUIPMENT_STATUSES = ['Tất cả', 'Đang hoạt động', 'Cần bảo trì', 'Đang sửa chữa', 'Hỏng hóc', 'Không sử dụng'];
+// Tùy chọn bộ lọc trạng thái sự cố cho Admin
+const INCIDENT_STATUS_FILTER_OPTIONS_ADMIN = [
+  { value: 'chưa giải quyết', label: 'Chưa giải quyết' },
+  { value: 'đã giải quyết', label: 'Đã giải quyết' },
+  { value: 'tất cả', label: 'Tất cả (bao gồm đã và chưa giải quyết)' }
+];
 
+// Map functions
 const mapEquipmentApiToClient = (apiEquipment) => ({
   MATHIETBI: apiEquipment.MATHIETBI,
   TENTHIETBI: apiEquipment.TENTHIETBI,
@@ -44,189 +65,484 @@ const mapEquipmentApiToClient = (apiEquipment) => ({
   GHICHU: apiEquipment.GHICHU
 });
 
+const mapIncidentApiToClient = (apiIncident) => ({
+  MASUCO: apiIncident.MASUCO,
+  MATHIETBI: apiIncident.MATHIETBI,
+  TENTHIETBI: apiIncident.TENTHIETBI || 'N/A', // Giả sử API trả về TENTHIETBI đã join
+  LOAITHIETBI: apiIncident.LOAITHIETBI || 'N/A', // Giả sử API trả về LOAITHIETBI đã join
+  VITRITHIETBI: apiIncident.VITRITHIETBI || 'N/A', // Giả sử API trả về VITRITHIETBI đã join
+  MANV_BAOCAO: apiIncident.MANV,
+  TEN_NV_BAOCAO: apiIncident.TEN_NV_BAOCAO || apiIncident.MANV || 'N/A', // Giả sử API trả về TEN_NV_BAOCAO đã join
+  NGAY_BAOCAO: apiIncident.NGAY_BAOCAO,
+  MOTA: apiIncident.MOTA,
+  MUCDO_UUTIEN: apiIncident.MUCDO_UUTIEN,
+  TRANGTHAI_SUCO: apiIncident.TRANGTHAI_SUCO, // "Chưa giải quyết" hoặc "Đã giải quyết"
+  HINHANH_SUCO: getFullImageUrl(apiIncident.HINHANH_SUCO),
+});
+
+const mapRepairHistoryApiToClient = (apiRepairItem) => ({
+  ID_SUACHUA: apiRepairItem.MASUACHUA,
+  MATHIETBI: apiRepairItem.MATHIETBI,
+  TENTHIETBI: apiRepairItem.TENTHIETBI || 'N/A', // Giả sử API trả về TENTHIETBI đã join
+  MASUCO: apiRepairItem.MASUCO,
+  NGAY_BAOCAO_SUCO: apiRepairItem.NGAY_BAOCAO_SUCO, // API nên trả về ngày này
+  NGAYSUACHUA: apiRepairItem.NGAYSUACHUA,
+  MOTA_SUCO: apiRepairItem.MOTA_SUCO, // API nên trả về mô tả sự cố gốc
+  MOTA_SUACHUA: apiRepairItem.MOTA_SUACHUA || apiRepairItem.MOTA, // MOTA_SUACHUA là tên đúng hơn
+  CHIPHI: apiRepairItem.CHIPHI,
+  TEN_NV_SUA: apiRepairItem.TEN_NV_SUA || apiRepairItem.MANV_SUA || 'N/A', // Giả sử API trả về TEN_NV_SUA đã join
+  TINHTRANG_SAU_SC: apiRepairItem.TINHTRANG_SAU_SC,
+  HINHANH_SUACHUA: getFullImageUrl(apiRepairItem.HINHANH_SUACHUA),
+});
+
 function Equipments() {
+  // STATE THIẾT BỊ
   const [equipments, setEquipments] = useState([]);
+  const [searchTermEquipment, setSearchTermEquipment] = useState('');
+  const [filterTypeEquipment, setFilterTypeEquipment] = useState('Tất cả');
+  const [filterStatusEquipment, setFilterStatusEquipment] = useState('Tất cả');
+  const [loadingEquipments, setLoadingEquipments] = useState(false);
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState('Tất cả');
-  const [filterStatus, setFilterStatus] = useState('Tất cả');
+  // STATE SỰ CỐ
+  const [facilityIncidents, setFacilityIncidents] = useState([]);
+  const [searchTermIncident, setSearchTermIncident] = useState('');
+  const [filterStatusIncident, setFilterStatusIncident] = useState('tất cả'); // Mặc định cho Admin
+  const [loadingIncidents, setLoadingIncidents] = useState(false);
 
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [editingEquipment, setEditingEquipment] = useState(null);
-  const [viewingEquipment, setViewingEquipment] = useState(null);
+  // STATE LỊCH SỬ SỬA CHỮA
+  const [repairHistory, setRepairHistory] = useState([]);
+  const [searchTermRepair, setSearchTermRepair] = useState('');
+  const [loadingRepairHistory, setLoadingRepairHistory] = useState(false);
 
-  const [showDetailModal, setShowDetailModal] = useState(false);
+  // STATE CHUNG (MODALS, MESSAGES)
+  const [activeTab, setActiveTab] = useState('all'); // 'all', 'issues', 'repair-history'
+  const [showAddEquipmentModal, setShowAddEquipmentModal] = useState(false);
+  const [showEquipmentDetailModal, setShowEquipmentDetailModal] = useState(false);
   const [equipmentToView, setEquipmentToView] = useState(null);
+  const [showIncidentDetailModal, setShowIncidentDetailModal] = useState(false);
+  const [incidentToView, setIncidentToView] = useState(null);
+  const [showRepairHistoryDetailModal, setShowRepairHistoryDetailModal] = useState(false);
+  const [repairItemToView, setRepairItemToView] = useState(null); // Dùng để XEM/SỬA lịch sử sửa chữa
+  const [incidentForRepairModal, setIncidentForRepairModal] = useState(null); // Dùng để THÊM lịch sử sửa chữa cho sự cố
 
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // FETCH FUNCTIONS
   const fetchEquipmentsFromApi = useCallback(async () => {
-    console.log("Equipments: Fetching equipments from API...");
+    setLoadingEquipments(true);
+    setErrorMessage('');
     try {
       const apiEquipments = await getAllEquipmentApi();
-      console.log("Equipments: API data fetched successfully", apiEquipments);
-      const mappedEquipments = apiEquipments.map(mapEquipmentApiToClient);
-      setEquipments(mappedEquipments);
+      setEquipments(apiEquipments.map(mapEquipmentApiToClient));
     } catch (error) {
-      console.error("Equipments: Error fetching equipments from API", error);
-      alert("Lỗi khi tải dữ liệu thiết bị từ máy chủ. Vui lòng thử lại sau.");
+      console.error("Equipments: Error fetching equipments", error);
+      setErrorMessage("Lỗi khi tải danh sách thiết bị. " + (error.message || ''));
     } finally {
-      console.log("Equipments: Finished fetching equipments from API.");
+      setLoadingEquipments(false);
     }
   }, []);
 
-  useEffect(() => {
-    fetchEquipmentsFromApi();
-  }, [fetchEquipmentsFromApi]);
+  const fetchAllFacilityIncidents = useCallback(async (currentSearchTerm, currentFilterStatus) => {
+    setLoadingIncidents(true);
+    setErrorMessage('');
+    try {
+      const queryParams = {
+        status: currentFilterStatus, // Sẽ là 'chưa giải quyết', 'đã giải quyết', hoặc 'tất cả'
+      };
+      if (currentSearchTerm) {
+        queryParams.searchTerm = currentSearchTerm;
+      }
+      
+      console.log("[Admin Equipments-fetchAllFacilityIncidents] Fetching with params:", queryParams);
+      const apiIncidentsData = await getAllFacilityIncidentsApi(queryParams);
+      setFacilityIncidents(Array.isArray(apiIncidentsData) ? apiIncidentsData.map(mapIncidentApiToClient) : []);
+    } catch (error) {
+      console.error("Admin Equipments: Error fetching facility incidents", error);
+      setErrorMessage(error.message || "Lỗi khi tải danh sách sự cố.");
+      setFacilityIncidents([]);
+    } finally {
+      setLoadingIncidents(false);
+    }
+  }, []); // Thêm mapIncidentApiToClient nếu nó phụ thuộc vào state/prop từ Equipments
 
+  const fetchRepairHistoryFromApi = useCallback(async () => {
+    setLoadingRepairHistory(true);
+    setErrorMessage('');
+    try {
+      const apiRepairHistory = await getAllRepairHistoryApi(); // API này cần JOIN để có TENTHIETBI, TEN_NV_SUA...
+      setRepairHistory(Array.isArray(apiRepairHistory) ? apiRepairHistory.map(mapRepairHistoryApiToClient) : []);
+    } catch (error) {
+      console.error("Equipments: Error fetching repair history", error);
+      setErrorMessage(error.message || "Lỗi khi tải lịch sử sửa chữa.");
+      setRepairHistory([]);
+    } finally {
+      setLoadingRepairHistory(false);
+    }
+  }, []); // Thêm mapRepairHistoryApiToClient nếu nó phụ thuộc vào state/prop từ Equipments
+
+  useEffect(() => {
+    if (activeTab === 'all') {
+      fetchEquipmentsFromApi();
+    } else if (activeTab === 'issues') {
+      fetchAllFacilityIncidents(searchTermIncident, filterStatusIncident);
+    } else if (activeTab === 'repair-history') {
+      fetchRepairHistoryFromApi();
+    }
+  }, [activeTab, fetchEquipmentsFromApi, fetchAllFacilityIncidents, fetchRepairHistoryFromApi, searchTermIncident, filterStatusIncident]);
+
+  // HANDLER FUNCTIONS
   const handleAddEquipment = useCallback(async (equipmentData) => {
-    console.log("Equipments: Adding new equipment", equipmentData);
+    setSuccessMessage('');
+    setErrorMessage('');
     try {
       const newEquipment = await createEquipmentApi(equipmentData);
-      console.log("Equipments: New equipment added successfully", newEquipment);
-      fetchEquipmentsFromApi(); // Cập nhật danh sách thiết bị sau khi thêm mới
+      setSuccessMessage(`Thiết bị "${newEquipment.TENTHIETBI || 'mới'}" đã được thêm thành công!`);
+      setShowAddEquipmentModal(false);
+      fetchEquipmentsFromApi(); // Tải lại danh sách thiết bị
     } catch (error) {
-      console.error("Equipments: Error adding new equipment", error);
-      alert("Lỗi khi thêm thiết bị mới. Vui lòng kiểm tra dữ liệu và thử lại.");
+      console.error("Equipments: Error adding equipment", error);
+      setErrorMessage((error.response?.data?.message || error.message) || "Lỗi khi thêm thiết bị mới.");
     }
   }, [fetchEquipmentsFromApi]);
 
-  const handleUpdateEquipment = (updatedEquipmentData) => {
-    setEquipments(prev => prev.map(eq =>
-      eq.MATHIETBI === updatedEquipmentData.MATHIETBI
-        ? {
-          ...updatedEquipmentData,
-          GIA: updatedEquipmentData.GIA ? parseFloat(updatedEquipmentData.GIA) : null // Parse GIA khi update
-        }
-        : eq
-    ));
-    setEditingEquipment(null);
-  };
-
-  const handleDeleteEquipment = (equipmentId) => { // Giả sử equipmentId là MATHIETBI
-    if (window.confirm(`Bạn có chắc muốn xóa thiết bị có ID: ${equipmentId}?`)) {
-      setEquipments(prev => prev.filter(eq => eq.MATHIETBI !== equipmentId));
-    }
-  };
-
-  // << HÀM MỞ MODAL CHI TIẾT >>
-  const openDetailModal = (equipment) => {
+  const openDetailModalForEquipment = (equipment) => {
     setEquipmentToView(equipment);
-    setShowDetailModal(true);
+    setShowEquipmentDetailModal(true);
+  };
+  
+  const openDetailModalForIncident = (incident) => {
+    setIncidentToView(incident);
+    setShowIncidentDetailModal(true);
   };
 
-  // CẬP NHẬT KEYS TRONG FILTER
-  const filteredEquipments = equipments.filter(eq => {
-    // Kiểm tra eq có phải là object không trước khi dùng Object.values
-    if (typeof eq !== 'object' || eq === null) return false;
+  // Dùng để XEM chi tiết một bản ghi lịch sử sửa chữa
+  const openDetailModalForRepairHistory = (repairItem) => {
+    setRepairItemToView(repairItem);
+    setIncidentForRepairModal(null); // Không phải là thêm mới từ sự cố
+    setShowRepairHistoryDetailModal(true);
+  };
 
-    const matchesSearchTerm = Object.values(eq).some(value =>
-      String(value).toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    const matchesType = filterType === 'Tất cả' || eq.LOAITHIETBI === filterType;
-    const matchesStatus = filterStatus === 'Tất cả' || eq.TRANGTHAI === filterStatus;
-    return matchesSearchTerm && matchesType && matchesStatus;
+  // Dùng để MỞ FORM THÊM một bản ghi sửa chữa cho sự cố cụ thể
+  const openAddRepairModalForIncident = (incident) => {
+    setIncidentForRepairModal(incident); // Cung cấp context của sự cố
+    setRepairItemToView(null);           // Đảm bảo là form thêm mới
+    setShowRepairHistoryDetailModal(true);
+  };
+
+  // Callback khi một bản ghi sửa chữa được lưu thành công từ RepairHistoryDetailModal
+  // Backend đã tự động cập nhật TRANGTHAI_SUCO của sự cố liên quan
+  const handleRepairRecorded = useCallback(async (savedRepairData, relatedMasuco) => {
+    setSuccessMessage(`Sửa chữa cho sự cố ${relatedMasuco} đã được ghi nhận.`);
+    setShowRepairHistoryDetailModal(false);
+    setIncidentForRepairModal(null);
+    setRepairItemToView(null);
+
+    // Tải lại danh sách sự cố và lịch sử sửa chữa
+    if (activeTab === 'issues') {
+      fetchAllFacilityIncidents(searchTermIncident, filterStatusIncident);
+    }
+    if (activeTab === 'repair-history') {
+      fetchRepairHistoryFromApi(); // Để cập nhật danh sách lịch sử
+    }
+  }, [activeTab, fetchAllFacilityIncidents, fetchRepairHistoryFromApi, searchTermIncident, filterStatusIncident,fetchEquipmentsFromApi]);
+  
+  // Lọc client-side: Chủ yếu cho searchTerm nếu backend không lọc, status đã được backend xử lý
+  const filteredEquipments = equipments.filter(eq => {
+    if (searchTermEquipment && !Object.values(eq).some(value => String(value).toLowerCase().includes(searchTermEquipment.toLowerCase()))) return false;
+    if (filterTypeEquipment !== 'Tất cả' && eq.LOAITHIETBI !== filterTypeEquipment) return false;
+    if (filterStatusEquipment !== 'Tất cả' && eq.TRANGTHAI !== filterStatusEquipment) return false;
+    return true;
   });
+  
+  const filteredIncidents = facilityIncidents.filter(inc => {
+    // Backend đã lọc theo filterStatusIncident.
+    // Client chỉ cần lọc theo searchTermIncident nếu backend chưa làm.
+    // Giả sử backend CHƯA lọc theo searchTermIncident:
+    if (searchTermIncident) {
+      const term = searchTermIncident.toLowerCase();
+      const match =
+        String(inc.MASUCO).toLowerCase().includes(term) ||
+        (inc.TENTHIETBI && String(inc.TENTHIETBI).toLowerCase().includes(term)) ||
+        (inc.MOTA && String(inc.MOTA).toLowerCase().includes(term)) ||
+        (inc.TEN_NV_BAOCAO && String(inc.TEN_NV_BAOCAO).toLowerCase().includes(term));
+      if (!match) return false;
+    }
+    return true;
+  });
+
+  const filteredRepairHistory = repairHistory.filter(item => {
+    if (searchTermRepair &&
+      !Object.values(item).some(value => String(value).toLowerCase().includes(searchTermRepair.toLowerCase()))) {
+      return false;
+    }
+    return true;
+  });
+
+  const getPageTitle = () => {
+    if (activeTab === 'all') return 'Danh sách thiết bị';
+    if (activeTab === 'issues') return 'Quản lý Sự Cố Thiết Bị';
+    if (activeTab === 'repair-history') return 'Lịch sử sửa chữa thiết bị';
+    return 'Quản lý Thiết bị & CSVC';
+  };
 
   return (
     <div className="page-container equipments-page">
       <div className="content-card">
-        <h1 className="page-title">Quản Lý Trang Thiết Bị</h1>
-
-        <div className="page-controls equipments-controls">
-          <input
-            type="text"
-            placeholder="Tìm kiếm thiết bị (ID, tên, loại, vị trí...)"
-            className="search-input"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <div className="filter-group">
-            <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="filter-select">
-              {EQUIPMENT_TYPES.map(type => <option key={type} value={type}>{type}</option>)}
-            </select>
-            <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="filter-select">
-              {EQUIPMENT_STATUSES.map(status => <option key={status} value={status}>{status}</option>)}
-            </select>
+        <div className="page-header-custom">
+          <h1 className="main-page-title">{getPageTitle()}</h1>
+          <div className="view-tabs">
+            <button className={`view-tab-button ${activeTab === 'all' ? 'active' : ''}`} onClick={() => setActiveTab('all')}>Thiết Bị</button>
+            <button className={`view-tab-button ${activeTab === 'issues' ? 'active' : ''}`} onClick={() => setActiveTab('issues')}>Sự Cố</button>
+            <button className={`view-tab-button ${activeTab === 'repair-history' ? 'active' : ''}`} onClick={() => setActiveTab('repair-history')}>Lịch Sử Sửa Chữa</button>
           </div>
-          <button onClick={() => setShowAddModal(true)} className="btn-add-new">
-            + Thêm Thiết Bị Mới
-          </button>
         </div>
 
-        {filteredEquipments.length > 0 ? (
-          <div className="table-responsive-wrapper">
-            <table className="data-table equipments-table">
-              <thead>
-                <tr>
-                  <th>Mã TB</th>
-                  <th>Tên Thiết Bị</th>
-                  <th>Loại</th>
-                  <th>Vị Trí</th>
-                  <th>Ngày Mua</th>
-                  <th>Trạng Thái</th>
-                  <th>Giá</th>
-                  <th>Hành động</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredEquipments.map(eq => (
-                  <tr key={eq.MATHIETBI}>
-                    <td>{eq.MATHIETBI}</td>
-                    <td title={eq.TENTHIETBI} className="equipment-name-cell">{eq.TENTHIETBI}</td>
-                    <td>{eq.LOAITHIETBI}</td>
-                    <td>{eq.VITRITHIETBI}</td>
-                    <td>{formatDate(eq.NGAYMUA)}</td>
-                    <td>
-                      {eq.TRANGTHAI ? (
-                        <span className={`status-badge status-equipment-${eq.TRANGTHAI.toLowerCase().replace(/\s+/g, '-')}`}>
-                          {eq.TRANGTHAI}
-                        </span>
-                      ) : (
-                        <span className="status-badge status-equipment-unknown">Không rõ</span>
-                      )}
-                    </td>
-                    <td>{formatCurrency(eq.GIA)}</td>
-                    <td className="actions-cell">
-                      {/* <button onClick={() => setEditingEquipment(eq)} className="btn-action btn-edit">Sửa</button>
-                      <button onClick={() => handleDeleteEquipment(eq.MATHIETBI)} className="btn-action btn-delete">Xóa</button> */}
-                      <Button onClick={() => openDetailModal(eq)} className="btn-action btn-view">Xem</Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <p className="no-data-message">
-            {searchTerm || filterType !== 'Tất cả' || filterStatus !== 'Tất cả'
-              ? "Không tìm thấy thiết bị phù hợp."
-              : "Chưa có thiết bị nào."}
-          </p>
-        )}
+        <div className="tab-content-area">
+          {/* TAB: DANH SÁCH THIẾT BỊ */}
+          {activeTab === 'all' && (
+             <div className="equipment-list-tab-content">
+              <div className="page-controls equipments-controls">
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm thiết bị (ID, tên, loại, vị trí...)"
+                  className="search-input"
+                  value={searchTermEquipment}
+                  onChange={(e) => setSearchTermEquipment(e.target.value)}
+                />
+                <div className="filter-group">
+                  <select value={filterTypeEquipment} onChange={(e) => setFilterTypeEquipment(e.target.value)} className="filter-select">
+                    {EQUIPMENT_TYPES_OPTIONS.map(type => <option key={type} value={type}>{type}</option>)}
+                  </select>
+                  <select value={filterStatusEquipment} onChange={(e) => setFilterStatusEquipment(e.target.value)} className="filter-select">
+                    {EQUIPMENT_STATUS_OPTIONS.map(status => <option key={status} value={status}>{status}</option>)}
+                  </select>
+                </div>
+                <Button onClick={() => setShowAddEquipmentModal(true)} className="btn-add-new">
+                  + Thêm Thiết Bị Mới
+                </Button>
+              </div>
+
+              {loadingEquipments && <p className="loading-message">Đang tải danh sách thiết bị...</p>}
+              {!loadingEquipments && filteredEquipments.length > 0 ? (
+                <div className="table-responsive-wrapper">
+                  <table className="data-table equipments-table">
+                    <thead><tr><th>Mã TB</th><th>Tên Thiết Bị</th><th>Loại</th><th>Vị Trí</th><th>Ngày Mua</th><th>Trạng Thái TB</th><th>Giá</th><th>Hành động</th></tr></thead>
+                    <tbody>
+                      {filteredEquipments.map(eq => (
+                        <tr key={eq.MATHIETBI}>
+                          <td>{eq.MATHIETBI}</td>
+                          <td title={eq.TENTHIETBI} className="equipment-name-cell">{eq.TENTHIETBI}</td>
+                          <td>{eq.LOAITHIETBI}</td>
+                          <td>{eq.VITRITHIETBI}</td>
+                          <td>{formatDate(eq.NGAYMUA)}</td>
+                          <td><span className={`status-badge status-equipment-${eq.TRANGTHAI ? String(eq.TRANGTHAI).toLowerCase().replace(/\s+/g, '-') : 'unknown'}`}>{eq.TRANGTHAI || 'Không rõ'}</span></td>
+                          <td className="currency-cell">{formatCurrency(eq.GIA)}</td>
+                          <td className="actions-cell"><Button onClick={() => openDetailModalForEquipment(eq)} className="btn-action btn-view btn-sm">Xem</Button></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (!loadingEquipments && <p className="no-data-message">{searchTermEquipment || filterTypeEquipment !== 'Tất cả' || filterStatusEquipment !== 'Tất cả' ? "Không tìm thấy thiết bị phù hợp." : "Chưa có thiết bị nào."}</p>)}
+            </div>
+          )}
+
+          {/* TAB: QUẢN LÝ SỰ CỐ */}
+          {activeTab === 'issues' && (
+            <div className="facility-incidents-tab-content">
+              <div className="page-controls incidents-controls equipments-controls">
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm sự cố (Mã SC, Tên TB, Mô tả...)"
+                  className="search-input"
+                  value={searchTermIncident}
+                  onChange={(e) => setSearchTermIncident(e.target.value)} // useEffect sẽ trigger fetch
+                />
+                <div className="filter-group">
+                  <select 
+                    value={filterStatusIncident} 
+                    onChange={(e) => setFilterStatusIncident(e.target.value)} // useEffect sẽ trigger fetch
+                    className="filter-select"
+                  >
+                    {INCIDENT_STATUS_FILTER_OPTIONS_ADMIN.map(option => 
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    )}
+                  </select>
+                </div>
+                {/* Admin có thể có nút báo cáo sự cố riêng nếu cần, nhưng thường là nhân viên báo cáo */}
+              </div>
+
+              {loadingIncidents && <p className="loading-message">Đang tải danh sách sự cố...</p>}
+              {!loadingIncidents && filteredIncidents.length > 0 ? (
+                <div className="table-responsive-wrapper">
+                  <table className="data-table incidents-table equipments-table">
+                    <thead><tr>
+                      {/* <th>Mã Sự Cố</th> */}
+                      <th>Mã thiết bị</th>
+                      <th>Tên Thiết Bị</th> 
+                      <th>Người Báo Cáo</th>
+                      <th>Ngày Báo Cáo</th>
+                      <th>Mô Tả</th>
+                      <th>Ưu Tiên</th>
+                      <th>Trạng Thái SC</th>
+                      <th>Hành động</th>
+                    </tr></thead>
+                    <tbody>
+                      {filteredIncidents.map(inc => (
+                        <tr key={inc.MASUCO}>
+                          {/* <td>{inc.MASUCO}</td> */}
+                          <td>{inc.MATHIETBI}</td>
+                          <td title={inc.TENTHIETBI} className="equipment-name-cell">{inc.TENTHIETBI}</td>
+                          <td>{inc.TEN_NV_BAOCAO}</td>
+                          <td>{formatDate(inc.NGAY_BAOCAO)}</td>
+                          <td title={inc.MOTA} className="notes-cell">{inc.MOTA}</td>
+                          <td>
+                            <span className={`priority-badge priority-${String(inc.MUCDO_UUTIEN || 'unknown').toLowerCase().replace(/\s+/g, '-')}`}>
+                              {inc.MUCDO_UUTIEN || 'Không rõ'}
+                            </span>
+                          </td>
+                          <td>
+                            <span 
+                              className={`status-badge status-incident-${String(inc.TRANGTHAI_SUCO || 'abc')
+                                .toLowerCase()
+                                .replace(/\s+/g, '-') // "Chưa giải quyết" -> "chua-giai-quyet"
+                              }`}
+                            >
+                                {inc.TRANGTHAI_SUCO || 'Không rõ'}
+                            </span>
+                          </td>
+                          <td className="actions-cell">
+                            <Button onClick={() => openDetailModalForIncident(inc)} className="btn-action btn-view btn-sm">Xem</Button>
+                            {/* {inc.TRANGTHAI_SUCO === 'Chưa giải quyết' && (
+                                <Button 
+                                    onClick={() => openAddRepairModalForIncident(inc)} 
+                                    className="btn-action btn-repair btn-sm"
+                                    style={{marginLeft: '5px'}}
+                                >
+                                    Sửa chữa
+                                </Button>
+                            )} */}
+                             {/* Tùy chọn: Nút giải quyết nhanh cho Admin */}
+                            {/* {inc.TRANGTHAI_SUCO === 'Chưa giải quyết' && (
+                                <Button 
+                                    onClick={async () => {
+                                        if(window.confirm(`Bạn có chắc muốn đánh dấu sự cố ${inc.MASUCO} là "Đã giải quyết" mà không cần ghi nhận sửa chữa chi tiết?`)){
+                                            try {
+                                                //setIsLoading(true); // Nên có state isLoading chung cho các action
+                                                await resolveIncidentApi(inc.MASUCO);
+                                                setSuccessMessage(`Sự cố ${inc.MASUCO} đã được đánh dấu là "Đã giải quyết".`);
+                                                fetchAllFacilityIncidents(searchTermIncident, filterStatusIncident); // Tải lại
+                                            } catch (err) {
+                                                setErrorMessage(err.message || `Lỗi khi giải quyết sự cố ${inc.MASUCO}.`);
+                                            } finally {
+                                                // setIsLoading(false);
+                                            }
+                                        }
+                                    }} 
+                                    className="btn-action btn-sm" // Có thể tạo class btn-resolve
+                                    style={{marginLeft: '5px', backgroundColor: '#17a2b8', borderColor: '#17a2b8', color: 'white'}}
+                                >
+                                    Đã Xong
+                                </Button>
+                            )} */}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (!loadingIncidents && 
+                    <p className="no-data-message">
+                        { (searchTermIncident || (filterStatusIncident !== 'chưa giải quyết' && filterStatusIncident !== 'tất cả')) ? 
+                            "Không tìm thấy sự cố phù hợp với bộ lọc." : 
+                            (filterStatusIncident === 'chưa giải quyết' ? "Hiện không có sự cố nào chưa được giải quyết." : "Không có sự cố nào để hiển thị.")
+                        }
+                    </p>
+                )}
+            </div>
+          )}
+
+          {/* TAB: LỊCH SỬ SỬA CHỮA */}
+          {activeTab === 'repair-history' && (
+            <div className="facility-repair-history-tab-content">
+              <div className="page-controls repair-history-controls equipments-controls">
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm lịch sử (Mã SC, Mã TB, Mô tả...)"
+                  className="search-input"
+                  value={searchTermRepair}
+                  onChange={(e) => setSearchTermRepair(e.target.value)}
+                />
+                {/* Có thể thêm bộ lọc cho lịch sử sửa chữa nếu cần */}
+              </div>
+              {loadingRepairHistory && <p className="loading-message">Đang tải lịch sử sửa chữa...</p>}
+              {!loadingRepairHistory && filteredRepairHistory.length > 0 ? (
+                <div className="table-responsive-wrapper">
+                  <table className="data-table repair-history-table equipments-table">
+                    <thead><tr>
+                      {/* <th>Mã Sửa Chữa</th>
+                      <th>Mã Sự Cố</th> */}
+                      <th>Mã thiết bị</th>
+                      <th>Tên Thiết Bị</th>
+                      <th>Ngày Sửa Xong</th>
+                      <th>Người Sửa</th>
+                      <th>Tình Trạng Sau SC</th>
+                      <th>Chi Phí</th>
+                      <th>Hành động</th>
+                    </tr></thead>
+                    <tbody>
+                      {filteredRepairHistory.map(item => (
+                        <tr key={item.ID_SUACHUA}>
+                          {/* <td>{item.ID_SUACHUA}</td>
+                          <td>{item.MASUCO}</td> */}
+                          <td>{item.MATHIETBI}</td>
+                          <td title={item.TENTHIETBI} className="equipment-name-cell">{item.TENTHIETBI}</td>
+                          <td>{formatDate(item.NGAYSUACHUA)}</td>
+                          <td>{item.TEN_NV_SUA}</td>
+                          <td>
+                            <span className={`status-badge status-repair-${String(item.TINHTRANG_SAU_SC || 'unknown').toLowerCase().replace(/\s+/g, '-')/* .normalize("NFD").replace(/[\u0300-\u036f]/g, "") */}`}>
+                              {item.TINHTRANG_SAU_SC || 'Không rõ'}
+                            </span>
+                          </td>
+                          <td className="currency-cell">{formatCurrency(item.CHIPHI)}</td>
+                          <td className="actions-cell">
+                            <Button onClick={() => openDetailModalForRepairHistory(item)} className="btn-action btn-view btn-sm">Xem</Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (!loadingRepairHistory && <p className="no-data-message">{searchTermRepair ? "Không tìm thấy lịch sử phù hợp." : "Chưa có lịch sử sửa chữa."}</p>)}
+            </div>
+          )}
+        </div>
       </div>
 
-      {showAddModal && (
-        <AddEquipmentModal
-          onClose={() => setShowAddModal(false)}
-          onAddEquipment={handleAddEquipment}
-          // generateId prop không còn cần thiết nếu ID được xử lý hoàn toàn trong Equipments
-          equipmentTypes={EQUIPMENT_TYPES.filter(t => t !== 'Tất cả')}
-          equipmentStatuses={EQUIPMENT_STATUSES.filter(s => s !== 'Tất cả')}
-        />
-      )}
-      {showDetailModal && equipmentToView && (
-        <EquipmentDetailModal
-          equipment={equipmentToView}
-          onClose={() => {
-            setShowDetailModal(false);
-            setEquipmentToView(null);
+      {/* Modals */}
+      {showAddEquipmentModal && <AddEquipmentModal onClose={() => setShowAddEquipmentModal(false)} onAddEquipment={handleAddEquipment} equipmentTypes={EQUIPMENT_TYPES_OPTIONS.filter(t => t !== 'Tất cả')} equipmentStatuses={EQUIPMENT_STATUS_OPTIONS.filter(s => s !== 'Tất cả')} />}
+      {showEquipmentDetailModal && equipmentToView && <EquipmentDetailModal equipment={equipmentToView} onClose={() => { setShowEquipmentDetailModal(false); setEquipmentToView(null); }} formatCurrency={formatCurrency} formatDate={formatDate} />}
+      {showIncidentDetailModal && incidentToView && <IncidentDetailModal incident={incidentToView} onClose={() => { setShowIncidentDetailModal(false); setIncidentToView(null); }} formatDate={formatDate} formatCurrency={formatCurrency} />}
+      
+      {showRepairHistoryDetailModal && (
+        <RepairHistoryDetailModal
+          repairItem={repairItemToView} 
+          incidentContext={incidentForRepairModal} 
+          onClose={() => { 
+            setShowRepairHistoryDetailModal(false); 
+            setRepairItemToView(null);
+            setIncidentForRepairModal(null);
           }}
-          formatCurrency={formatCurrency} // Truyền các hàm helper
+          onSaveSuccess={handleRepairRecorded} 
           formatDate={formatDate}
+          formatCurrency={formatCurrency}
+          // recordRepairApiFunc={recordFacilityRepairApi} // Truyền hàm API nếu cần
         />
       )}
-      {/* Các modal Edit và Detail sẽ cần được cập nhật tương tự nếu bạn sử dụng chúng */}
-      {/* Ví dụ EditEquipmentModal sẽ nhận equipmentToEdit với các key mới */}
 
+      <SuccessMessageModal isOpen={!!successMessage} onClose={() => setSuccessMessage('')} successMessage={successMessage} />
+      <ErrorMessageModal isOpen={!!errorMessage} onClose={() => setErrorMessage('')} errorMessage={errorMessage} />
     </div>
   );
 }

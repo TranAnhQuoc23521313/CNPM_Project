@@ -1,20 +1,23 @@
+// src/components/Sidebar.jsx
 import React from 'react';
-// Assuming you're using react-router-dom for navigation
 import { NavLink } from 'react-router-dom';
 import './Sidebar.css'; // We'll need this CSS file for styling
 
-// Placeholder for icons - replace with actual icon components (e.g., from react-icons)
-const IconPlaceholder = ({ name }) => <span className="icon-placeholder">{/* {name} */}</span>;
+// Import các icon từ react-icons (ví dụ sử dụng Font Awesome icons)
+import { FaTicketAlt, FaTools } from 'react-icons/fa'; // Icon cho vé và thiết bị
 
 const Sidebar = () => {
-  // Define navigation items for Cinema Management
+  // Kích thước mặc định cho các icon
+  const iconSize = 20;
+
+  // Define navigation items for Staff
   const navItems = [
-    { path: '/staff/tickets', icon: 'ticket', label: 'Quản lý vé phim' },
-    { path: '/staff/facilities', icon: 'facilities', label: 'Quản lý thiết bị' },
-    // Add more relevant items here
+    { path: '/staff/tickets', icon: <FaTicketAlt size={iconSize} />, label: 'Quản lý vé phim' },
+    { path: '/staff/facilities', icon: <FaTools size={iconSize} />, label: 'Quản lý thiết bị' },
+    // Add more relevant items here if needed
   ];
 
-  const bottomNavItems = []
+  const bottomNavItems = []; // Giữ nguyên, không có mục ở footer cho staff theo yêu cầu
 
   return (
     <aside className="sidebar">
@@ -31,7 +34,7 @@ const Sidebar = () => {
                 to={item.path}
                 className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
               >
-                <IconPlaceholder name={item.icon} />
+                {item.icon} {/* Hiển thị component icon trực tiếp */}
                 <span>{item.label}</span>
               </NavLink>
             </li>
@@ -40,30 +43,33 @@ const Sidebar = () => {
       </nav>
 
       <div className="sidebar-footer">
-         <nav className='sidebar-nav-footer'>
-             <ul>
-               {bottomNavItems.map((item) => (
-                 <li key={item.path}>
-                   <NavLink
-                     to={item.path}
-                     className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
-                   >
-                     <IconPlaceholder name={item.icon} />
-                     <span>{item.label}</span>
-                   </NavLink>
-                 </li>
-               ))}
-             </ul>
-         </nav>
-        {/* User profile section - similar to the example */}
+         {/* Phần này sẽ không render gì nếu bottomNavItems rỗng */}
+         {bottomNavItems.length > 0 && (
+            <nav className='sidebar-nav-footer'>
+                <ul>
+                {bottomNavItems.map((item) => (
+                    <li key={item.path}>
+                    <NavLink
+                        to={item.path}
+                        className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+                    >
+                        {item.icon}
+                        <span>{item.label}</span>
+                    </NavLink>
+                    </li>
+                ))}
+                </ul>
+            </nav>
+         )}
+        {/* User profile section - tương tự như ví dụ */}
         <div className="user-profile-section">
-           {/* Replace with actual user avatar and info */}
+           {/* Thay thế bằng avatar và thông tin người dùng thực tế */}
            <div className="user-avatar-placeholder"></div>
            <div className="user-info">
-             <span className="user-name">Admin User</span>
-             <span className="user-email">admin@cinemasys.com</span>
+             <span className="user-name">Staff User</span> {/* Cập nhật tên người dùng */}
+             <span className="user-email">staff@cinemasys.com</span> {/* Cập nhật email */}
            </div>
-           {/* Add dropdown icon/button if needed */}
+           {/* Thêm icon/button dropdown nếu cần */}
            <span className="user-menu-icon">⋮</span>
         </div>
       </div>

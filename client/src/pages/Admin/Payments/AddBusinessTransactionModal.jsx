@@ -15,7 +15,7 @@ function AddBusinessTransactionModal({ onClose, onAddTransaction, employeesList}
   }); */
 
   const [transactionCode, setTransactionCode] = useState('');
-  const [type, setType] = useState('');
+  const [type, setType] = useState('expense');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [employeeId, setEmployeeId] = useState('');
   const [description, setDescription] = useState('');
@@ -73,6 +73,7 @@ function AddBusinessTransactionModal({ onClose, onAddTransaction, employeesList}
 
   const validateForm = () => {
     const newErrors = {};
+    if (!type) newErrors.type = "Vui lòng chọn loại giao dịch.";
     if (!description.trim()) newErrors.description = "Mô tả không được để trống.";
     if (!cost.toString().trim()) newErrors.cost = "Số tiền không được để trống.";
     else if (isNaN(Number(cost)) || Number(cost) <= 0) newErrors.cost = "Số tiền phải là một số dương.";
@@ -129,7 +130,7 @@ function AddBusinessTransactionModal({ onClose, onAddTransaction, employeesList}
             </div>
             <div className="form-group">
               <label htmlFor="add-bt-type">Loại Giao Dịch:</label>
-              <select id="add-bt-type" name="type" value={type} onChange={(e) => setType(e.target.value)}>
+              <select id="add-bt-type" name="type" value={type} onChange={(e) => setType(e.target.value)} required>
                 <option value="expense">Chi phí</option>
                 <option value="income">Thu nhập khác</option>
               </select>

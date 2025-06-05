@@ -36,7 +36,7 @@ function AddEquipmentModal({ onClose, onAddEquipment, equipmentTypes = [], equip
 
   // useEffect để cập nhật type/status nếu props thay đổi (ví dụ: tải dữ liệu không đồng bộ)
   // Điều này hữu ích nếu danh sách types/statuses được tải sau khi modal mở
-  useEffect(() => {
+  /* useEffect(() => {
     if (equipmentTypes.length > 0 && !type) { // Nếu type chưa có giá trị và có danh sách
         setType(equipmentTypes[0]);
     } else if (equipmentTypes.length === 0) { // Nếu danh sách rỗng, reset type
@@ -50,7 +50,7 @@ function AddEquipmentModal({ onClose, onAddEquipment, equipmentTypes = [], equip
     } else if (equipmentStatuses.length === 0) {
         setStatus('');
     }
-  }, [equipmentStatuses]); // Chỉ chạy khi equipmentStatuses thay đổi
+  }, [equipmentStatuses]); // Chỉ chạy khi equipmentStatuses thay đổi */
 
 
   const validateForm = () => {
@@ -86,9 +86,9 @@ function AddEquipmentModal({ onClose, onAddEquipment, equipmentTypes = [], equip
         TRANGTHAI: status,
         NGAYMUA: purchaseDate,
         NGAYHETBAOHANH: warrantyEndDate, // Gửi null nếu rỗng
-        NGAYBAOTRI: lastMaintenance,   // Gửi null nếu rỗng
+        NGAYBAOTRI: lastMaintenance || null,   // Gửi null nếu rỗng
         GIA: costs, // Chuyển thành số hoặc null
-        GHICHU: notes          // Trim và gửi null nếu rỗng
+        GHICHU: notes || null          // Trim và gửi null nếu rỗng
       };
       onAddEquipment(newEquipment);
       onClose(); // Đóng modal sau khi thêm thành công

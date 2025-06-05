@@ -5,6 +5,8 @@ import Button from '../../../../components/common/Button';
 import './CreateTicketWorkflow.css';
 import './CustomerInfoPage.css';
 import { findCustomerByPhoneApi, registerCustomerApi } from '../../../../services/customerApiService';
+import SuccessMessageModal from '../../../../components/common/SuccessMessageModal'; // THÊM IMPORT
+import ErrorMessageModal from '../../../../components/common/ErrorMessageModal';   // THÊM IMPORT
 
 const STAFF_BASE_PATH = "/staff";
 
@@ -31,6 +33,11 @@ const CustomerInfoPage = () => {
   const [foundMember, setFoundMember] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [searchError, setSearchError] = useState('');
+
+
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [pendingNavigation, setPendingNavigation] = useState(null); // Lưu thông tin navigate sau khi modal thành công đóng
 
   useEffect(() => {
     if (!previousState.movieId || !previousState.showtimeId || !previousState.selectedSeats || previousState.totalSeatPrice === undefined) {
@@ -73,12 +80,12 @@ const CustomerInfoPage = () => {
 
     // Chỉ tìm kiếm khi là thành viên
     if (customerType === 'member') {
-        const debounceSearch = setTimeout(searchMember, 500);
-        return () => clearTimeout(debounceSearch);
+      const debounceSearch = setTimeout(searchMember, 500);
+      return () => clearTimeout(debounceSearch);
     } else {
-        // Nếu chuyển sang guest, xóa thông tin tìm kiếm cũ
-        setFoundMember(null);
-        setSearchError('');
+      // Nếu chuyển sang guest, xóa thông tin tìm kiếm cũ
+      setFoundMember(null);
+      setSearchError('');
     }
   }, [customerPhone, customerType]);
 
@@ -91,6 +98,9 @@ const CustomerInfoPage = () => {
     setCustomerEmail('');
     setFoundMember(null);
     setSearchError('');
+    setErrorMessage(''); // Xóa lỗi cũ khi đổi type
+    setSuccessMessage(''); // Xóa success cũ
+    setPendingNavigation(null);
 
     if (customerType === 'guest') {
       setWantsToRegisterAsMember(false); // Mặc định khách vãng lai không đăng ký
@@ -101,70 +111,91 @@ const CustomerInfoPage = () => {
 
   const handleNext = async () => {
     setIsProcessing(true);
+    setErrorMessage('');
+    setSuccessMessage('');
     let customerDataForNextStep = null;
+    let registrationAttempted = false; // Biến để biết có cố gắng đăng ký hay không
+    let registrationSuccess = false;   // Biến để biết đăng ký có thành công không
 
-    if (customerType === 'member') {
-      if (foundMember) { // Thành viên đã tồn tại
-        customerDataForNextStep = {
-          type: 'member', MaKH: foundMember.MaKH,
-          phone: foundMember.SoDT, name: foundMember.HoTen, email: foundMember.Email,
-        };
-      } else { // Đăng ký thành viên mới
-        if (!customerPhone.trim() || customerPhone.trim().length < 9) {
-          alert("Vui lòng nhập Số Điện Thoại hợp lệ (ít nhất 9 số) để đăng ký thành viên.");
-          setIsProcessing(false); return;
-        }
-        if (!customerName.trim()) {
-          alert("Vui lòng nhập Tên Khách Hàng để đăng ký thành viên.");
-          setIsProcessing(false); return;
-        }
-        try {
-            const newMemberPayload = { HoTen: customerName.trim(), SoDT: customerPhone.trim(), Email: customerEmail.trim() || null };
-            const registeredMember = await registerCustomerApi(newMemberPayload);
-            customerDataForNextStep = {
-                type: 'member', MaKH: registeredMember.MaKH,
-                phone: registeredMember.SoDT, name: registeredMember.HoTen, email: registeredMember.Email,
-            };
-            alert(`Đăng ký thành viên mới thành công: ${registeredMember.HoTen}`);
-        } catch (error) {
-            console.error("Lỗi đăng ký thành viên mới:", error);
-            alert(error.message || "Lỗi khi đăng ký thành viên mới.");
+    try {
+      if (customerType === 'member') {
+        if (foundMember) { // Thành viên đã tồn tại
+          customerDataForNextStep = {
+            type: 'member', MaKH: foundMember.MaKH,
+            phone: foundMember.SoDT, name: foundMember.HoTen, email: foundMember.Email,
+          };
+          // Không đăng ký, không cần pending nav, navigate trực tiếp
+        } else { // Đăng ký thành viên mới (khi customerType là 'member' và không tìm thấy)
+          registrationAttempted = true;
+          if (!customerPhone.trim() || customerPhone.trim().length < 9) {
+            setErrorMessage("Vui lòng nhập Số Điện Thoại hợp lệ (ít nhất 9 số) để đăng ký thành viên.");
             setIsProcessing(false); return;
+          }
+          if (!customerName.trim()) {
+            setErrorMessage("Vui lòng nhập Tên Khách Hàng để đăng ký thành viên.");
+            setIsProcessing(false); return;
+          }
+          const newMemberPayload = { HoTen: customerName.trim(), SoDT: customerPhone.trim(), Email: customerEmail.trim() || null };
+          const registeredMember = await registerCustomerApi(newMemberPayload);
+          customerDataForNextStep = {
+            type: 'member', MaKH: registeredMember.MaKH,
+            phone: registeredMember.SoDT, name: registeredMember.HoTen, email: registeredMember.Email,
+          };
+          setSuccessMessage(`Đăng ký thành viên mới thành công: ${registeredMember.HoTen}`);
+          registrationSuccess = true;
+        }
+      } else { // customerType === 'guest'
+        if (wantsToRegisterAsMember) { // Khách vãng lai muốn đăng ký
+          registrationAttempted = true;
+          if (!customerPhone.trim() || customerPhone.trim().length < 9) {
+            setErrorMessage("Vui lòng nhập Số Điện Thoại hợp lệ (ít nhất 9 số) để đăng ký.");
+            setIsProcessing(false); return;
+          }
+          if (!customerName.trim()) {
+            setErrorMessage("Vui lòng nhập Tên Khách Hàng để đăng ký.");
+            setIsProcessing(false); return;
+          }
+          const newMemberPayload = { HoTen: customerName.trim(), SoDT: customerPhone.trim(), Email: customerEmail.trim() || null };
+          const registeredMember = await registerCustomerApi(newMemberPayload);
+          customerDataForNextStep = {
+            type: 'member', MaKH: registeredMember.MaKH,
+            phone: registeredMember.SoDT, name: registeredMember.HoTen, email: registeredMember.Email,
+          };
+          setSuccessMessage(`Đăng ký thành viên mới thành công: ${registeredMember.HoTen} (từ khách vãng lai)`);
+          registrationSuccess = true;
+        } else {
+          // Khách vãng lai không đăng ký, không có thông tin gì cần gửi
+          customerDataForNextStep = null;
         }
       }
-    } else { // customerType === 'guest'
-      if (wantsToRegisterAsMember) { // Khách vãng lai muốn đăng ký
-        if (!customerPhone.trim() || customerPhone.trim().length < 9) {
-          alert("Vui lòng nhập Số Điện Thoại hợp lệ (ít nhất 9 số) để đăng ký thành viên.");
-          setIsProcessing(false); return;
-        }
-        if (!customerName.trim()) {
-          alert("Vui lòng nhập Tên Khách Hàng để đăng ký thành viên.");
-          setIsProcessing(false); return;
-        }
-        try {
-            const newMemberPayload = { HoTen: customerName.trim(), SoDT: customerPhone.trim(), Email: customerEmail.trim() || null };
-            const registeredMember = await registerCustomerApi(newMemberPayload);
-            customerDataForNextStep = {
-                type: 'member', MaKH: registeredMember.MaKH,
-                phone: registeredMember.SoDT, name: registeredMember.HoTen, email: registeredMember.Email,
-            };
-            alert(`Đăng ký thành viên mới thành công: ${registeredMember.HoTen} (từ khách vãng lai)`);
-        } catch (error) {
-            console.error("Lỗi đăng ký thành viên (từ khách vãng lai):", error);
-            alert(error.message || "Lỗi khi đăng ký thành viên.");
-            setIsProcessing(false); return;
-        }
-      } else {
-        // Khách vãng lai không đăng ký, không có thông tin gì cần gửi
-        customerDataForNextStep = null;
+
+      // Quyết định điều hướng
+      if (registrationAttempted && registrationSuccess) {
+        setPendingNavigation({
+          path: `${STAFF_BASE_PATH}/tickets/new/confirm-order`,
+          state: { ...previousState, customerInfo: customerDataForNextStep }
+        });
+      } else if (!registrationAttempted || (registrationAttempted && !registrationSuccess && !errorMessage)) {
+        // Navigate trực tiếp nếu không đăng ký, hoặc nếu đăng ký thất bại nhưng không có error message (trường hợp này ít xảy ra)
+        // Hoặc nếu là thành viên đã tồn tại
+        navigate(`${STAFF_BASE_PATH}/tickets/new/confirm-order`, {
+          state: { ...previousState, customerInfo: customerDataForNextStep }
+        });
       }
+      // Nếu registrationAttempted=true, registrationSuccess=false VÀ errorMessage được set, thì không navigate, modal lỗi sẽ hiện
+
+    } catch (error) {
+      console.error("Lỗi trong handleNext:", error);
+      let apiErrorMessage = "Lỗi khi xử lý thông tin khách hàng.";
+      if (error.response && error.response.data && error.response.data.message) {
+        apiErrorMessage = error.response.data.message;
+      } else if (error.message) {
+        apiErrorMessage = error.message;
+      }
+      setErrorMessage(apiErrorMessage);
+    } finally {
+      setIsProcessing(false);
     }
-
-    navigate(`${STAFF_BASE_PATH}/tickets/new/confirm-order`, {
-      state: { ...previousState, customerInfo: customerDataForNextStep }
-    });
-    setIsProcessing(false); // Đặt ở đây để đảm bảo nó được gọi sau navigate
   };
 
   const handleSkip = () => {
@@ -177,7 +208,19 @@ const CustomerInfoPage = () => {
     // Các state khác sẽ được reset trong useEffect theo dõi customerType
   };
 
-    return (
+  const handleCloseSuccessModal = () => {
+    setSuccessMessage('');
+    if (pendingNavigation) {
+      navigate(pendingNavigation.path, { state: pendingNavigation.state });
+      setPendingNavigation(null);
+    }
+  };
+
+  const handleCloseErrorModal = () => {
+    setErrorMessage('');
+  };
+
+  return (
     <div className="create-ticket-step customer-info-page">
       <div className="customer-info-card">
         <div className="card-header">
@@ -189,10 +232,10 @@ const CustomerInfoPage = () => {
             <label>Loại Khách Hàng:</label>
             <div className="radio-group"> {/* Giữ class gốc */}
               <label htmlFor="guest" className={customerType === 'guest' ? 'active' : ''}>
-                <input type="radio" id="guest" name="customerType" value="guest" checked={customerType === 'guest'} onChange={handleCustomerTypeChange} disabled={isProcessing}/> Khách vãng lai
+                <input type="radio" id="guest" name="customerType" value="guest" checked={customerType === 'guest'} onChange={handleCustomerTypeChange} disabled={isProcessing} /> Khách vãng lai
               </label>
               <label htmlFor="member" className={customerType === 'member' ? 'active' : ''}>
-                <input type="radio" id="member" name="customerType" value="member" checked={customerType === 'member'} onChange={handleCustomerTypeChange} disabled={isProcessing}/> Thành viên
+                <input type="radio" id="member" name="customerType" value="member" checked={customerType === 'member'} onChange={handleCustomerTypeChange} disabled={isProcessing} /> Thành viên
               </label>
             </div>
           </div>
@@ -287,7 +330,7 @@ const CustomerInfoPage = () => {
                 và (theo logic ngầm) có thể đã có tên/email từ trước đó hoặc được set rỗng.
                 Nhưng các input này sẽ không hiển thị trên giao diện.
               */}
-              
+
               {/*
               <div className="form-field">
                 <label htmlFor="customerName">Tên Khách Hàng*</label>
@@ -316,15 +359,15 @@ const CustomerInfoPage = () => {
               </div>
               */}
 
-              {isProcessing && customerPhone.trim().length >=9 && <p className="processing-text">Đang tìm kiếm thành viên...</p>}
+              {isProcessing && customerPhone.trim().length >= 9 && <p className="processing-text">Đang tìm kiếm thành viên...</p>}
 
               {foundMember && (
-                <div className="found-member-info" style={{marginTop: '15px', padding: '10px', border: '1px solid lightgreen', borderRadius: '4px'}}> {/* Giữ class gốc, style inline nếu bạn muốn */}
-                    <h4>Thông tin thành viên:</h4>
-                    <p><strong>Mã KH:</strong> {foundMember.MaKH}</p>
-                    <p><strong>Tên:</strong> {foundMember.HoTen}</p>
-                    <p><strong>Email:</strong> {foundMember.Email || 'Chưa có'}</p>
-                    <p><strong>Đã chi tiêu:</strong> {foundMember.SoTienDaChi?.toLocaleString('vi-VN')}đ</p>
+                <div className="found-member-info" style={{ marginTop: '15px', padding: '10px', border: '1px solid lightgreen', borderRadius: '4px' }}> {/* Giữ class gốc, style inline nếu bạn muốn */}
+                  <h4>Thông tin thành viên:</h4>
+                  <p><strong>Mã KH:</strong> {foundMember.MaKH}</p>
+                  <p><strong>Tên:</strong> {foundMember.HoTen}</p>
+                  <p><strong>Email:</strong> {foundMember.Email || 'Chưa có'}</p>
+                  <p><strong>Đã chi tiêu:</strong> {foundMember.SoTienDaChi?.toLocaleString('vi-VN')}đ</p>
                 </div>
               )}
             </>
@@ -340,6 +383,18 @@ const CustomerInfoPage = () => {
           </div>
         </div>
       </div>
+
+      <SuccessMessageModal
+        isOpen={!!successMessage}
+        onClose={handleCloseSuccessModal}
+        successMessage={successMessage}
+      />
+      <ErrorMessageModal
+        isOpen={!!errorMessage}
+        onClose={handleCloseErrorModal}
+        errorMessage={errorMessage}
+      />
+
     </div>
   );
 };

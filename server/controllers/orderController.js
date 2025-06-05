@@ -77,6 +77,39 @@ class OrderController {
             next(error);
         }
     }
+
+    async getTicketsForPrintingController(req, res, next) {
+        try {
+            const maHoaDon = req.params.orderId;
+            // const maNV = req.user?.id; // Nếu cần log ai yêu cầu in
+
+            if (!maHoaDon) {
+                return res.status(400).json({ message: "Mã hóa đơn là bắt buộc." });
+            }
+
+            console.log(`OrderController: Request to get tickets for printing for order ${maHoaDon}`);
+
+            const ticketPrintData = await OrderService.getTicketsForPrinting(maHoaDon);
+
+            if (!ticketPrintData || ticketPrintData.length === 0) {
+                // Kiểm tra xem hóa đơn có tồn tại nhưng không có vé, hay hóa đơn không tồn tại
+                // Dựa vào logic của OrderService.getTicketsForPrinting
+                // Ví dụ: nếu OrderService trả về null khi hóa đơn không tồn tại
+                const orderExists = await OrderService.getOrderById(maHoaDon); // Kiểm tra lại hóa đơn
+                if (!orderExists) {
+                    return res.status(404).json({ message: `Không tìm thấy hóa đơn với mã ${maHoaDon}.` });
+                }
+                // Hóa đơn tồn tại nhưng không có vé (ví dụ: chỉ mua sản phẩm)
+                return res.status(404).json({ message: `Không tìm thấy vé nào cho hóa đơn ${maHoaDon} hoặc hóa đơn này không có vé.` });
+            }
+
+            res.status(200).json(ticketPrintData);
+        } catch (error) {
+            console.error(`OrderController.getTicketsForPrintingController for order ${req.params.orderId} error:`, error);
+            next(error);
+        }
+    }
+
 }
 
 module.exports = new OrderController();
