@@ -1,0 +1,95 @@
+/* src/components/common/AlertDialog.css */
+.alert-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.55); /* Tăng độ mờ nhẹ */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050; /* Đảm bảo modal ở trên cùng */
+  padding: 15px; /* Thêm padding để modal không bị sát cạnh màn hình nhỏ */
+}
+
+.alert-dialog-content {
+  background-color: #fff;
+  padding: 20px 30px; /* Giảm padding một chút */
+  border-radius: 8px; /* Giảm bo góc */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25); /* Điều chỉnh bóng đổ */
+  text-align: center;
+  min-width: 300px;
+  max-width: 480px;
+  width: 100%; /* Để modal co giãn tốt hơn trên mobile */
+  border-top: 4px solid; /* Sẽ được định nghĩa màu bởi type */
+  animation: fadeInScale 0.3s ease-out;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Styling theo type cho border-top và có thể là icon sau này */
+.alert-dialog-info {
+  border-top-color: var(--info-color, #17a2b8); 
+}
+.alert-dialog-success {
+  border-top-color: var(--success-color, #28a745);
+}
+.alert-dialog-warning {
+  border-top-color: var(--warning-color, #ffc107);
+}
+.alert-dialog-error {
+  border-top-color: var(--danger-color, #dc3545);
+}
+
+.alert-dialog-title {
+  margin-top: 0;
+  margin-bottom: 12px; /* Giảm margin */
+  font-size: 1.4em; /* Điều chỉnh kích thước */
+  color: var(--text-color-dark, #212529);
+  font-weight: 600;
+}
+
+.alert-dialog-message {
+  margin-bottom: 20px; /* Giảm margin */
+  font-size: 1em; /* Điều chỉnh kích thước */
+  color: var(--text-color-medium, #495057);
+  line-height: 1.5;
+  white-space: pre-line; /* Cho phép \n trong message tạo xuống dòng */
+}
+
+.alert-dialog-children-content {
+  margin-bottom: 20px;
+  font-size: 1em;
+  color: var(--text-color-medium, #495057);
+  line-height: 1.5;
+  text-align: left; /* Mặc định cho children nếu cần */
+}
+
+
+.alert-dialog-actions {
+  display: flex;
+  justify-content: center; /* Hoặc 'flex-end' nếu muốn nút ở góc phải */
+}
+
+/* Giả sử bạn đã định nghĩa các biến màu này trong CSS global (ví dụ: index.css) */
+/*
+:root {
+  --info-color: #17a2b8;
+  --success-color: #28a745;
+  --warning-color: #ffc107;
+  --danger-color: #dc3545;
+  --primary-color: #007bff;
+  --text-color-dark: #212529;
+  --text-color-medium: #495057;
+}
+*/

@@ -1,30 +1,43 @@
 /* src/pages/Staff/ManageBookings/BookingDetailModal.css */
 
+:root {
+  --primary-text-color: #2d3748; /* Xám đậm cho văn bản chính */
+  --secondary-text-color: #4a5568; /* Xám vừa cho văn bản phụ */
+  --tertiary-text-color: #718096; /* Xám nhạt cho chú thích, text ít quan trọng */
+  --border-color-light: #e2e8f0; /* Border rất nhạt */
+  --border-color-medium: #cbd5e0; /* Border vừa */
+  --accent-color: #3182ce; /* Xanh dương hiện đại */
+  --accent-color-dark: #2b6cb0;
+  --background-color-light: #f7fafc; /* Nền xám rất nhạt, gần trắng */
+  --success-color: #38a169; /* Xanh lá cây */
+  --success-color-dark: #2f855a;
+  --danger-color: #e53e3e; /* Đỏ */
+  --modal-background: #ffffff;
+  --font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(33, 37, 41, 0.7);
+  background-color: rgba(0, 0, 0, 0.65); /* Tăng độ mờ nhẹ */
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1050;
   padding: 20px;
+  font-family: var(--font-family-sans);
 }
 
 .modal-content.booking-detail-modal-content {
-  background-color: #ffffff;
+  background-color: var(--modal-background);
   padding: 0;
-  border-radius: 8px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  border-radius: 10px; /* Giảm nhẹ bo góc cho thanh thoát hơn */
+  box-shadow: 0 15px 35px rgba(50, 50, 93, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07); /* Đổ bóng tinh tế hơn */
   width: 100%;
-  /* --- THAY ĐỔI CHÍNH ĐỂ MODAL RỘNG HƠN --- */
-  max-width: 1000px; /* << TĂNG GIÁ TRỊ NÀY LÊN (ví dụ từ 850px) */
-  /* HOẶC CÂN NHẮC SỬ DỤNG vw KẾT HỢP VỚI max-width cố định: */
-  /* max-width: min(1100px, 90vw); */
-  /* ------------------------------------------ */
+  max-width: 1050px; /* Tăng nhẹ max-width nếu cần */
   max-height: 90vh;
   display: flex;
   flex-direction: column;
@@ -36,253 +49,352 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #e9ecef;
-  padding: 18px 25px;
+  border-bottom: 1px solid var(--border-color-light);
+  padding: 22px 30px; /* Tăng padding nhẹ */
   flex-shrink: 0;
+  /* Bỏ background riêng cho header để đồng nhất với modal content */
 }
 
 .booking-detail-header .modal-main-title {
   margin: 0;
-  font-size: 1.6rem;
+  font-size: 1.65rem; /* Điều chỉnh font size */
   flex-grow: 1;
   text-align: center;
-  color: #2c3e50;
+  color: var(--primary-text-color);
   font-weight: 600;
 }
 
 .modal-close-icon-btn {
-  padding: 5px 10px;
   background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: 2rem; /* Icon to hơn, rõ ràng */
   line-height: 1;
   cursor: pointer;
-  color: #6c757d;
+  color: var(--tertiary-text-color);
+  padding: 4px; /* Đảm bảo vùng click đủ lớn */
+  transition: color 0.2s ease-in-out;
 }
 .modal-close-icon-btn:hover {
-  color: #343a40;
+  color: var(--secondary-text-color);
 }
 
 
 .booking-detail-body {
   display: flex;
-  gap: 25px; /* Có thể giảm gap một chút nếu cần thêm không gian ngang */
+  gap: 35px; /* Tăng gap */
   flex-grow: 1;
-  min-height: 0; /* Cho phép co lại theo chiều dọc nếu cần */
-  overflow: hidden; /* Ngăn cuộn ở body, để các panel con tự cuộn */
-  padding: 20px 25px;
+  min-height: 0;
+  overflow: hidden;
+  padding: 28px 30px; /* Tăng padding */
 }
 
 .booking-info-panel {
-  flex: 1; /* Cho phép cột này co giãn, nhưng seat-map-panel sẽ ưu tiên hơn */
-  /* HOẶC đặt một width cụ thể hơn nếu muốn: */
-  /* width: 380px; */ /* Ví dụ */
-  /* max-width: 40%; */ /* Giới hạn chiều rộng tối đa */
-  font-size: 0.95rem;
-  overflow-y: auto; /* Cho phép cuộn nếu thông tin dài */
-  padding-right: 15px;
-  border-right: 1px solid #e9ecef;
-  margin-right: -15px; /* Để bù padding, giúp border đẹp hơn */
+  flex: 1;
+  font-size: 0.925rem; /* Điều chỉnh font size cơ bản */
+  overflow-y: auto;
+  padding-right: 25px; /* Tăng padding */
+  border-right: 1px solid var(--border-color-light);
+  margin-right: -25px; /* Bù padding */
 }
 
 .booking-info-panel .info-section-title {
   margin-top: 0;
-  margin-bottom: 10px;
-  font-size: 1.1rem;
-  color: #34495e;
-  border-bottom: 1px solid #e0e6ed;
-  padding-bottom: 8px;
+  margin-bottom: 18px; /* Tăng margin bottom */
+  font-size: 1.15rem; /* Điều chỉnh font size */
+  color: var(--primary-text-color);
+  font-weight: 600;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--accent-color); /* Sử dụng màu nhấn */
 }
 .booking-info-panel > h4:first-child {
     margin-top: 0;
 }
-
+.info-section-title.section-spacing-top {
+  margin-top: 30px; /* Tăng margin top */
+}
 
 .booking-info-panel .info-item {
-  text-align: left !important;
-  margin-bottom: 10px;
-  line-height: 1.6;
-  color: #525f7f;
+  display: grid;
+  grid-template-columns: auto 1fr; /* Label vừa đủ, value chiếm phần còn lại */
+  align-items: start;
+  gap: 6px 15px;
+  margin-bottom: 14px; /* Tăng margin */
+  line-height: 1.65; /* Điều chỉnh line-height */
 }
 .booking-info-panel .info-item strong {
-  color: #32325d;
+  color: var(--secondary-text-color);
   font-weight: 500;
-  min-width: 140px;
-  display: inline-block;
+  white-space: nowrap;
 }
+.booking-info-panel .info-item span {
+  color: var(--primary-text-color);
+  text-align: right;
+  word-break: break-word;
+  font-weight: 500; /* Làm giá trị đậm hơn một chút */
+}
+.booking-info-panel .info-item.long-value span {
+  text-align: right;
+}
+
 
 .booking-info-panel hr.info-divider {
   border: none;
-  border-top: 1px dashed #ddd;
-  margin: 20px 0;
+  border-top: 1px solid var(--border-color-light);
+  margin: 30px 0; /* Tăng margin */
 }
 .booking-info-panel .total-amount-display {
-    font-size: 1.1rem;
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #e9ecef;
-    font-weight: bold;
+    font-size: 1.25rem; /* Tăng font size */
+    margin-top: 25px;
+    padding-top: 25px;
+    border-top: 2px solid var(--secondary-text-color); /* Border đậm hơn */
+    font-weight: 600;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 6px 15px;
 }
 .booking-info-panel .total-amount-display strong {
-    color: #dc3545;
+    color: var(--primary-text-color);
+}
+.booking-info-panel .total-amount-display span {
+    color: var(--danger-color);
+    font-weight: 700;
+    font-size: 1.3rem; /* To hơn */
+    text-align: right;
+}
+
+
+.info-subsection-title {
+  font-size: 1rem; /* Điều chỉnh */
+  font-weight: 600;
+  color: var(--primary-text-color); /* Đồng nhất màu */
+  margin-top: 25px;
+  margin-bottom: 12px;
+}
+
+.seat-details-container {
+  margin-bottom: 18px;
+}
+
+.seat-detail-entry {
+  padding: 12px 0;
+  border-bottom: 1px dashed var(--border-color-light); /* Nhạt hơn */
+}
+.seat-detail-entry:last-child {
+  border-bottom: none;
+}
+
+.seat-detail-info {
+  margin-bottom: 10px;
+}
+.seat-detail-info .seat-name {
+  display: block;
+  font-weight: 600;
+  color: var(--primary-text-color);
+  font-size: 0.95em; /* Điều chỉnh */
+  margin-bottom: 4px;
+}
+.seat-detail-info .ticket-id-display {
+  display: block;
+  font-size: 0.8em;
+  color: var(--tertiary-text-color);
+}
+
+.seat-detail-pricing-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 5px 12px;
+  padding-left: 18px; /* Tăng thụt lề */
+  font-size: 0.875em; /* Điều chỉnh */
+}
+.seat-detail-pricing-grid > span {
+  color: var(--secondary-text-color);
+  line-height: 1.6;
+}
+.seat-detail-pricing-grid > span:nth-child(odd) { /* Labels */
+  color: var(--tertiary-text-color); /* Nhãn nhạt hơn */
+}
+.seat-detail-pricing-grid > span:nth-child(even) { /* Values */
+  text-align: right;
+  color: var(--secondary-text-color); /* Giá trị đậm hơn nhãn một chút */
+  font-weight: 500;
+}
+.seat-detail-pricing-grid .label-bold {
+  font-weight: 600;
+  color: var(--secondary-text-color); /* Đậm hơn các label khác */
+}
+.seat-detail-pricing-grid .value-bold {
+  font-weight: 600;
+  color: var(--primary-text-color); /* Giá trị thành tiền nổi bật */
 }
 
 
 /* --- STYLES CHO SEAT MAP DISPLAY --- */
 .seat-map-panel {
-  /* --- THAY ĐỔI CHÍNH ĐỂ CÓ THÊM KHÔNG GIAN CHO SƠ ĐỒ GHẾ --- */
-  flex: 1.8; /* << TĂNG TỶ LỆ FLEX LÊN (ví dụ từ 1) để nó chiếm nhiều không gian hơn */
-  /* HOẶC đặt min-width cụ thể: */
-  min-width: 450px; /* << Đặt giá trị này đủ lớn để chứa sơ đồ ghế mà không cuộn ngang */
-                   /* Ví dụ: nếu mỗi ghế rộng 28px + margin 4px = 32px, 9 ghế là ~288px */
-                   /* cộng với row label và padding, có thể cần 350px-500px tùy số ghế ngang */
-  /* ------------------------------------------------------- */
-  padding-left: 25px; /* Có thể giảm padding-left một chút nếu cần */
+  flex: 1.8;
+  min-width: 480px; /* Giữ nguyên hoặc điều chỉnh tùy số ghế tối đa */
+  padding-left: 30px;
   display: flex;
   flex-direction: column;
-  align-items: center; /* Căn giữa màn hình và sơ đồ */
-  overflow-y: auto; /* Cho phép cuộn dọc nếu sơ đồ ghế quá cao */
-  /* overflow-x: hidden; */ /* << CÂN NHẮC THÊM DÒNG NÀY NẾU BẠN MUỐN CHẮC CHẮN KHÔNG CÓ CUỘN NGANG */
+  align-items: center;
+  overflow-y: auto;
+  /* Bỏ background riêng để đồng nhất, hoặc dùng --background-color-light nếu muốn phân tách nhẹ */
+  /* background-color: var(--background-color-light); */
+  /* border-radius: 8px; */ /* Bo góc nếu có background riêng */
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .seat-map-display-container h4 {
   margin-top: 0;
-  margin-bottom: 15px;
-  font-size: 1.1rem;
+  margin-bottom: 22px;
+  font-size: 1.15rem;
   text-align: center;
-  color: #34495e;
+  color: var(--primary-text-color); /* Đồng nhất màu tiêu đề */
+  font-weight: 600;
 }
 
 .screen-indicator {
-    width: 80%;
-    max-width: 250px;
-    margin: 0 auto 20px auto;
-    padding: 8px;
+    width: auto; /* Để tự co giãn theo nội dung */
+    display: inline-block; /* Để width: auto có tác dụng */
+    max-width: 280px;
+    margin: 0 auto 28px auto; /* Tăng margin dưới */
+    padding: 8px 20px; /* Điều chỉnh padding */
     text-align: center;
-    background-color: #495057;
-    color: white;
-    font-weight: bold;
-    border-radius: 4px;
-    font-size: 0.9em;
+    background-color: var(--primary-text-color); /* Xám đậm hơn */
+    color: var(--modal-background); /* Chữ trắng */
+    font-weight: 600;
+    border-radius: 4px; /* Bo góc nhẹ */
+    font-size: 0.85em; /* Font nhỏ hơn */
+    letter-spacing: 0.075em; /* Giãn chữ */
+    text-transform: uppercase;
 }
 
 .seat-row-display {
     display: flex;
     align-items: center;
-    margin-bottom: 5px;
-    justify-content: center; /* Giữ căn giữa các hàng ghế */
+    margin-bottom: 7px; /* Tăng nhẹ */
+    justify-content: center;
 }
 
 .row-label-display {
-    width: 25px; /* Giữ nguyên hoặc điều chỉnh nếu cần */
-    font-weight: bold;
-    margin-right: 10px;
+    width: 32px;
+    font-weight: 500; /* Giảm nhẹ độ đậm */
+    margin-right: 12px;
     text-align: center;
-    color: #495057;
+    color: var(--tertiary-text-color);
+    font-size: 0.9em;
 }
 
 .seat-box-display {
-    width: 28px;
-    height: 28px;
-    border: 1px solid #ccc;
-    margin: 2px;
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--border-color-medium);
+    margin: 3.5px; /* Tăng nhẹ */
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    font-size: 0.75em;
-    border-radius: 3px;
+    font-size: 0.8rem;
+    border-radius: 5px; /* Bo góc nhiều hơn chút */
     cursor: default;
-    color: #333;
+    color: var(--primary-text-color);
+    transition: transform 0.15s ease-out, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.15s ease-out;
 }
 
-/* Trạng thái ghế của khách hàng đã đặt */
 .seat-box-display.customer-selected-seat {
-    background-color: #28a745;
+    background-color: var(--success-color);
     color: white;
-    border-color: #1e7e34;
+    border-color: var(--success-color-dark);
+    font-weight: bold;
+    box-shadow: 0 0 0 2px rgba(56, 161, 105, 0.3); /* Viền mờ khi được chọn */
 }
 
-/* Trạng thái cho các ghế khác */
-.seat-box-display.other-seat-gray {
-    background-color: #e9ecef;
-    color: #6c757d;
-    border-color: #ced4da;
+.seat-box-display.other-booked-seat {
+    background-color: var(--secondary-text-color); /* Xám đậm hơn */
+    color: white;
+    border-color: var(--primary-text-color);
+}
+
+.seat-box-display.available-seat {
+    background-color: var(--modal-background); /* Nền trắng */
+    color: var(--accent-color);
+    border-color: var(--accent-color); /* Border màu nhấn */
+}
+.seat-box-display.available-seat:hover {
+    background-color: #ebf8ff; /* Màu nền rất nhạt khi hover */
+    border-color: var(--accent-color-dark);
+    transform: translateY(-2px) scale(1.05); /* Hiệu ứng nhấc lên */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.seat-box-display.unavailable-seat {
+    background-color: var(--background-color-light);
+    color: var(--tertiary-text-color);
+    border-color: var(--border-color-light);
+    /* Có thể thêm sọc chéo nếu muốn
+    background-image: repeating-linear-gradient(
+        45deg, transparent, transparent 4px,
+        rgba(0,0,0,0.03) 4px, rgba(0,0,0,0.03) 8px
+    );
+    */
+}
+.seat-placeholder-display {
+    width: 30px; /* Đồng bộ với seat-box-display */
+    height: 30px;
+    margin: 3.5px;
 }
 
 .seat-legend {
-    margin-top: 20px;
-    font-size: 0.85em;
-    align-self: center;
+    margin-top: 30px;
+    font-size: 0.875em;
+    align-self: flex-start;
+    padding-left: 5%; /* Điều chỉnh thụt lề */
+    width: 100%; /* Đảm bảo các legend item có không gian */
 }
 .legend-item {
     display: flex;
     align-items: center;
-    margin-bottom: 5px;
-    color: #495057;
+    margin-bottom: 10px;
+    color: var(--secondary-text-color);
 }
 .legend-item .seat-box-display {
-    margin-right: 8px;
-    width: 20px;
+    margin-right: 12px;
+    width: 20px; /* Nhỏ hơn trong legend */
     height: 20px;
+    font-size: 0.7em; /* Font số ghế trong legend nhỏ hơn */
 }
 /* --- KẾT THÚC STYLES CHO SEAT MAP DISPLAY --- */
 
+.seatmap-loading-info,
+.seatmap-error-info,
+.no-seatmap-info {
+  padding: 25px;
+  text-align: center;
+  font-style: italic;
+  color: var(--tertiary-text-color);
+  margin-top: 20px;
+  font-size: 0.95rem;
+}
+.seatmap-error-info {
+  color: var(--danger-color);
+  font-weight: 500;
+}
+
 
 .booking-detail-footer {
-  border-top: 1px solid #e9ecef;
-  padding: 15px 25px;
+  border-top: 1px solid var(--border-color-light);
+  padding: 20px 30px;
   margin-top: auto;
   text-align: right;
   flex-shrink: 0;
+  /* Bỏ background riêng */
 }
 .booking-detail-footer .btn {
-  margin-left: 10px;
-}
-
-/*  new */
-
-.info-subsection-title {
-  font-size: 1em;
-  font-weight: bold;
-  color: #444;
-  margin-top: 15px;
-  margin-bottom: 8px;
-}
-
-.seat-details-list {
-  list-style: none;
-  padding-left: 0;
-  margin-bottom: 10px;
-}
-
-.seat-detail-item {
-  padding: 5px 0;
-  border-bottom: 1px dashed #eee;
-  font-size: 0.9em;
-}
-.seat-detail-item:last-child {
-  border-bottom: none;
-}
-
-.seat-detail-item > span:first-child { /* Tên ghế */
-  display: block;
-  margin-bottom: 3px;
-}
-
-.seat-price-breakdown {
-  padding-left: 15px;
-  font-size: 0.95em;
-}
-.seat-price-breakdown span {
-  display: block;
-  color: #666;
-}
-.seat-price-breakdown span:last-child { /* Thành tiền vé */
-  font-weight: bold;
-  color: #333;
-}
-
-.info-item.total-amount-display span { /* Cho Tổng cộng hóa đơn */
-  color: red;
-  font-weight: bold;
+  margin-left: 12px;
+  /* Nếu Button component của bạn chưa có style hiện đại, có thể thêm ở đây:
+  padding: 10px 22px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 6px;
+  */
 }

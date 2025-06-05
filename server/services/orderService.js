@@ -4,7 +4,9 @@ const CustomerRepository = require('../repositories/customerRepository');
 const ProductRepository = require('../repositories/productRepository');
 const generateMaHoaDon = require('../utils/generateMaHoaDon');
 const generateMultipleMaVe = require('../utils/generateMaVe')
+const EmailService = require('./emailService'); // THÊM IMPORT NÀY
 const pool = require('../config/db');
+const qrcode = require('qrcode');
 
 
 class OrderService {
@@ -92,17 +94,16 @@ class OrderService {
 
     async createOrder(orderPayload, maNV) {
         const connection = await pool.getConnection();
-        let invoiceInfo;
-        let productsInfo = [];
+        let customerForEmail = null;
+        // Biến createdOrder sẽ giữ thông tin đơn hàng sau khi được tạo trong DB
+        let createdOrder;
+
         try {
-            await connection.beginTransaction();
-            await connection.beginTransaction();
+            await connection.beginTransaction(); // CHỈ MỘT LẦN
 
             const maHoaDon = await generateMaHoaDon();
             const ngayTaoHD = new Date();
 
-            // Lấy MASUATCHIEU của hóa đơn từ payload.
-            // Quan trọng: Client phải gửi showtimeId này ở cấp độ hóa đơn.
             const maSuatChieuCuaHoaDon = orderPayload.showtimeId;
             if (!maSuatChieuCuaHoaDon) {
                 throw new Error("MASUATCHIEU cho hóa đơn là bắt buộc.");
@@ -110,7 +111,7 @@ class OrderService {
 
             const invoiceInfo = {
                 MAHOADON: maHoaDon,
-                MASUATCHIEU: maSuatChieuCuaHoaDon, // Gán MASUATCHIEU cho hóa đơn
+                MASUATCHIEU: maSuatChieuCuaHoaDon,
                 MAKH: orderPayload.MaKH || null,
                 MANV: maNV,
                 NGAYTAOHD: ngayTaoHD,
@@ -118,115 +119,98 @@ class OrderService {
                 HINHTHUCTHANHTOAN: orderPayload.HinhThucThanhToan || 'Tiền mặt',
                 TRANGTHAITHANHTOAN: 'Đã thanh toán'
             };
-            if (!orderPayload.showtimeId) { // Kiểm tra lại cho chắc
-                throw new Error("MASUATCHIEU cho hóa đơn là bắt buộc (orderPayload.showtimeId).");
-            }
-
 
             const ticketsInfo = [];
             if (orderPayload.ve && orderPayload.ve.length > 0) {
                 const numberOfTickets = orderPayload.ve.length;
-                console.log(`OrderService: Requesting ${numberOfTickets} MAVEs...`);
-                // Gọi generateMultipleMaVe MỘT LẦN, truyền connection và số lượng vé cần
                 const maVeArray = await generateMultipleMaVe(connection, numberOfTickets);
-
                 if (maVeArray.length !== numberOfTickets) {
-                    // Điều này không nên xảy ra nếu generateMultipleMaVe hoạt động đúng
                     throw new Error("Lỗi hệ thống: Không tạo đủ số lượng mã vé yêu cầu.");
                 }
-                console.log(`OrderService: Batch of MAVEs received:`, JSON.stringify(maVeArray));
-
                 for (let i = 0; i < numberOfTickets; i++) {
                     const ticketClientData = orderPayload.ve[i];
-                    const maVe = maVeArray[i]; // Lấy mã từ mảng đã được tạo sẵn
-                    console.log(`OrderService: Assigning MAVE ${maVe} to ticket ${i + 1}`);
                     ticketsInfo.push({
-                        MAVE: maVe,
-                        MASUATCHIEU: invoiceInfo.MASUATCHIEU, // Sử dụng MASUATCHIEU của hóa đơn
-                        MAGHE: ticketClientData.MaGhe,
-                        MAPHONG: ticketClientData.MaPhong,
+                        MAVE: maVeArray[i], MASUATCHIEU: invoiceInfo.MASUATCHIEU,
+                        MAGHE: ticketClientData.MaGhe, MAPHONG: ticketClientData.MaPhong,
                         GIASUATCHIEU: ticketClientData.GiaVeCoBan_LucChon,
                         GIAGHENOI: ticketClientData.PhuThuGhe_LucChon,
-                        GIABAN: ticketClientData.GiaBan,
-                        TRANGTHAIVE: 'Đã bán'
+                        GIABAN: ticketClientData.GiaBan, TRANGTHAIVE: 'Đã bán'
                     });
                 }
-                console.log("OrderService: All tickets processed. Final TicketsInfo:", JSON.stringify(ticketsInfo, null, 2));
             }
 
-            //const productsInfo = [];
-            /* if (orderPayload.sanPhamKhac && orderPayload.sanPhamKhac.length > 0) {
-                for (const product of orderPayload.sanPhamKhac) {
-                    productsInfo.push({
-                        MASP: product.MaSP,
-                        SOLUONG: product.SoLuong,
-                        GIASP: product.GiaBan_LucChon,
-                        THANHTIEN: product.ThanhTien
-                    });
-                }
-            } */
-
-            // XỬ LÝ SẢN PHẨM KÈM THEO VÀ TỒN KHO
             const productsInfoForDb = [];
             if (orderPayload.sanPhamKhac && orderPayload.sanPhamKhac.length > 0) {
                 for (const productClientData of orderPayload.sanPhamKhac) {
-                    console.log("OrderService: Processing productClientData FROM PAYLOAD:", JSON.stringify(productClientData, null, 2));
                     const { MaSP, SoLuong, GiaBan_LucChon, ThanhTien } = productClientData;
-
                     if (!MaSP || SoLuong === undefined || GiaBan_LucChon === undefined || ThanhTien === undefined) {
                         throw new Error(`Dữ liệu sản phẩm ${MaSP || '(không có mã)'} không đầy đủ từ client.`);
                     }
                     if (SoLuong <= 0) {
-                        throw new Error(`Số lượng mua sản phẩm ${MaSP} phải lớn hơn 0.`);
+                        console.warn(`OrderService: Sản phẩm ${MaSP} có số lượng ${SoLuong}, sẽ được bỏ qua.`);
+                        continue; // Bỏ qua sản phẩm nếu số lượng là 0 hoặc âm
                     }
-
-                    // SỬA Ở ĐÂY: Truyền `connection`
                     const productInDb = await ProductRepository.findProductByIdForUpdate(MaSP, connection);
-
-                    if (!productInDb) {
-                        throw new Error(`Sản phẩm với mã ${MaSP} không tồn tại.`);
+                    if (!productInDb) throw new Error(`Sản phẩm với mã ${MaSP} không tồn tại.`);
+                    if (productInDb.TRANGTHAISP === 'Ngừng kinh doanh') {
+                        throw new Error(`Sản phẩm "${productInDb.TENSP}" đã ngừng kinh doanh.`);
                     }
-                    if (productInDb.TRANGTHAISP === 'Hết hàng' || productInDb.TRANGTHAISP === 'Ngừng kinh doanh') {
-                        throw new Error(`Sản phẩm "${productInDb.TENSP}" hiện đã ${productInDb.TRANGTHAISP.toLowerCase()}.`);
+                    if (productInDb.TRANGTHAISP === 'Hết hàng' || productInDb.SOLUONG < SoLuong) {
+                        throw new Error(`Sản phẩm "${productInDb.TENSP}" không đủ số lượng (còn ${productInDb.SOLUONG}, yêu cầu ${SoLuong}).`);
                     }
-                    if (productInDb.SOLUONG < SoLuong) {
-                        throw new Error(`Sản phẩm "${productInDb.TENSP}" chỉ còn ${productInDb.SOLUONG} sản phẩm. Không đủ số lượng yêu cầu (${SoLuong}).`);
-                    }
-
                     const newStock = productInDb.SOLUONG - SoLuong;
                     const newStatus = newStock > 0 ? 'Còn hàng' : 'Hết hàng';
-                    // SỬA Ở ĐÂY: Truyền `connection`
                     await ProductRepository.updateStockAndStatus(MaSP, newStock, newStatus, connection);
-
-                    productsInfoForDb.push({
-                        MASP: MaSP,
-                        SOLUONG: SoLuong,
-                        GIASP: GiaBan_LucChon,
-                        THANHTIEN: ThanhTien
-                    });
+                    productsInfoForDb.push({ MASP: MaSP, SOLUONG: SoLuong, GIASP: GiaBan_LucChon, THANHTIEN: ThanhTien });
                 }
             }
 
             const fullOrderData = { invoiceInfo, ticketsInfo, productsInfo: productsInfoForDb };
-            const createdOrder = await OrderRepository.createOrder(fullOrderData, connection);
+            createdOrder = await OrderRepository.createOrder(fullOrderData, connection); // Gán cho biến createdOrder
 
-            // ... (cập nhật spending, commit, etc.) ...
             if (invoiceInfo.MAKH && invoiceInfo.TRANGTHAITHANHTOAN === 'Đã thanh toán') {
                 await CustomerRepository.updateSpending(invoiceInfo.MAKH, invoiceInfo.TONGTIEN, connection);
+                customerForEmail = await CustomerRepository.findById(invoiceInfo.MAKH, connection);
             }
+
             await connection.commit();
-            return { MaHoaDon: createdOrder.MaHoaDon, TongTien: createdOrder.TONGTIEN, NgayTao: createdOrder.NGAYTAOHD };
+            console.log('OrderService: CustomerForEmail: ', customerForEmail);
+            console.log('OrderService: CustomerForEmail.EMAIL:', customerForEmail.EMAIL);
+            // GỬI EMAIL SAU KHI COMMIT THÀNH CÔNG
+            if (customerForEmail && customerForEmail.EMAIL) {
+                const detailedOrderForEmail = await this.getOrderById(createdOrder.MaHoaDon);
+                console.log("OrderService: customerForEmail for email:", JSON.stringify(customerForEmail, null, 2)); // DEBUG
+                console.log("OrderService: detailedOrderForEmail for email:", JSON.stringify(detailedOrderForEmail, null, 2)); // DEBUG
+                if (detailedOrderForEmail) {
+                    EmailService.sendOrderConfirmationEmail(detailedOrderForEmail, customerForEmail)
+                        .then(emailResult => {
+                            if (emailResult && emailResult.success) {
+                                console.log(`OrderService: Email xác nhận đơn hàng ${createdOrder.MaHoaDon} đã được yêu cầu gửi thành công. ID: ${emailResult.messageId}`);
+                            } else {
+                                console.warn(`OrderService: Gửi email xác nhận cho đơn hàng ${createdOrder.MaHoaDon} thất bại. Lỗi (nếu có): ${emailResult?.error}`);
+                            }
+                        })
+                        .catch(emailError => {
+                            console.error(`OrderService: Lỗi không mong muốn khi cố gắng gửi email cho đơn hàng ${createdOrder.MaHoaDon}:`, emailError);
+                        });
+                } else {
+                    console.warn(`OrderService: Không thể lấy chi tiết đơn hàng ${createdOrder.MaHoaDon} để gửi email.`);
+                }
+            } else if (invoiceInfo.MAKH) {
+                console.log(`OrderService: Khách hàng ${invoiceInfo.MAKH} không có email hoặc không tìm thấy thông tin để gửi mail xác nhận.`);
+            }
+
+            return { MaHoaDon: createdOrder.maHoaDon, TongTien: createdOrder.TONGTIEN, NgayTao: createdOrder.NGAYTAOHD };
 
         } catch (error) {
-            // ... (rollback, release connection) ...
-            console.error('Error in OrderService.createOrder, ROLLING BACK main transaction:', error);
+            console.error('Error in OrderService.createOrder, ROLLING BACK transaction:', error);
             if (connection) {
                 try { await connection.rollback(); } catch (e) { console.error("Rollback error", e); }
             }
             throw error;
         } finally {
             if (connection) {
-                try { connection.release(); } catch (e) { console.error("Release error", e); }
+                try { connection.release(); } catch (e) { console.error("Release connection error", e); }
             }
         }
     }
@@ -374,7 +358,7 @@ class OrderService {
                             await ProductRepository.updateStockAndStatus(item.MASP, newStock, newStatus, connection);
                             console.log(`OrderService: Product ${item.MASP} stock updated to ${newStock}, status to ${newStatus}`);
                         } else {
-                             console.warn(`OrderService.cancelOrder: Product ${item.MASP} not found to restock for order ${maHoaDon}.`);
+                            console.warn(`OrderService.cancelOrder: Product ${item.MASP} not found to restock for order ${maHoaDon}.`);
                         }
                     }
                 }
@@ -409,6 +393,102 @@ class OrderService {
             }
         }
     }
+
+    async getTicketsForPrinting(maHoaDon) {
+        const connection = await pool.getConnection(); // Hoặc lấy connection theo cách của bạn
+        try {
+            console.log(`OrderService: Fetching tickets for printing for order ${maHoaDon}`);
+
+            // *** KHOANG CODE CHỜ YÊU CẦU TỪ TÔI (OrderService.getTicketsForPrinting - Lấy dữ liệu vé) ***
+            // Yêu cầu 1: Cần một phương thức trong OrderRepository để lấy tất cả vé
+            //            và các thông tin liên quan cho một mã hóa đơn.
+            //            Ví dụ: OrderRepository.findTicketsByOrderIdWithDetails(maHoaDon, connection)
+            //
+            // Dữ liệu mỗi vé cần bao gồm (ví dụ):
+            // - MAVE (Mã vé - có thể dùng để tạo mã vạch/QR code)
+            // - TENPHIM (Tên phim)
+            // - THOIGIANSUATCHIEU (Ngày giờ suất chiếu)
+            // - TENPHONG (Tên phòng chiếu)
+            // - DAYGHE, VITRIGHE (Thông tin ghế)
+            // - LOAIGHE (Loại ghế)
+            // - GIABAN (Giá vé - có thể hiển thị hoặc không tùy thiết kế vé)
+            // - MAHOADON (Mã hóa đơn - để tham chiếu)
+            // - Tên rạp (Lấy từ .env hoặc cấu hình)
+            // - Địa chỉ rạp (Nếu có)
+            // - Logo rạp (URL nếu có)
+            // - Các thông tin quy định (ví dụ: vé không hoàn trả, đến sớm, v.v.)
+
+            const ticketsDataFromRepo = await OrderRepository.findTicketsByOrderIdWithDetails(maHoaDon, connection);
+
+            if (!ticketsDataFromRepo || ticketsDataFromRepo.length === 0) {
+                // Trước khi trả về mảng rỗng, kiểm tra xem hóa đơn có thực sự tồn tại không
+                // để phân biệt giữa "không có vé" và "không có hóa đơn".
+                // Tuy nhiên, Controller đã có bước kiểm tra này, nên ở đây có thể chỉ cần trả về những gì repo trả.
+                console.log(`OrderService: No tickets found in repository for order ${maHoaDon}`);
+                return []; // Trả về mảng rỗng nếu không có vé
+            }
+
+            const formattedTickets = await Promise.all(ticketsDataFromRepo.map(async (ticket) => {
+                let qrCodeDataUrl = null;
+                if (ticket.MAVE) {
+                    try {
+                        qrCodeDataUrl = await qrcode.toDataURL(String(ticket.MAVE), {
+                            errorCorrectionLevel: 'M',
+                            margin: 2,
+                            width: 200, // Kích thước QR code (pixel), client có thể scale lại nếu cần
+                            color: {
+                                dark: "#000000",  // Màu của các ô QR
+                                light: "#FFFFFF" // Màu nền QR
+                            }
+                        });
+                    } catch (qrError) {
+                        console.error(`[OrderService] Lỗi tạo QR code cho vé ${ticket.MAVE}:`, qrError);
+                    }
+                }
+
+                // Lấy các thông tin cố định từ biến môi trường hoặc default
+                const tenRap = process.env.CINEMA_NAME || "Rạp Phim XYZ";
+                const diaChiRap = process.env.CINEMA_ADDRESS || "123 Đường ABC, Quận 1, TP.HCM";
+                const hotlineRap = process.env.CINEMA_HOTLINE || "1900 1234";
+                const logoRapUrl = process.env.CINEMA_LOGO_FOR_TICKET_URL; // Ví dụ: URL logo cho vé
+
+                return {
+                    maVe: ticket.MAVE,
+                    tenPhim: ticket.TENPHIM,
+                    thoiGianSuatChieu: ticket.THOIGIANSUATCHIEU ? new Date(ticket.THOIGIANSUATCHIEU) : null,
+                    phongChieu: ticket.TENPHONG,
+                    dayGhe: ticket.DAYGHE,
+                    viTriGhe: ticket.VITRIGHE,
+                    loaiGhe: ticket.LOAIGHE,
+                    giaVeDaLuu: parseFloat(ticket.GIABAN) || 0,
+                    maHoaDon: ticket.MAHOADON,
+                    qrCodeDataUrl: qrCodeDataUrl, // Data URL của QR code
+                    tenRap: tenRap,
+                    diaChiRap: diaChiRap,
+                    hotlineRap: hotlineRap,
+                    logoRapUrl: logoRapUrl, // Có thể là null nếu không có trong .env
+                    quyDinh: [
+                        "Vé chỉ có giá trị cho suất chiếu đã chọn.",
+                        "Vui lòng đến sớm 15 phút trước giờ chiếu.",
+                        "Vé đã mua không được hoàn trả hoặc quy đổi."
+                        // Thêm các quy định khác nếu cần
+                    ]
+                };
+            }));
+
+            console.log(`OrderService: Successfully fetched and formatted ${formattedTickets.length} tickets for order ${maHoaDon}`);
+            return formattedTickets; // Trả về mảng các đối tượng vé đã được format
+
+        } catch (error) {
+            console.error(`Error in OrderService.getTicketsForPrinting for order ${maHoaDon}:`, error);
+            throw error; // Ném lỗi để controller xử lý
+        } finally {
+            if (connection) {
+                try { connection.release(); } catch (e) { console.error("Release connection error", e); }
+            }
+        }
+    }
+
 }
 
 module.exports = new OrderService();

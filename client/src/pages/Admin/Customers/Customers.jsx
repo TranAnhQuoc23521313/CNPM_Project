@@ -84,15 +84,23 @@ function Customers() {
       // Nếu API trả về trực tiếp customer object đã cập nhật:
       setCustomers(prevCustomers =>
         prevCustomers.map(cust =>
+          // If the API returns the full updated object, use it. Otherwise, merge.
+          // For now, let's assume updatedCustomerFromServer might not be the full customer object
+          // or might not even be returned if the API is a 204 No Content or simple success.
+          // The safest is to update based on what was sent, if the API response isn't detailed.
+          // However, the current code *expects* updatedCustomerFromServer to be the full object for list update.
+          // If API just returns success, we'd need to merge updatedCustomerDataFromModal with existing customer.
+          // For now, assuming API returns the updated object:
           cust.id === updatedCustomerFromServer.id ? updatedCustomerFromServer : cust
         )
       );
-      setSuccessMessage(`Thông tin khách hàng "${updatedCustomerFromServer.name || updatedCustomerFromServer.HoTen}" đã được cập nhật.`);
+      // Use the name from the data submitted to the modal, as the API response might not contain it.
+      setSuccessMessage(`Thông tin khách hàng "${updatedCustomerDataFromModal.name}" đã được cập nhật.`);
       
       setShowEditModal(false); // Đóng modal khi thành công
       setCustomerToEdit(null);
 
-      await fetchCustomers();
+      await fetchCustomers(); // Refetch to ensure data consistency, especially if API response was minimal
 
     } catch (err) {
       console.error("Error updating customer:", err);

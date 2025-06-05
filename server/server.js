@@ -21,6 +21,7 @@ const customerRoutes = require('./routes/customerRoutes'); // << MỚI
 const orderRoutes =require('./routes/orderRoutes');         // << MỚI
 const seatRoutes = require('./routes/seatRoutes');           // << MỚI
 const facilitiesRoutes = require('./routes/facility.routes');
+const statisticsRoutes = require('./routes/statisticsRoutes');
 
 // Ví dụ:
 // const showtimeRoutes = require('./routes/showtimeRoutes');
@@ -77,6 +78,7 @@ app.use('/api/customers', customerRoutes);     // << MỚI
 app.use('/api/orders', orderRoutes);           // << MỚI
 app.use('/api/seats', seatRoutes);             // << MỚI
 app.use('/api/facilities',facilitiesRoutes);    // << Mới
+app.use('/api/statistics', statisticsRoutes);
 
 // Ví dụ gắn các routes khác:
 // app.use('/api/showtimes', showtimeRoutes);

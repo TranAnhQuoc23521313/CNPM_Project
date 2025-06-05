@@ -4,7 +4,8 @@ import { useNavigate, useLocation } from 'react-router-dom'; // Thêm useLocatio
 import Button from '../../../components/common/Button';
 import './ManageBookingsPage.css';
 import BookingDetailModal from './BookingDetailModal';
-import { getAllOrdersApi, getOrderByIdApi, cancelOrderApi } from '../../../services/orderApiService';
+import { getAllOrdersApi, getOrderByIdApi, cancelOrderApi, getTicketsForPrintingApi } from '../../../services/orderApiService';
+import TicketPrintPreviewModal from './TicketPrintPreviewModal';
 
 const STAFF_BASE_PATH = "/staff";
 
@@ -44,6 +45,11 @@ const ManageBookingsPage = () => {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedBookingForDetail, setSelectedBookingForDetail] = useState(null);
   const [isFetchingDetail, setIsFetchingDetail] = useState(false);
+
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+  const [ticketsToPrint, setTicketsToPrint] = useState([]);
+  const [isFetchingTicketsForPrint, setIsFetchingTicketsForPrint] = useState(false);
+  const [currentOrderForPrint, setCurrentOrderForPrint] = useState(null); // Lưu mã hóa đơn đang được xử lý để in
 
   // Sử dụng useCallback để fetchBookings không bị tạo lại mỗi lần render trừ khi searchTerm thay đổi
   const fetchBookings = useCallback(async () => {
@@ -163,6 +169,41 @@ const ManageBookingsPage = () => {
     }
   };
 
+  const handlePrintTickets = async (bookingSummary) => {
+    if (bookingSummary.paymentStatus === 'Đã hủy') {
+      alert(`Hóa đơn ${bookingSummary.id} đã bị hủy, không thể in vé.`);
+      return;
+    }
+    setIsFetchingTicketsForPrint(true);
+    setTicketsToPrint([]);
+    setCurrentOrderForPrint(bookingSummary.id); // Lưu mã hóa đơn
+    setIsPrintModalOpen(true); // Mở modal trước để hiển thị loading
+    try {
+      const tickets = await getTicketsForPrintingApi(bookingSummary.id);
+      if (!tickets || tickets.length === 0) {
+        alert(`Không tìm thấy vé nào hợp lệ để in cho hóa đơn ${bookingSummary.id}.`);
+        setIsPrintModalOpen(false); // Đóng modal nếu không có vé
+        setCurrentOrderForPrint(null);
+        return;
+      }
+      setTicketsToPrint(tickets);
+    } catch (err) {
+      console.error(`Lỗi khi lấy vé để in cho hóa đơn ${bookingSummary.id}:`, err);
+      alert(`Lỗi khi lấy vé để in: ${err.message || 'Vui lòng thử lại.'}`);
+      setIsPrintModalOpen(false); // Đóng modal nếu có lỗi
+      setCurrentOrderForPrint(null);
+    } finally {
+      setIsFetchingTicketsForPrint(false);
+    }
+  };
+
+  const handleClosePrintModal = () => {
+    setIsPrintModalOpen(false);
+    setTicketsToPrint([]);
+    setCurrentOrderForPrint(null);
+  };
+
+
   return (
     <div className="page-container tickets-management-page">
       <div className="page-header">
@@ -219,9 +260,30 @@ const ManageBookingsPage = () => {
                     <td>{bookingItem.totalAmount?.toLocaleString('vi-VN')} đ</td>
                     <td><span className={`status-badge status-${bookingItem.statusColor}`}>{bookingItem.paymentStatus}</span></td>
                     <td className="actions-cell">
-                      <Button variant="info" size="small" onClick={() => handleViewBookingDetails(bookingItem)} disabled={isFetchingDetail}>Chi tiết</Button>
+                      <Button variant="info" size="small" onClick={() => handleViewBookingDetails(bookingItem)} disabled={isFetchingDetail}>
+                        {/* <i className="fas fa-eye btn-icon"></i> */}
+                        Chi tiết
+                      </Button>
+                      {bookingItem.paymentStatus !== 'Đã hủy' && (
+                        <Button
+                          variant="success"
+                          size="small"
+                          onClick={() => handlePrintTickets(bookingItem)}
+                          disabled={isFetchingTicketsForPrint && currentOrderForPrint === bookingItem.id}
+                        >
+                          {/* <i className="fas fa-print btn-icon"></i> */}
+                          In Vé
+                        </Button>
+                      )}
                       {/* {bookingItem.paymentStatus !== 'Đã hủy' && (
-                        <Button variant="danger" size="small" onClick={() => handleCancelBooking(bookingItem)} style={{ marginLeft: '5px' }}>Hủy HĐ</Button>
+                        <Button
+                          variant="danger"
+                          size="small"
+                          onClick={() => handleCancelBooking(bookingItem)}
+                        >
+                           <i className="fas fa-times-circle btn-icon"></i>
+                          Hủy HĐ
+                        </Button>
                       )} */}
                     </td>
                   </tr>
@@ -240,6 +302,14 @@ const ManageBookingsPage = () => {
         onClose={handleCloseDetailModal}
         bookingDetails={selectedBookingForDetail}
         isLoading={isFetchingDetail}
+      />
+
+      <TicketPrintPreviewModal
+        isOpen={isPrintModalOpen}
+        onClose={handleClosePrintModal}
+        tickets={ticketsToPrint}
+        orderId={currentOrderForPrint}
+        isLoading={isFetchingTicketsForPrint}
       />
     </div>
   );

@@ -1,88 +1,131 @@
-/* src/pages/Staff/Tickets/ManageTicketsPage.css */
+/* src/pages/Staff/Tickets/ManageBookingsPage.css */
 
 .tickets-management-page {
-  /* Style chung cho container trang nếu cần */
-  padding: 20px; /* Hoặc lấy từ StaffLayout.css .staff-page-content */
+  padding: 25px 30px; /* Tăng padding chung của trang */
+  background-color: #f4f7f6; /* Nền nhẹ cho toàn trang */
 }
 
-/* Style cho page-header đã có trong Common.css hoặc StaffLayout.css */
-/* Nếu bạn muốn tùy chỉnh thêm cho header của trang này: */
-/*
-.tickets-management-page .page-header {
-  margin-bottom: 25px;
+/* --- Header của trang --- */
+/* .tickets-management-page .page-header đã có style chung, có thể không cần ghi đè nhiều */
+.tickets-management-page .page-header h1 {
+  color: #33475b; /* Màu tiêu đề đậm hơn */
 }
-*/
 
 .header-actions-group {
   display: flex;
   align-items: center;
-  gap: 15px; /* Khoảng cách giữa ô tìm kiếm và nút */
+  gap: 12px; /* Giảm gap một chút nếu cần */
 }
-
-/* Style cho page-header-search-input đã có trong Common.css */
-/* Nếu bạn muốn tùy chỉnh thêm: */
 
 .tickets-management-page .page-header-search-input {
-  min-width: 700px;
+  min-width: 350px; /* Kích thước ô tìm kiếm */
+  border-radius: 6px; /* Bo góc nhẹ */
+  border: 1px solid #ced4da;
+  padding: 10px 12px; /* Tăng padding cho dễ nhìn */
+}
+.tickets-management-page .page-header-search-input:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
 }
 
 
+/* --- Container của bảng --- */
 .table-responsive-container {
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  overflow-x: auto; /* Cho phép cuộn ngang trên màn hình nhỏ */
-  padding: 15px;
+  background-color: #ffffff;
+  border-radius: 10px; /* Bo góc nhiều hơn */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Shadow mềm mại hơn */
+  overflow: hidden; /* Quan trọng để border-radius hoạt động với table */
+  padding: 0; /* Bỏ padding ở đây, table sẽ tự xử lý */
 }
 
 .data-table.tickets-table {
   width: 100%;
-  border-collapse: collapse; /* Gộp đường viền */
+  border-collapse: collapse;
 }
 
 .data-table th,
 .data-table td {
-  padding: 12px 15px;
+  padding: 14px 18px; /* Tăng padding cho thoáng hơn */
   text-align: left;
-  border-bottom: 1px solid #e9ecef; /* Đường kẻ ngang giữa các hàng */
+  border-bottom: 1px solid #f1f1f1; /* Đường kẻ ngang mảnh hơn */
   vertical-align: middle;
+  font-size: 0.9rem; /* Cỡ chữ nội dung bảng */
 }
+.data-table td:first-child, .data-table th:first-child { padding-left: 24px; } /* Padding lớn hơn cho cột đầu */
+.data-table td:last-child, .data-table th:last-child { padding-right: 24px; } /* Padding lớn hơn cho cột cuối */
+
 
 .data-table th {
-  background-color: #f8f9fa; /* Nền cho header của bảng */
-  font-weight: 600;
-  color: #495057;
-  font-size: 0.9em;
-  text-transform: uppercase; /* Viết hoa chữ cái đầu (tùy chọn) */
+  background-color: #f9fafb; /* Nền header bảng nhạt hơn */
+  font-weight: 600; /* Vẫn giữ bold */
+  color: #526474; /* Màu chữ header */
+  font-size: 0.8rem; /* Cỡ chữ header nhỏ hơn một chút */
+  text-transform: uppercase;
+  letter-spacing: 0.5px; /* Giãn cách chữ nhẹ */
+  border-bottom-width: 2px; /* Đường kẻ dưới header đậm hơn */
+  border-bottom-color: #e5e9ed;
 }
 
+.data-table tbody tr {
+  transition: background-color 0.15s ease-in-out; /* Hiệu ứng chuyển nền mượt hơn */
+}
 .data-table tbody tr:hover {
-  background-color: #f1f3f5; /* Hiệu ứng hover trên hàng */
+  background-color: #f5f8fa; /* Màu hover nhạt hơn */
+}
+.data-table tbody tr:last-child td {
+  border-bottom: none; /* Bỏ đường kẻ cho hàng cuối cùng */
 }
 
+/* --- Status Badge --- */
 .status-badge {
-  padding: 4px 8px;
-  border-radius: 12px; /* Bo tròn nhiều */
-  font-size: 0.8em;
+  padding: 6px 12px;
+  border-radius: 20px; /* Bo tròn hoàn toàn */
+  font-size: 0.75rem;
   font-weight: 500;
   color: #fff;
-  display: inline-block;
+  display: inline-flex; /* Để căn chỉnh icon (nếu có) và text */
+  align-items: center;
+  line-height: 1;
+  text-transform: capitalize; /* Viết hoa chữ cái đầu */
+}
+/* Thêm một chút shadow cho badge (tùy chọn) */
+/* .status-badge { box-shadow: 0 1px 3px rgba(0,0,0,0.1); } */
+
+.status-green { background-color: #20c997; } /* Màu xanh mint */
+.status-orange { background-color: #ffc107; color: #212529; } /* Vàng với chữ đậm */
+.status-red { background-color: #e63946; } /* Đỏ hiện đại */
+
+
+/* --- Cột Hành động --- */
+.actions-cell {
+  display: flex;
+  flex-direction: column; /* << THAY ĐỔI CHÍNH: Xếp các nút thành cột */
+  align-items: flex-start; /* Căn các nút về bên trái của cột (tùy chọn) */
+                           /* Hoặc 'center' để căn giữa các nút trong cột */
+                           /* Hoặc 'stretch' để các nút tự dãn bằng chiều rộng của cell (nếu không set width cố định cho nút) */
+  gap: 6px; /* Khoảng cách giữa các nút theo chiều dọc */
 }
 
-.status-green { background-color: #28a745; } /* Đã thanh toán */
-.status-orange { background-color: #fd7e14; } /* Chưa thanh toán */
-.status-red { background-color: #dc3545; } /* Đã hủy */
-/* Thêm các màu khác nếu cần */
+/* Style cho các nút trong actions-cell (giữ nguyên hoặc điều chỉnh nếu cần) */
+.actions-cell > button, .actions-cell > .btn {
+  padding: 6px 10px !important;
+  font-size: 0.8rem !important;
+  border-radius: 5px !important;
+  width: 100%; /* << THÊM: Để các nút chiếm hết chiều rộng của cột actions-cell (nếu align-items là stretch hoặc không đặt) */
+                /* Hoặc đặt một min-width/width cố định nếu muốn các nút có chiều rộng bằng nhau */
+                /* ví dụ: min-width: 80px; text-align: center; */
+  box-sizing: border-box; /* Đảm bảo padding không làm tăng width */
+}
 
-.actions-cell .btn { /* Style cho các nút trong cột hành động */
-  margin-right: 5px; /* Khoảng cách giữa các nút */
-}
-.actions-cell .btn:last-child {
-  margin-right: 0;
-}
+
+/* Icon cho nút (ví dụ sử dụng Font Awesome hoặc SVG inline) */
+/* Bạn cần cài đặt thư viện icon hoặc có SVG sẵn */
+/* .actions-cell .btn-icon { margin-right: 4px; font-size: 0.9em; } */
+
 
 .no-data-message {
   text-align: center;
-  padding: 20px;
-  color: #6c757d;
+  padding: 30px; /* Tăng padding */
+  color: #77838f;
+  font-style: italic;
 }

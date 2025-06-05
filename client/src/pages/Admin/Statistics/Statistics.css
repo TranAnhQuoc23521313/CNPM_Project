@@ -1,390 +1,369 @@
 /* pages/Statistics/Statistics.css */
 
-/* General Page Layout - tương tự Customers.css */
+/* --- General Page Layout --- */
 .statistics-page-container {
-  padding: 20px;
-  max-width: 1400px; /* Có thể rộng hơn customer page để chứa nhiều thông tin */
-  margin: 20px auto;
-  background-color: #f0f2f5; /* Nền xám nhạt như Customer page */
-  border-radius: 8px;
-  /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */ /* Bỏ shadow ở container ngoài cùng */
+  padding: 25px; /* Tăng padding một chút */
+  max-width: 1600px; /* Có thể rộng hơn nữa nếu nhiều dữ liệu */
+  margin: 30px auto;
+  background-color: #f4f6f9; /* Màu nền xám rất nhạt, chuyên nghiệp hơn */
+  border-radius: 12px; /* Bo góc mềm mại hơn */
 }
 
 .statistics-header h2 {
-  text-align: left; /* Hoặc center tùy theo layout chung */
-  color: #333;
-  margin-bottom: 20px;
-  font-size: 1.8em;
-  padding: 10px 15px;
-  background-color: #fff; /* Nền trắng cho header */
-  border-radius: 8px 8px 0 0; /* Bo góc trên */
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  color: #2c3e50; /* Màu chữ đậm hơn, dễ đọc */
+  margin-bottom: 25px;
+  font-size: 2em; /* Tăng kích thước tiêu đề chính */
+  font-weight: 600; /* Đậm hơn một chút */
+  padding: 18px 25px;
+  background-color: #ffffff;
+  border-radius: 10px 10px 0 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Shadow tinh tế hơn */
+  border-bottom: 1px solid #e9ecef; /* Thêm đường kẻ dưới header */
 }
 
-/* Tabs Styling */
+/* --- Tabs Styling --- */
 .statistics-tabs {
   display: flex;
-  margin-bottom: 20px;
-  background-color: #fff;
-  padding: 0 15px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  margin-bottom: 0; /* Gộp với filter */
+  background-color: #ffffff;
+  padding: 0 25px; /* Đồng bộ padding */
+  /* box-shadow: 0 2px 4px rgba(0,0,0,0.05); */ /* Shadow này có thể bỏ nếu header đã có */
 }
 
 .tab-button {
-  padding: 12px 20px;
-  font-size: 1em;
+  padding: 15px 25px; /* Tăng padding cho dễ click */
+  font-size: 1.05em; /* Tăng nhẹ font size */
   font-weight: 500;
-  color: #555;
+  color: #5a6a7b; /* Màu chữ tab dịu hơn */
   background-color: transparent;
   border: none;
   border-bottom: 3px solid transparent;
   cursor: pointer;
-  transition: color 0.2s, border-bottom-color 0.2s;
-  margin-right: 10px;
+  transition: color 0.25s ease-in-out, border-bottom-color 0.25s ease-in-out;
+  margin-right: 15px; /* Tăng khoảng cách giữa các tab */
+  position: relative; /* Cho hiệu ứng gạch chân */
+  outline: none; /* Bỏ outline khi focus */
 }
-
 .tab-button:hover {
   color: #007bff;
 }
-
 .tab-button.active {
   color: #007bff;
+  font-weight: 600; /* Làm đậm tab active */
   border-bottom-color: #007bff;
 }
+/* (Tùy chọn) Hiệu ứng gạch chân khi active */
+/* .tab-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #007bff;
+} */
 
-/* Filters Styling */
+
+/* --- Filters Styling --- */
 .statistics-filters {
   display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
-  padding: 15px;
-  background-color: #fff;
-  border-radius: 0 0 8px 8px; /* Bo góc dưới */
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  gap: 20px; /* Tăng gap */
+  margin-bottom: 25px;
+  padding: 20px 25px; /* Đồng bộ padding */
+  background-color: #ffffff;
+  border-radius: 0 0 10px 10px; /* Bo góc dưới */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Đồng bộ shadow */
+  border-top: 1px solid #e9ecef; /* Thêm đường kẻ nếu tab và filter tách biệt */
 }
 
 .filter-select {
-  padding: 8px 12px;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
+  padding: 10px 15px; /* Tăng padding */
+  border: 1px solid #d1d9e6; /* Màu border dịu hơn */
+  border-radius: 6px; /* Bo góc mềm mại hơn */
   background-color: #fff;
-  font-size: 0.95em;
-  min-width: 150px;
+  font-size: 1em;
+  min-width: 180px; /* Tăng chiều rộng tối thiểu */
+  color: #495057;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  outline: none; /* Bỏ outline khi focus */
+}
+.filter-select:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
-/* Content Area */
+/* --- Content Area --- */
 .statistics-content {
-  background-color: #fff;  /* Content đã nằm trong các card */
-  padding: 20px; 
-  border-radius: 8px; 
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); 
+  /* Nền content sẽ được đặt bởi các card bên trong,
+     nên có thể bỏ background-color và box-shadow ở đây nếu tất cả content đều nằm trong card */
+  /* background-color: #fff; */
+  padding: 0; /* Bỏ padding nếu các tab con tự quản lý padding */
+  /* border-radius: 8px; */
+  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); */
 }
 
-.stats-content-grid {
-  display: grid;
-  grid-template-columns: 350px 1fr; /* Cột trái cho card, cột phải cho chart */
-  gap: 20px;
-}
-
-.stats-cards-column {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-
-
-/* Individual Statistic Card Styling */
+/* --- General Stat Card Styling --- */
 .stat-card {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  background-color: #ffffff;
+  padding: 25px; /* Tăng padding card */
+  border-radius: 10px; /* Bo góc mềm mại hơn */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07); /* Shadow tinh tế hơn */
+  /* transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; */ /* Tùy chọn: hiệu ứng khi hover */
 }
+/* .stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+} */
 
-.stat-card .card-header {
-  margin-bottom: 15px;
-  /* border-bottom: 1px solid #f0f0f0; */
-  /* padding-bottom: 10px; */
-}
-.stat-card .card-header h4 {
-  margin: 0;
-  font-size: 1.1em;
-  color: #333;
+.stat-card .card-header h4,
+.card-header-with-actions h4 { /* Áp dụng cho cả card có nút export */
+  margin: 0 0 20px 0; /* Tăng margin bottom */
+  font-size: 1.25em; /* Tăng nhẹ font size */
+  color: #343a40; /* Màu chữ đậm hơn */
   font-weight: 600;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid #f0f2f5; /* Gạch chân nhẹ cho tiêu đề card */
+  padding-bottom: 12px; /* Khoảng cách với gạch chân */
 }
+.card-header-with-actions h4 { /* Riêng cho card có nút export để không có gạch chân */
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0; /* Vì card-header-with-actions đã có margin-bottom */
+}
+
+
+/* --- Styles for RevenueExpenseTab --- */
+.stats-content-grid {
+  display: grid;
+  grid-template-columns: 380px 1fr; /* Tăng chiều rộng cột card một chút */
+  gap: 25px; /* Tăng gap */
+}
+.stats-cards-column {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
 .stat-card .card-header .trend-positive {
-  color: #28a745; /* Green */
-  font-size: 0.9em;
+  color: #20c997; /* Màu xanh lá cây dịu hơn */
+  font-size: 0.95em;
+  font-weight: 600;
 }
 .stat-card .card-header .trend-negative {
-  color: #dc3545; /* Red */
-  font-size: 0.9em;
+  color: #e74c3c; /* Màu đỏ dịu hơn */
+  font-size: 0.95em;
+  font-weight: 600;
 }
 
 .breakdown-container {
   display: flex;
-  justify-content: space-around; /* Hoặc space-between */
+  justify-content: space-around;
   text-align: center;
+  margin-top: 10px; /* Thêm khoảng cách trên */
 }
 .breakdown-item h5 {
-  margin: 0 0 5px 0;
-  font-size: 0.95em;
-  color: #555;
+  margin: 0 0 8px 0;
+  font-size: 1em;
+  color: #5a6a7b;
+  font-weight: 500;
 }
 .breakdown-item .percentage {
-  font-size: 1.6em;
-  font-weight: bold;
-  color: #333;
-  margin: 5px 0;
+  font-size: 1.8em; /* Làm nổi bật % */
+  font-weight: 700; /* Đậm hơn */
+  color: #2c3e50;
+  margin: 8px 0;
 }
 .breakdown-item .amount {
-  font-size: 0.9em;
-  color: #777;
+  font-size: 0.95em;
+  color: #7f8c8d;
 }
 
-
-/* Total Revenue/Expense Card */
-.total-rev-exp-card h4 {
-  margin-bottom: 15px;
-  font-size: 1.1em;
-  color: #333;
+.total-rev-exp-card h4 { /* Tiêu đề "Tổng thu chi (VND)" */
+  margin-bottom: 20px; /* Tăng margin */
+  font-size: 1.25em; /* Đồng bộ với các card header khác */
+  color: #343a40;
   font-weight: 600;
+  border-bottom: 1px solid #f0f2f5;
+  padding-bottom: 12px;
 }
 .progress-item {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
-  font-size: 0.95em;
+  margin-bottom: 12px;
+  font-size: 1em;
 }
-.progress-item span:first-child {
-  width: 40px; /* "Thu", "Chi" */
-  color: #555;
-}
-.progress-item span:last-child {
-  margin-left: 10px;
-  color: #333;
-  font-weight: 500;
-}
+.progress-item span:first-child { width: 45px; color: #5a6a7b; }
+.progress-item span:last-child { margin-left: 12px; color: #2c3e50; font-weight: 600; }
 .progress-bar-container {
-  flex-grow: 1;
-  height: 12px;
-  background-color: #e9ecef;
-  border-radius: 6px;
-  overflow: hidden;
-  margin: 0 10px;
+  flex-grow: 1; height: 14px; background-color: #e9ecef;
+  border-radius: 7px; overflow: hidden; margin: 0 12px;
 }
-.progress-bar {
-  height: 100%;
-  border-radius: 6px;
-  transition: width 0.5s ease-in-out;
-}
-.revenue-bar {
-  background-color: #007bff; /* Blue */
-}
-.expense-bar {
-  background-color: #fd7e14; /* Orange/Red */
-}
+.progress-bar { height: 100%; border-radius: 7px; transition: width 0.5s ease-in-out; }
+.revenue-bar { background-color: #007bff; }
+.expense-bar { background-color: #ff6b6b; } /* Màu đỏ cho chi phí */
 
-
-/* Summary Card */
 .summary-card .summary-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  font-size: 0.95em;
-  border-bottom: 1px dashed #f0f0f0;
+  display: flex; justify-content: space-between;
+  padding: 10px 0; font-size: 1em;
+  border-bottom: 1px dashed #e9ecef; /* Đường dash nhạt hơn */
 }
-.summary-card .summary-item:last-child {
-  border-bottom: none;
+.summary-card .summary-item:last-child { border-bottom: none; }
+.summary-card .summary-item span:first-child { color: #5a6a7b; }
+.summary-card .summary-item span:last-child { color: #2c3e50; font-weight: 500; }
+.summary-card .summary-item.profit span:last-child {
+  font-weight: 700; color: #20c997; font-size: 1.15em;
 }
-.summary-card .summary-item span:first-child {
-  color: #555;
+
+.chart-card { height: auto; /* Cho phép card tự điều chỉnh chiều cao */ }
+.chart-card .chart-container { /* Bỏ h4 trong chart-card nếu không cần */
+  height: 450px; /* Tăng chiều cao chart chính */
+  position: relative;
 }
-.summary-card .summary-item span:last-child {
-  color: #333;
+
+/* --- Ranking & Trends Tab Styles --- */
+.ranking-tab-container, .trends-tab-container {
+  display: flex; flex-direction: column;
+  gap: 25px; /* Tăng gap */
+}
+.ranking-filters-info, .trends-filters-info {
+  background-color: #ffffff;
+  padding: 12px 20px; /* Tăng padding */
+  border-radius: 8px; /* Bo góc mềm mại */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  display: flex; gap: 20px;
+  font-weight: 500; color: #343a40; font-size: 0.95em;
+}
+.ranking-grid, .trends-grid {
+  display: grid;
+  /* Sử dụng fixed number of columns hoặc điều chỉnh minmax cho phù hợp hơn */
+  /* grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); */
+  grid-template-columns: 1fr 1fr; /* Luôn 2 cột, sẽ điều chỉnh responsive sau */
+  gap: 25px;
+}
+.ranking-card h4, .trends-card h4 { /* Tiêu đề trong card của Ranking/Trends */
+  /* Đã được xử lý bởi .stat-card .card-header h4 hoặc .card-header-with-actions h4 */
+  text-align: left; /* Căn trái tiêu đề cho nhất quán */
+}
+
+.ranking-chart-container { /* Biểu đồ tròn trong RankingTab */
+  height: 250px; /* Tăng chiều cao */
+  margin-bottom: 25px;
+  display: flex; justify-content: center; align-items: center;
+}
+.trends-chart-container { /* Biểu đồ cột trong TrendsTab */
+  height: 300px; /* Tăng chiều cao */
+  margin-bottom: 25px;
+}
+
+.ranking-table {
+  width: 100%; border-collapse: collapse; font-size: 0.95em; /* Tăng nhẹ font */
+  margin-top: 15px; /* Thêm khoảng cách với biểu đồ */
+}
+.ranking-table th, .ranking-table td {
+  border: 1px solid #e0e5ec; /* Màu border dịu hơn */
+  padding: 10px 12px; /* Tăng padding cell */
+  text-align: left;
+  vertical-align: middle; /* Căn giữa theo chiều dọc */
+}
+.ranking-table th {
+  background-color: #f8f9fc; /* Màu nền header table dịu hơn */
+  font-weight: 600; color: #495057;
+}
+.ranking-table tbody tr:nth-child(even) {
+  background-color: #fdfdfe; /* Màu xen kẽ rất nhạt cho dễ đọc */
+}
+.ranking-table tbody tr:hover {
+  background-color: #f1f5f9; /* Hiệu ứng hover */
+}
+.ranking-table td:last-child, .ranking-table th:last-child {
+  text-align: right; font-weight: 500; /* Làm đậm số liệu cuối */
+}
+
+/* --- Shared Styles for Tabs --- */
+.card-header-with-actions {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20px; /* Tăng margin */
+}
+/* .card-header-with-actions h4 đã được định nghĩa ở trên */
+
+.btn-export-csv, .btn-export-report {
+  padding: 8px 15px; /* Tăng padding nút */
+  font-size: 0.9em;
+  font-weight: 500;
+  color: #fff;
+  background-color: #1abc9c; /* Màu xanh ngọc, hiện đại hơn */
+  border: none; /* Bỏ border */
+  border-radius: 5px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.btn-export-csv:hover, .btn-export-report:hover {
+  background-color: #16a085;
+  color: #fff;
+  transform: translateY(-1px); /* Hiệu ứng nhấc lên nhẹ */
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+.btn-export-csv:active, .btn-export-report:active {
+    transform: translateY(0px);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+
+/* --- Loading & Error States --- */
+.loading-indicator, .error-message, .placeholder-tab {
+  text-align: center; padding: 50px 20px; font-size: 1.15em;
+  color: #5a6a7b; background-color: #fff; border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+  min-height: 200px; /* Chiều cao tối thiểu để không bị xẹp khi loading */
+  display: flex; align-items: center; justify-content: center;
+}
+.error-message {
+  color: #e74c3c; /* Màu đỏ cho lỗi */
   font-weight: 500;
 }
-.summary-card .summary-item.profit span:last-child {
-  font-weight: bold;
-  color: #28a745; /* Green for profit */
-  font-size: 1.1em;
-}
 
 
-/* Chart Card Styling */
-.chart-card {
-  height: 100%;  /* Đảm bảo card chart chiếm đủ chiều cao nếu cần */
-}
-.chart-card h4 {
-  margin-bottom: 15px;
-  font-size: 1.2em;
-  color: #333;
-  font-weight: 600;
-}
-.chart-container {
-  height: 420px; /* Chiều cao cố định cho biểu đồ, điều chỉnh nếu cần */
-  position: relative; /* Cần thiết cho Chart.js responsive */
-}
-
-
-/* Placeholder for inactive tabs */
-.placeholder-tab {
-  padding: 50px;
-  text-align: center;
-  font-size: 1.2em;
-  color: #777;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-}
-
-/* Responsive Adjustments */
-@media (max-width: 1200px) {
-  .stats-content-grid {
-    grid-template-columns: 300px 1fr; /* Thu nhỏ cột card */
+/* --- Responsive Adjustments --- */
+@media (max-width: 1300px) { /* Điều chỉnh breakpoint cho grid 2 cột */
+  .ranking-grid, .trends-grid {
+    grid-template-columns: 1fr; /* Xếp chồng sớm hơn nếu nội dung quá rộng */
   }
 }
 
 @media (max-width: 992px) {
   .stats-content-grid {
-    grid-template-columns: 1fr; /* Xếp chồng lên nhau trên màn hình nhỏ hơn */
+    grid-template-columns: 1fr;
   }
-  .stats-chart-column {
-    margin-top: 20px; /* Khoảng cách khi xếp chồng */
-  }
-  .chart-container {
-    height: 350px; /* Giảm chiều cao chart trên tablet */
-  }
+  .stats-chart-column { margin-top: 25px; }
+  .chart-container { height: 380px; } /* Điều chỉnh lại */
 }
 
 @media (max-width: 768px) {
-  .statistics-filters {
-    flex-direction: column; /* Filter xếp chồng trên mobile */
-    align-items: stretch;
-  }
-  .filter-select {
-    width: 100%;
-  }
-  .chart-container {
-    height: 300px; /* Giảm chiều cao chart trên mobile */
-  }
-  .statistics-tabs {
-    overflow-x: auto; /* Cho phép cuộn ngang các tab nếu không đủ chỗ */
-    white-space: nowrap; /* Ngăn tab xuống dòng */
-  }
-  .tab-button {
-    flex-shrink: 0; /* Ngăn tab co lại */
-  }
+  .statistics-page-container { padding: 15px; margin: 15px auto; }
+  .statistics-header h2 { font-size: 1.6em; padding: 15px; }
+  .statistics-tabs { padding: 0 15px; overflow-x: auto; white-space: nowrap; }
+  .tab-button { padding: 12px 18px; font-size: 1em; margin-right: 5px;}
+  .statistics-filters { flex-direction: column; align-items: stretch; padding: 15px; gap: 12px;}
+  .filter-select { width: 100%; }
+  .stats-content-grid { grid-template-columns: 1fr; gap: 20px; } /* Đã có ở trên */
+  .chart-container { height: 320px; }
+  .ranking-grid, .trends-grid { grid-template-columns: 1fr; gap: 20px; } /* Đã có ở trên */
+  .ranking-chart-container { height: 200px; }
+  .trends-chart-container { height: 250px; }
+  .ranking-table { font-size: 0.9em; }
+  .ranking-table th, .ranking-table td { padding: 8px; }
+  .card-header-with-actions { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .card-header-with-actions h4 { margin-bottom: 10px; width: 100%; }
+  .btn-export-csv { width: 100%; text-align: center; }
 }
 
-/* Thêm vào cuối file pages/Statistics/Statistics.css */
-
-/* --- Ranking Tab Styles --- */
-.ranking-tab-container, .trends-tab-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.ranking-filters-info, .trends-filters-info { /* Hiển thị thông tin filter trên đầu tab */
-  background-color: #fff;
-  padding: 10px 15px;
-  border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-  display: flex;
-  gap: 15px;
-  font-weight: 500;
-  color: #333;
-}
-
-.ranking-grid, .trends-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); /* Responsive 2 cột */
-  gap: 20px;
-}
-
-.ranking-card h4, .trends-card h4 {
-  margin-bottom: 15px;
-  font-size: 1.2em;
-  color: #333;
-  font-weight: 600;
-  text-align: center;
-}
-
-.ranking-chart-container {
-  height: 220px; /* Điều chỉnh chiều cao biểu đồ tròn */
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.ranking-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9em;
-}
-.ranking-table th, .ranking-table td {
-  border: 1px solid #e9ecef;
-  padding: 8px 10px;
-  text-align: left;
-}
-.ranking-table th {
-  background-color: #f8f9fa;
-  font-weight: 600;
-}
-.ranking-table td:last-child, .ranking-table th:last-child {
-  text-align: right; /* Căn phải cột số liệu cuối */
-}
-
-/* --- Trends Tab Styles --- */
-.trends-chart-container {
-  height: 280px; /* Điều chỉnh chiều cao biểu đồ cột */
-  margin-bottom: 20px;
-}
-
-
-/* Loading Indicator */
-.loading-indicator {
-  text-align: center;
-  padding: 40px;
-  font-size: 1.1em;
-  color: #555;
-}
-
-.card-header-with-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px; /* Giữ lại margin nếu cần */
-}
-.card-header-with-actions h4 {
-  margin: 0; /* Loại bỏ margin mặc định của h4 */
-}
-
-.btn-export-csv, .btn-export-report {
-  padding: 6px 12px;
-  font-size: 0.85em;
-  font-weight: 500;
-  color: #fff;
-  background-color: #198754; /* Màu xanh lá cây cho export */
-  border: 1px solid #198754;
-  border-radius: 4px;
-  text-decoration: none; /* Cho CSVLink */
-  cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-.btn-export-csv:hover, .btn-export-report:hover {
-  background-color: #157347;
-  border-color: #146c43;
-  color: #fff;
-}
-
-.report-export-section {
-  margin-top: 20px; /* Khoảng cách với bảng phía trên */
-  text-align: right; /* Căn phải nút xuất báo cáo */
+@media (max-width: 480px) {
+  .statistics-header h2 { font-size: 1.4em; }
+  .tab-button { padding: 10px 15px; font-size: 0.95em; }
+  .breakdown-item .percentage { font-size: 1.5em; }
+  .chart-container { height: 280px; }
 }
