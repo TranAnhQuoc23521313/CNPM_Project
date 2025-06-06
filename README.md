@@ -48,8 +48,8 @@ Thành viên thực hiện:
 ```mermaid
 graph TD
     %% ----- Actors (Người dùng) -----
-    user("👨‍💻<br>Staff")
-    admin("👑<br>Admin")
+    user("👨‍💻<br>Người dùng")
+    admin("👑<br>Quản trị viên")
 
     %% ----- External Systems (Hệ thống bên ngoài) -----
     email_service["✉️<br>Dịch vụ Email<br>(Nodemailer, SendGrid...)"]
@@ -63,13 +63,13 @@ graph TD
         
         api["<b>Backend API (Server)</b><br><i>Công nghệ: Node.js, Express.js</i><br>Xử lý logic, nghiệp vụ, xác thực và quản lý dữ liệu."]
         
-        db[("<b>Database</b><br><i>(Cần xác nhận: MySql)</i><br>Lưu trữ dữ liệu ứng dụng.")]
+        db[("<b>Database</b><br><i>(Cần xác nhận: MongoDB/Postgres?)</i><br>Lưu trữ dữ liệu ứng dụng.")]
 
     end
 
     %% ----- Connections (Các luồng tương tác) -----
     
-    %% User <-> Frontend
+    %% User -> Frontend
     user -- "Sử dụng trình duyệt (HTTPS)" --> webapp
     admin -- "Sử dụng trình duyệt (HTTPS)" --> webapp
 
@@ -79,4 +79,3 @@ graph TD
     %% Backend -> Other Services
     api -- "Đọc/Ghi dữ liệu (SQL/NoSQL)" --> db
     api -- "Gửi email (SMTP/API)" --> email_service
-
