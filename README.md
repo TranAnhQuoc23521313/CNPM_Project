@@ -35,7 +35,7 @@ Thành viên thực hiện:
 
 - server/config dùng để thiết lập liên kết database
 - server/controller điều kiển các thao tác và gửi yêu cầu cần thực hiện truy vấn đến services
-- server/middleware dùng để thực hiện các thao tác liên quan đến lưu trữ / xóa các file ảnh, poster, ... ( cần chứa trên đồ án do database quản lý = link )
+- server/middleware dùng để thực hiện các thao tác liên quan đến lưu trữ / xóa các file ảnh, poster khi được đóng gói bằng FormData ở client, đồng thời phân luồng api theo hoạt động của các user dựa trên token đăng nhập của tài khoản
 - server/repositories dùng để nhận tín hiệu từ server/service để thực hiện truy vấn vào database
 - server/routes nhận tính hiệu từ server.js sau đó lựa chọn thao thác phù hợp cho yêu cầu và gửi đến Controller
 - server/services nhận yêu cầu từ controller và chuyển tiếp đến Repositories để thực hiện yêu cầu.
