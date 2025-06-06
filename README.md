@@ -47,35 +47,34 @@ Thành viên thực hiện:
 
 ```mermaid
 graph TD
-    %% ----- Actors (Người dùng) -----
-    user("👨‍💻<br>Người dùng")
-    admin("👑<br>Quản trị viên")
-
-    %% ----- External Systems (Hệ thống bên ngoài) -----
-    email_service["✉️<br>Dịch vụ Email<br>(Nodemailer, SendGrid...)"]
-
-    %% ----- Your System Boundary (Hộp chứa hệ thống của bạn) -----
-    subgraph "Hệ thống CNPM Project"
+    %% ----- Actors & Client -----
+    subgraph "Phía Người Dùng"
         direction LR
+        actors["<b>Actors</b><br>Admin / Staff"]
+        client_app["<b>React Application (Client)</b>"]
+    end
+    
+    actors -- "Sử dụng" --> client_app
 
-        %% ----- Containers (Các thành phần chính của bạn) -----
-        webapp["<b>Web Application (Client)</b><br><i>Công nghệ: React.js, Tailwind CSS</i><br>Giao diện người dùng chạy trên trình duyệt."]
-        
-        api["<b>Backend API (Server)</b><br><i>Công nghệ: Node.js, Express.js</i><br>Xử lý logic, nghiệp vụ, xác thực và quản lý dữ liệu."]
-        
-        db[("<b>Database</b><br><i>(MySQL)</i><br>Lưu trữ dữ liệu ứng dụng.")]
+    %% ----- Server - The N-Tier Architecture -----
+    subgraph "Server (Kiến trúc Đa tầng)"
+        direction TB
 
+        %% Define the layers
+        routes["<b>1. Lớp Định tuyến (Routes Layer)</b><br><i>/routes</i><br>Tiếp nhận và điều hướng HTTP Request"]
+        middlewares["<b>2. Lớp Trung gian (Middleware Layer)</b><br><i>/middleware</i><br>Xác thực, Ghi log, Xử lý lỗi"]
+        controllers["<b>3. Lớp Điều khiển (Controller Layer)</b><br><i>/controllers</i><br>Điều phối Request và Response"]
+        services["<b>4. Lớp Nghiệp vụ (Service Layer)</b><br><i>/services</i><br>Thực thi Business Logic cốt lõi"]
+        repositories["<b>5. Lớp Truy cập Dữ liệu (Repository Layer)</b><br><i>/repositories</i><br>Trừu tượng hóa việc truy vấn Database"]
+        db[("<b>6. Lớp Dữ liệu (Data Layer)</b><br>Hệ quản trị CSDL")]
+
+        %% Define the flow through layers
+        routes --> middlewares
+        middlewares --> controllers
+        controllers --> services
+        services --> repositories
+        repositories --> db
     end
 
-    %% ----- Connections (Các luồng tương tác) -----
-    
-    %% User -> Frontend
-    user -- "Sử dụng trình duyệt (HTTPS)" --> webapp
-    admin -- "Sử dụng trình duyệt (HTTPS)" --> webapp
-
-    %% Frontend -> Backend
-    webapp -- "Gọi API (REST/GraphQL, JSON)" --> api
-
-    %% Backend -> Other Services
-    api -- "Đọc/Ghi dữ liệu (SQL/NoSQL)" --> db
-    api -- "Gửi email (SMTP/API)" --> email_service
+    %% ----- Connect Client to Server -----
+    client_app -- "Gửi API Request" --> routes
