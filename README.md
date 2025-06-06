@@ -40,3 +40,42 @@ Thành viên thực hiện:
 - server/routes nhận tính hiệu từ server.js sau đó lựa chọn thao thác phù hợp cho yêu cầu và gửi đến Controller
 - server/services nhận yêu cầu từ controller và chuyển tiếp đến Repositories để thực hiện yêu cầu.
 - server.js nhận tín hiệu giao tiếp giữa các PORT sau đó truyền tín hiệu cho routes để thực hiện các yêu cầu gửi từ client
+
+# Sơ đồ kiến trúc của ứng dụng
+
+### Sơ đồ Kiến trúc Hệ thống - CNPM Project
+
+```mermaid
+graph TD
+    %% ----- Actors (Người dùng) -----
+    user("👨‍💻<br>Người dùng")
+    admin("👑<br>Quản trị viên")
+
+    %% ----- External Systems (Hệ thống bên ngoài) -----
+    email_service["✉️<br>Dịch vụ Email<br>(Nodemailer, SendGrid...)"]
+
+    %% ----- Your System Boundary (Hộp chứa hệ thống của bạn) -----
+    subgraph "Hệ thống CNPM Project"
+        direction LR
+
+        %% ----- Containers (Các thành phần chính của bạn) -----
+        webapp["<b>Web Application (Client)</b><br><i>Công nghệ: React.js, Tailwind CSS</i><br>Giao diện người dùng chạy trên trình duyệt."]
+        
+        api["<b>Backend API (Server)</b><br><i>Công nghệ: Node.js, Express.js</i><br>Xử lý logic, nghiệp vụ, xác thực và quản lý dữ liệu."]
+        
+        db[("<b>Database</b><br><i>(Cần xác nhận: MongoDB/Postgres?)</i><br>Lưu trữ dữ liệu ứng dụng.")]
+
+    end
+
+    %% ----- Connections (Các luồng tương tác) -----
+    
+    %% User -> Frontend
+    user -- "Sử dụng trình duyệt (HTTPS)" --> webapp
+    admin -- "Sử dụng trình duyệt (HTTPS)" --> webapp
+
+    %% Frontend -> Backend
+    webapp -- "Gọi API (REST/GraphQL, JSON)" --> api
+
+    %% Backend -> Other Services
+    api -- "Đọc/Ghi dữ liệu (SQL/NoSQL)" --> db
+    api -- "Gửi email (SMTP/API)" --> email_service
