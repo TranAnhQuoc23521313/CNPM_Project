@@ -45,59 +45,38 @@ Thành viên thực hiện:
 
 ### Sơ đồ Kiến trúc Hệ thống - CNPM Project
 
+```mermaid
 graph TD
-    %% ----- Actors (Người dùng với các vai trò khác nhau) -----
-    admin("👑<br>Quản trị viên")
-    staff("👩‍💼<br>Nhân viên")
+    %% ----- Actors (Người dùng) -----
+    user("👨‍💻<br>Staff")
+    admin("👑<br>Admin")
 
-    subgraph "Máy tính của người dùng"
-        browser["🌐<br>Trình duyệt Web"]
-    end
-    
-    %% ----- CLIENT (Chạy trên trình duyệt) -----
-    subgraph "CLIENT<br>(Code trong thư mục /client)"
-        style CLIENT fill:#D2E9FF,stroke:#333,stroke-width:2px
+    %% ----- External Systems (Hệ thống bên ngoài) -----
+    email_service["✉️<br>Dịch vụ Email<br>(Nodemailer, SendGrid...)"]
+
+    %% ----- Your System Boundary (Hộp chứa hệ thống của bạn) -----
+    subgraph "Hệ thống CNPM Project"
+        direction LR
+
+        %% ----- Containers (Các thành phần chính của bạn) -----
+        webapp["<b>Web Application (Client)</b><br><i>Công nghệ: React.js, Tailwind CSS</i><br>Giao diện người dùng chạy trên trình duyệt."]
         
-        subgraph "React Application"
-            direction LR
-            
-            client_router["<b>Routing</b><br><i>(react-router-dom)</i><br>Điều hướng giữa các trang Login, Admin, Staff"]
-            client_views["<b>Views / Pages</b><br><i>(src/admin, src/staff)</i><br>Các trang quản lý, chứa logic nghiệp vụ phía client"]
-            client_components["<b>UI Components</b><br>Các thành phần giao diện tái sử dụng"]
-            client_services["<b>API Services</b><br><i>(services)</i><br>Gọi API đến Server"]
-        end
-    end
-    
-    %% ----- SERVER (Chạy trên máy chủ) -----
-    subgraph "SERVER<br>(Code trong thư mục /server)"
-        style SERVER fill:#E2D2FF,stroke:#333,stroke-width:2px
+        api["<b>Backend API (Server)</b><br><i>Công nghệ: Node.js, Express.js</i><br>Xử lý logic, nghiệp vụ, xác thực và quản lý dữ liệu."]
+        
+        db[("<b>Database</b><br><i>(Cần xác nhận: MySql)</i><br>Lưu trữ dữ liệu ứng dụng.")]
 
-        subgraph "Node.js API Server"
-            direction TB
-            
-            server_routes["<b>Routes</b><br>Định nghĩa các endpoint API"]
-            server_middlewares["<b>Middlewares</b><br>Xác thực token, xử lý lỗi"]
-            server_controllers["<b>Controllers</b><br>Nhận request, gọi services"]
-            server_services["<b>Services</b><br>Thực thi logic nghiệp vụ chính"]
-            server_repositories["<b>Repositories</b><br>Trừu tượng hóa truy vấn CSDL"]
-        end
-
-        database[("<b>Database</b><br><i>(MongoDB, PostgreSQL)</i>")]
     end
 
-    %% ----- Define Relationships -----
-    admin -- "Sử dụng" --> browser
-    staff -- "Sử dụng" --> browser
+    %% ----- Connections (Các luồng tương tác) -----
+    
+    %% User <-> Frontend
+    user -- "Sử dụng trình duyệt (HTTPS)" --> webapp
+    admin -- "Sử dụng trình duyệt (HTTPS)" --> webapp
 
-    browser -- "Tải và chạy" --> client_router
-    client_router -- "Render" --> client_views
-    client_views -- "Sử dụng" --> client_components
-    client_views -- "Gọi hàm" --> client_services
-    
-    client_services -- "<b>Gửi HTTP Request</b>" --> server_routes
-    
-    server_routes --> server_middlewares
-    server_middlewares --> server_controllers
-    server_controllers --> server_services
-    server_services --> server_repositories
-    server_repositories -- "Đọc/Ghi dữ liệu" --> database
+    %% Frontend -> Backend
+    webapp -- "Gọi API (REST/GraphQL, JSON)" --> api
+
+    %% Backend -> Other Services
+    api -- "Đọc/Ghi dữ liệu (SQL/NoSQL)" --> db
+    api -- "Gửi email (SMTP/API)" --> email_service
+
