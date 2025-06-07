@@ -14,7 +14,7 @@ class ShowtimeController {
             // Ghép date và time từ client
             const { MAPHIM, MAPHONG, date, time, GIASUATCHIEU, TRANGTHAI } = req.body;
             if (!date || !time) {
-                const error = new Error('Date and Time are required for showtime.');
+                const error = new Error('Ngày tháng và thời gian là bắt buộc');
                 error.statusCode = 400;
                 throw error;
             }

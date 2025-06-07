@@ -6,6 +6,7 @@ import EditCustomerModal from './EditCustomerModal.jsx';
 import CustomerDetailModal from './CustomerDetailModal.jsx';
 import SuccessMessageModal from '../../../components/common/SuccessMessageModal';
 import ErrorMessageModal from '../../../components/common/ErrorMessageModal';
+import ConfirmationDialog from '../../../components/common/ConfirmationDialog.jsx'; // << THÊM IMPORT
 
 // Import API services
 import {
@@ -27,15 +28,14 @@ function Customers() {
 
   const [customerToEdit, setCustomerToEdit] = useState(null);
   const [customerToView, setCustomerToView] = useState(null);
+  const [customerToDelete, setCustomerToDelete] = useState(null); // << THÊM STATE MỚI
 
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  // const [pendingNavigation, setPendingNavigation] = useState(null); // Không cần ở đây
 
   const fetchCustomers = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    // Không reset errorMessage ở đây, vì nó có thể là kết quả của một action trước đó
     try {
       const data = await getAllCustomersApi(searchTerm);
       setCustomers(data || []);
@@ -49,10 +49,9 @@ function Customers() {
 
   useEffect(() => {
     fetchCustomers();
-  }, []); // Phụ thuộc vào fetchCustomers để chạy lại khi searchTerm thay đổi
+  }, [fetchCustomers]); // Đổi dependency thành fetchCustomers
 
   const handleUpdateCustomer = async (updatedCustomerDataFromModal) => {
-    console.log("Customers.jsx: handleUpdateCustomer called with:", updatedCustomerDataFromModal);
     setIsActionLoading(true);
     setSuccessMessage('');
     setErrorMessage('');
@@ -62,45 +61,19 @@ function Customers() {
         email: updatedCustomerDataFromModal.email,
         phone: updatedCustomerDataFromModal.phone,
       };
-      // Giả sử API trả về customer đã được cập nhật đầy đủ
       const updatedCustomerFromServer = await updateCustomerApi(updatedCustomerDataFromModal.id, payloadForApi);
       
-      // Cập nhật customer list với thông tin mới từ updatedCustomerFromServer
-      // API của bạn có thể trả về cấu trúc khác, ví dụ: { success: true, message: "...", customer: {...} }
-      // Nếu API trả về { success: true, customer: {...} }:
-      // if (updatedCustomerFromServer.success && updatedCustomerFromServer.customer) {
-      //   setCustomers(prevCustomers =>
-      //     prevCustomers.map(cust =>
-      //       cust.id === updatedCustomerFromServer.customer.id ? updatedCustomerFromServer.customer : cust
-      //     )
-      //   );
-      //   setSuccessMessage(updatedCustomerFromServer.message || `Cập nhật thông tin khách hàng "${updatedCustomerFromServer.customer.name || updatedCustomerFromServer.customer.HoTen}" thành công!`);
-      // } else { 
-      //   // Xử lý trường hợp API không trả về customer như mong đợi hoặc success: false
-      //   setErrorMessage(updatedCustomerFromServer.message || "Lỗi cập nhật: Dữ liệu trả về không hợp lệ.");
-      //   return; // Ngăn đóng modal nếu có lỗi logic từ API
-      // }
-
-      // Nếu API trả về trực tiếp customer object đã cập nhật:
       setCustomers(prevCustomers =>
         prevCustomers.map(cust =>
-          // If the API returns the full updated object, use it. Otherwise, merge.
-          // For now, let's assume updatedCustomerFromServer might not be the full customer object
-          // or might not even be returned if the API is a 204 No Content or simple success.
-          // The safest is to update based on what was sent, if the API response isn't detailed.
-          // However, the current code *expects* updatedCustomerFromServer to be the full object for list update.
-          // If API just returns success, we'd need to merge updatedCustomerDataFromModal with existing customer.
-          // For now, assuming API returns the updated object:
           cust.id === updatedCustomerFromServer.id ? updatedCustomerFromServer : cust
         )
       );
-      // Use the name from the data submitted to the modal, as the API response might not contain it.
       setSuccessMessage(`Thông tin khách hàng "${updatedCustomerDataFromModal.name}" đã được cập nhật.`);
       
-      setShowEditModal(false); // Đóng modal khi thành công
+      setShowEditModal(false); 
       setCustomerToEdit(null);
 
-      await fetchCustomers(); // Refetch to ensure data consistency, especially if API response was minimal
+      await fetchCustomers();
 
     } catch (err) {
       console.error("Error updating customer:", err);
@@ -111,50 +84,41 @@ function Customers() {
         errMsg = err.message;
       }
       setErrorMessage(errMsg);
-      // Không đóng modal edit khi lỗi để người dùng sửa
     } finally {
       setIsActionLoading(false);
-      // Không nên gọi setIsLoading(false) ở đây vì đây là isActionLoading
-      // Không đóng modal ở finally nếu có lỗi, chỉ đóng khi thành công (đã làm ở trên)
     }
   };
 
-  const handleDeleteCustomer = async (customerId, customerName) => { // customerName đã được truyền vào
-    if (window.confirm(`Bạn có chắc chắn muốn xóa khách hàng "${customerName}" (ID: ${customerId})? Hành động này không thể hoàn tác.`)) {
-      setIsActionLoading(true);
-      setSuccessMessage('');
-      setErrorMessage('');
-      try {
-        // Giả sử API của bạn không trả về gì nếu thành công, hoặc throw lỗi nếu thất bại
-        // Hoặc API trả về { success: true/false, message: "..." }
-        await deleteCustomerApi(customerId); 
-        
-        setCustomers(prevCustomers => prevCustomers.filter(cust => cust.id !== customerId));
-        setSuccessMessage(`Khách hàng "${customerName}" (ID: ${customerId}) đã được xóa thành công.`);
-        
-        // Nếu API trả về result object:
-        // const result = await deleteCustomerApi(customerId);
-        // if (result.success) {
-        //   setCustomers(prevCustomers => prevCustomers.filter(cust => cust.id !== customerId));
-        //   setSuccessMessage(result.message || `Khách hàng "${customerName}" (ID: ${customerId}) đã được xóa thành công.`);
-        // } else {
-        //   setErrorMessage(result.message || `Lỗi khi xóa khách hàng "${customerName}".`);
-        // }
+  // << HÀM XÓA ĐÃ ĐƯỢC CẬP NHẬT >>
+  const handleDeleteCustomer = async () => {
+    if (!customerToDelete) return; // Không làm gì nếu không có khách hàng nào được chọn để xóa
 
-      } catch (err) {
-        console.error("Error deleting customer:", err);
-        let errMsg = `Lỗi khi xóa khách hàng "${customerName}". Vui lòng thử lại.`;
-        if (err.response && err.response.data && err.response.data.message) {
-            errMsg = err.response.data.message;
-        } else if (err.message) {
-            errMsg = err.message;
-        }
-        setErrorMessage(errMsg);
-      } finally {
-        setIsActionLoading(false);
+    const { id: customerId, name: customerName } = customerToDelete;
+
+    setIsActionLoading(true);
+    setSuccessMessage('');
+    setErrorMessage('');
+    try {
+      await deleteCustomerApi(customerId);
+      
+      setCustomers(prevCustomers => prevCustomers.filter(cust => cust.id !== customerId));
+      setSuccessMessage(`Khách hàng "${customerName}" (ID: ${customerId}) đã được xóa thành công.`);
+
+    } catch (err) {
+      console.error("Error deleting customer:", err);
+      let errMsg = `Lỗi khi xóa khách hàng "${customerName}". Vui lòng thử lại.`;
+      if (err.response && err.response.data && err.response.data.message) {
+          errMsg = err.response.data.message;
+      } else if (err.message) {
+          errMsg = err.message;
       }
+      setErrorMessage(errMsg);
+    } finally {
+      setIsActionLoading(false);
+      setCustomerToDelete(null); // Đóng hộp thoại xác nhận sau khi hoàn tất
     }
   };
+
 
   const openEditModal = (customer) => {
     const customerForEdit = {
@@ -167,7 +131,7 @@ function Customers() {
     };
     setCustomerToEdit(customerForEdit);
     setShowEditModal(true);
-    setErrorMessage(''); // Xóa lỗi cũ khi mở modal edit
+    setErrorMessage('');
   };
 
   const openDetailModal = (customer) => {
@@ -185,18 +149,14 @@ function Customers() {
     setCustomerToView(customerForView);
     setShowDetailModal(true);
   };
-
-  const filteredCustomers = customers.filter(customer =>
-    (customer.name && customer.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (customer.id && String(customer.id).toLowerCase().includes(searchTerm.toLowerCase())) || // Đã sửa
-    (customer.email && customer.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (customer.phone && customer.phone.includes(searchTerm)) ||
-    (customer.membershipTier && customer.membershipTier.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
   
+  // Do fetchCustomers đã xử lý searchTerm, việc filter ở client là không cần thiết nữa
+  // và có thể gây nhầm lẫn. Bỏ filteredCustomers để hiển thị trực tiếp state `customers`
+  // là kết quả từ API.
+  // const filteredCustomers = customers.filter(...);
+
   const handleCloseSuccessModal = () => {
     setSuccessMessage('');
-    // Bỏ pendingNavigation vì không dùng ở đây
   };
 
   const handleCloseErrorModal = () => {
@@ -216,11 +176,11 @@ function Customers() {
     }
   };
 
-  if (isLoading && customers.length === 0 && !error && !searchTerm) { // Điều kiện loading ban đầu
+  if (isLoading && customers.length === 0 && !error && !searchTerm) {
     return <div className="customers-page-container"><p className="loading-text">Đang tải dữ liệu khách hàng...</p></div>;
   }
 
-  if (error && customers.length === 0) { // Lỗi fetch ban đầu và không có dữ liệu
+  if (error && customers.length === 0) {
     return <div className="customers-page-container"><p className="error-text" style={{ color: 'red' }}>Lỗi: {error}</p></div>;
   }
 
@@ -231,35 +191,27 @@ function Customers() {
       <div className="customer-controls">
         <input
           type="text"
-          placeholder="Tìm kiếm (ID, tên, email, SĐT...)"
+          placeholder="Tìm kiếm theo ID, tên, email, SĐT..."
           className="search-input"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          disabled={isActionLoading || isLoading} // Vô hiệu hóa khi đang action hoặc fetch
+          disabled={isActionLoading || isLoading}
         />
-        {/* 
-        <Button onClick={() => {
-          // setShowAddModal(true); 
-          // setErrorMessage(''); // Xóa lỗi cũ khi mở modal thêm
-        }} 
-        className="btn-add" 
-        disabled={isActionLoading || isLoading}> 
-          + Thêm Khách Hàng Mới
+        <Button onClick={fetchCustomers} className="btn-search" disabled={isActionLoading || isLoading}>
+          Tìm kiếm
         </Button>
-        */}
       </div>
 
       {isActionLoading && <p className="loading-text action-loading-text">Đang xử lý...</p>}
-      {isLoading && searchTerm && !isActionLoading && <p className="loading-text">Đang tìm kiếm...</p>}
+      {isLoading && !isActionLoading && <p className="loading-text">Đang tải...</p>}
 
-
-      {!isLoading && filteredCustomers.length === 0 && (
+      {!isLoading && customers.length === 0 && (
         <p className="no-customers-message">
           {searchTerm ? "Không tìm thấy khách hàng phù hợp." : "Chưa có dữ liệu khách hàng."}
         </p>
       )}
       
-      {!isLoading && filteredCustomers.length > 0 && (
+      {!isLoading && customers.length > 0 && (
         <table className="customer-list-table">
           <thead>
             <tr>
@@ -273,7 +225,7 @@ function Customers() {
             </tr>
           </thead>
           <tbody>
-            {filteredCustomers.map(customer => (
+            {customers.map(customer => (
               <tr key={customer.id}>
                 <td>{customer.id}</td>
                 <td>{customer.name}</td>
@@ -299,7 +251,8 @@ function Customers() {
                       Sửa
                   </Button>
                   <Button 
-                    onClick={() => handleDeleteCustomer(customer.id, customer.name)} 
+                    // << CẬP NHẬT ONCLICK ĐỂ MỞ HỘP THOẠI >>
+                    onClick={() => setCustomerToDelete({ id: customer.id, name: customer.name })} 
                     className="btn-delete" 
                     variant="danger" 
                     size="small"
@@ -313,26 +266,14 @@ function Customers() {
         </table>
       )}
 
-      {/* 
-      {showAddModal && (
-        <AddCustomerModal
-          onClose={() => {
-            setShowAddModal(false);
-            setErrorMessage(''); 
-          }}
-          onSave={handleAddCustomer} 
-          isSaving={isActionLoading}
-        />
-      )} 
-      */}
-
+      {/* MODALS */}
       {showEditModal && customerToEdit && (
         <EditCustomerModal
           customerData={customerToEdit}
           onClose={() => {
             setShowEditModal(false);
             setCustomerToEdit(null);
-            setErrorMessage(''); // Xóa lỗi khi người dùng chủ động đóng modal
+            setErrorMessage('');
           }}
           onSave={handleUpdateCustomer}
           isSaving={isActionLoading}
@@ -346,6 +287,25 @@ function Customers() {
             setShowDetailModal(false);
             setCustomerToView(null);
           }}
+        />
+      )}
+      
+      {/* << THÊM COMPONENT HỘP THOẠI XÁC NHẬN >> */}
+      {customerToDelete && (
+        <ConfirmationDialog
+          isOpen={!!customerToDelete}
+          onClose={() => setCustomerToDelete(null)} // Đóng modal khi nhấn hủy
+          onConfirm={handleDeleteCustomer} // Gọi hàm xóa khi xác nhận
+          title="Xác nhận xóa khách hàng"
+          message={
+            <span>
+              Bạn có chắc chắn muốn xóa khách hàng <strong>"{customerToDelete.name}"</strong> (ID: {customerToDelete.id})? 
+              <br/>
+              Hành động này không thể hoàn tác.
+            </span>
+          }
+          confirmButtonText="Xác nhận Xóa"
+          isLoading={isActionLoading}
         />
       )}
 

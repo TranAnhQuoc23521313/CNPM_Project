@@ -11,7 +11,7 @@ import SuccessMessageModal from '../../../components/common/SuccessMessageModal.
 import ErrorMessageModal from '../../../components/common/ErrorMessageModal.jsx';
 
 import { getAllTransactionHistory, createTransactionHistory } from '../../../services/transactionhistoryApiService.js';
-import { getAllOrdersApi } from '../../../services/orderApiService'; // <<<<===== IMPORT API LẤY HÓA ĐƠN
+import { getAllOrdersApi } from '../../../services/orderApiService';
 
 
 // Helper functions
@@ -39,12 +39,6 @@ const mapEmployeeApiToClient = (apiEmployee) => ({
   sex: apiEmployee.GIOITINH,
   address: apiEmployee.DIACHI,
   salary: apiEmployee.LUONG,
-  // Thông tin tài khoản
-  /* accountId: apiEmployee.MATK, // Mã tài khoản
-  username: apiEmployee.TENDANGNHAP, // Tên đăng nhập
-  password: apiEmployee.MATKHAU, // Mật khẩu text thuần từ API
-  role: apiEmployee.ROLE_DANGNHAP, // Vai trò
-  mockToken: apiEmployee.TOKEN_MOCK // Token cố định */
 });
 
 const mapTransactionHistoryApiToClient = (apiTransactionHistory) => ({
@@ -63,146 +57,99 @@ const mapTransactionHistoryApiToClient = (apiTransactionHistory) => ({
 });
 
 const mapApiOrderToCustomerInvoiceForDisplay = (apiOrder) => {
-  // apiOrder từ OrderService.getAllOrders có dạng:
-  // { MAHOADON, NGAYTAOHD, TONGTIEN, TRANGTHAITHANHTOAN, HINHTHUCTHANHTOAN, MANV, MAKH,
-  //   KhachHang: { HOTEN, SODT },
-  //   Phim: { TENPHIM },
-  //   SuatChieu: { PhongChieu: { TENPHONG }, THOIGIAN }
-  // }
-  // Bạn cần map nó sang dạng CustomerInvoiceDetailModal mong đợi:
-  // { id, date, customerName, customerId, employeeName (cần fetch thêm), totalAmount, items, paymentMethod, status }
-
-  // Tạm thời, 'items' sẽ là tên phim và phòng chiếu, 'employeeName' sẽ là MANV
-  // Để có employeeName đầy đủ, bạn cần join hoặc fetch thêm ở backend, hoặc map ở client nếu có danh sách nhân viên
   let itemsDescription = 'N/A';
   if (apiOrder.Phim?.TENPHIM && apiOrder.SuatChieu?.PhongChieu?.TENPHONG) {
     itemsDescription = `${apiOrder.Phim.TENPHIM} (Phòng: ${apiOrder.SuatChieu.PhongChieu.TENPHONG})`;
   } else if (apiOrder.Phim?.TENPHIM) {
     itemsDescription = apiOrder.Phim.TENPHIM;
   }
-  // Để lấy tên nhân viên, chúng ta sẽ dùng getEmployeeNameDisplay đã có
-  // nhưng nó cần danh sách employeesList. Trong hàm map này, chúng ta chưa có.
-  // Vì vậy, handleViewCustomerInvoiceDetail sẽ phải bổ sung tên nhân viên.
 
   return {
     id: apiOrder.MAHOADON,
-    date: apiOrder.NGAYTAOHD, // NGAYTAOHD là ngày hóa đơn được tạo
+    date: apiOrder.NGAYTAOHD,
     customerName: apiOrder.KhachHang?.HOTEN || 'Khách vãng lai',
     customerId: apiOrder.MAKH || null,
-    employeeId: apiOrder.MANV, // Sẽ dùng để lấy tên nhân viên sau
-    employeeName: apiOrder.MANV, // Tạm thời hiển thị MANV, sẽ được cập nhật
+    employeeId: apiOrder.MANV,
+    employeeName: apiOrder.MANV,
     totalAmount: apiOrder.TONGTIEN,
-    items: itemsDescription, // Mô tả chung về phim/suất chiếu
+    items: itemsDescription,
     paymentMethod: apiOrder.HINHTHUCTHANHTOAN,
     status: apiOrder.TRANGTHAITHANHTOAN,
-    // Thêm các trường gốc từ API nếu CustomerInvoiceDetailModal cần (ví dụ để gọi API chi tiết hơn sau này)
-    apiOrderData: apiOrder // Lưu lại dữ liệu gốc từ API nếu cần
+    apiOrderData: apiOrder
   };
 };
 
 const generateId = (prefix = 'TRX') => `${prefix}-${Date.now().toString().slice(-6)}${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
 
-// Dữ liệu mẫu
-/* const MOCK_EMPLOYEES = [
-  { id: 'NV001', name: 'Nguyễn Văn An' }, { id: 'NV002', name: 'Trần Thị Bình' }, { id: 'NV003', name: 'Lê Văn Cường' },
-]; */
-
-/* const INITIAL_BUSINESS_TRANSACTIONS = [
-  { id: generateId('DN'), date: '2023-11-01', type: 'expense', description: 'Chi phí tiền điện tháng 10', costs: 5500000, category: 'Vận hành', employeeId: 'NV003', employeeName: 'Lê Văn Cường', referenceId: 'HD-DIEN-1023', invoiceImageName: null },
-  { id: generateId('DN'), date: '2023-11-05', type: 'income', description: 'Thu từ cho thuê mặt bằng quảng cáo', costs: 10000000, category: 'Thu khác', employeeId: 'NV003', employeeName: 'Lê Văn Cường', referenceId: 'HD-QC-1123', invoiceImageName: 'qc_invoice.jpg' },
-]; */
-
-/* const INITIAL_CUSTOMER_INVOICES = [
-  { id: 'HD00123', date: '2023-11-15T10:30:00Z', customerName: 'Nguyễn Văn A', customerId: 'KH001', employeeName: 'Trần Thị Bình', totalAmount: 250000, items: '2 vé John Wick, 1 Bắp rang bơ', paymentMethod: 'Tiền mặt', status: 'Đã thanh toán' },
-  { id: 'HD00124', date: '2023-11-15T11:45:00Z', customerName: 'Lê Thị C (vãng lai)', customerId: null, employeeName: 'Trần Thị Bình', totalAmount: 180000, items: '2 vé Phim hoạt hình, 1 Nước ngọt', paymentMethod: 'Chuyển khoản', status: 'Đã thanh toán' },
-];
- */
-
 function TransactionHistory() {
-  const [activeTab, setActiveTab] = useState('business'); // 'business' or 'customerOrders'
+  const [activeTab, setActiveTab] = useState('business');
 
-  // --- State và logic cho Tab 1: Giao dịch Doanh nghiệp ---
   const [businessTransactions, setBusinessTransactions] = useState([]);
   const [searchTermBusiness, setSearchTermBusiness] = useState('');
   const [showAddBusinessModal, setShowAddBusinessModal] = useState(false);
-  const [editingBusinessTransaction, setEditingBusinessTransaction] = useState(null);     // For Edit Modal
-  const [viewingBusinessTransaction, setViewingBusinessTransaction] = useState(null); // For Detail Modal
+  const [editingBusinessTransaction, setEditingBusinessTransaction] = useState(null);
+  const [viewingBusinessTransaction, setViewingBusinessTransaction] = useState(null);
 
-
-  const [customerInvoices, setCustomerInvoices] = useState([]); // Khởi tạo mảng rỗng
+  const [customerInvoices, setCustomerInvoices] = useState([]);
   const [searchTermCustomer, setSearchTermCustomer] = useState('');
   const [viewingCustomerInvoice, setViewingCustomerInvoice] = useState(null);
-  const [isLoadingCustomerInvoices, setIsLoadingCustomerInvoices] = useState(false); // Thêm state loading
+  const [isLoadingCustomerInvoices, setIsLoadingCustomerInvoices] = useState(false);
 
-  const [employeesList, setEmployeesList] = useState(null);
+  const [employeesList, setEmployeesList] = useState([]); // Khởi tạo mảng rỗng để tránh lỗi
 
   const [errorToDisplay, setErrorToDisplay] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
-  const handleCloseErrorModal = useCallback(() => {
-    setErrorToDisplay(null);
-  }, []);
 
-  // Success Modal
-  const handleCloseSuccessModal = useCallback(() => {
-    setSuccessMessage(null);
-  }, []);
+  const handleCloseErrorModal = useCallback(() => setErrorToDisplay(null), []);
+  const handleCloseSuccessModal = useCallback(() => setSuccessMessage(null), []);
 
   const fetchEmployeesFromApi = useCallback(async () => {
     console.log('TransactionHistoryPage: Attempting to fetch employees ...');
     try {
       const apiEmployee = await getAllEmployeeApi();
       setEmployeesList(apiEmployee.map(mapEmployeeApiToClient));
-      console.log('TransactionHistoryPage: Fecth Employees successful');
-      //setSuccessMessage('TransactionHistoryPage: Fecth Employees successful');
+      console.log('TransactionHistoryPage: Fetch Employees successful');
     } catch (error) {
       console.error('TransactionHistoryPage: Error fetching employees:', error);
-      setErrorToDisplay(error);
-    } finally {
-
+      // <<< SỬA LỖI: Gán chuỗi thông báo lỗi, không phải object lỗi
+      setErrorToDisplay(error.message || 'Không thể tải danh sách nhân viên.');
     }
   }, []);
 
   const fecthTransactionHistoryFromApi = useCallback(async () => {
-    console.log('Fetching products from API...');
-    //setIsLoading(true);
+    console.log('Fetching business transactions from API...');
     try {
       const transactionhistorys = await getAllTransactionHistory();
       const mappedTransaction = transactionhistorys.map(mapTransactionHistoryApiToClient);
       setBusinessTransactions(mappedTransaction);
-      //setItems(mappedProducts);
-      //setFilteredItems(mappedTransaction);
       console.log('Fetched transaction history:', mappedTransaction);
     } catch (error) {
-      console.error('Error fetching trainsaction history:', error);
-      setErrorToDisplay(error.message || 'Failed to fetch transaction history');
-    } finally {
-      //setIsLoading(false);
+      console.error('Error fetching transaction history:', error);
+      // <<< SỬA LỖI: Gán chuỗi thông báo lỗi, không phải object lỗi
+      setErrorToDisplay(error.message || 'Không thể tải lịch sử giao dịch doanh nghiệp.');
     }
   }, []);
 
   const fetchCustomerInvoicesFromApi = useCallback(async () => {
     console.log('Fetching customer invoices from API /api/orders...');
     setIsLoadingCustomerInvoices(true);
-    setErrorToDisplay(null); // Reset lỗi trước khi fetch
+    setErrorToDisplay(null);
     try {
-      // API getAllOrdersApi có thể nhận object { searchTerm }, nhưng ở đây ta tìm kiếm ở client
-      // nên có thể gọi không cần searchTerm hoặc searchTerm rỗng.
-      // Giả sử API của bạn cho phép không có searchTerm.
-      const apiOrders = await getAllOrdersApi({ searchTerm: searchTermCustomer }); // Gửi searchTermCustomer nếu API hỗ trợ
+      const apiOrders = await getAllOrdersApi({ searchTerm: searchTermCustomer });
       const mappedInvoices = apiOrders.map(mapApiOrderToCustomerInvoiceForDisplay);
       setCustomerInvoices(mappedInvoices);
       console.log('Fetched customer invoices:', mappedInvoices);
     } catch (error) {
       console.error('Error fetching customer invoices:', error);
-      setErrorToDisplay({message: error.message || 'Không thể tải danh sách hóa đơn khách hàng.'});
-      setCustomerInvoices([]); // Reset nếu lỗi
+      // <<< SỬA LỖI: Gán chuỗi thông báo lỗi, không phải object lỗi
+      setErrorToDisplay(error.message || 'Không thể tải danh sách hóa đơn khách hàng.');
+      setCustomerInvoices([]);
     } finally {
       setIsLoadingCustomerInvoices(false);
     }
-  }, []); // Fetch lại khi searchTermCustomer thay đổi nếu API hỗ trợ search
+  }, [searchTermCustomer]); // Thêm searchTermCustomer vào dependencies
 
   useEffect(() => {
-    //localStorage.setItem('th_businessTransactions_v2', JSON.stringify(businessTransactions));
     fetchEmployeesFromApi();
     fecthTransactionHistoryFromApi();
     fetchCustomerInvoicesFromApi();
@@ -218,26 +165,20 @@ function TransactionHistory() {
     dataToPassToParent.append("SOTIEN", newTxDataFromModal.SOTIEN);
     dataToPassToParent.append("PHANLOAI", newTxDataFromModal.PHANLOAI);
     dataToPassToParent.append("MATHAMCHIEU", newTxDataFromModal.MATHAMCHIEU);
-    //dataToPassToParent.append("HINHANH", newTxDataFromModal.HINHANH);
+
     if (newTxDataFromModal.imageFile && newTxDataFromModal.imageFile instanceof File) {
       dataToPassToParent.append('transactionImageFile', newTxDataFromModal.imageFile, newTxDataFromModal.imageFile.name);
       console.log('TransactionHistory: Appended imageFile to FormData with key "transactionImageFile":', newTxDataFromModal.imageFile.name);
     } else {
       console.log('TransactionHistory: No imageFile to append or not a File instance.');
-      // Không cần append "HINHANH" là null ở đây, controller backend sẽ xử lý nếu không có file
     }
+    
     try {
       const createdTransactionApi = await createTransactionHistory(dataToPassToParent);
-
-      // Map lại kết quả từ API về client format (nếu cần)
       const newClientTransaction = mapTransactionHistoryApiToClient(createdTransactionApi);
-
-      // Thêm vào state để UI cập nhật
       setBusinessTransactions(prevTxs => [newClientTransaction, ...prevTxs]);
-
       setSuccessMessage('Thêm giao dịch doanh nghiệp thành công!');
       setShowAddBusinessModal(false);
-
     } catch (error) {
       console.error("Error adding business transaction:", error);
       let errorMessage = "Không thể thêm giao dịch.";
@@ -246,28 +187,16 @@ function TransactionHistory() {
       } else if (error.message) {
         errorMessage = error.message;
       }
-      setErrorToDisplay({ message: errorMessage }); // Đảm bảo errorToDisplay là object có key message
-      // setShowAddBusinessModal(false); // Có thể giữ modal mở để người dùng sửa
+      // <<< SỬA LỖI: Gán trực tiếp chuỗi `errorMessage`, không phải object `{ message: ... }`
+      setErrorToDisplay(errorMessage);
+      // Giữ modal mở để người dùng sửa lại thông tin
     }
   };
 
-  const handleUpdateBusinessTx = (updatedTx) => {
-    setEditingBusinessTransaction(null);
-  };
-
-  const handleDeleteBusinessTx = (txId) => {
-    if (window.confirm(`Bạn có chắc muốn xóa giao dịch ${txId}?`)) {
-      setBusinessTransactions(prev => prev.filter(tx => tx.id !== txId));
-    }
-  };
 
   const getEmployeeNameDisplay = (employeeId) => {
-    if (!employeesList || employeesList.length === 0) {
-      // Nếu danh sách nhân viên chưa có hoặc rỗng, trả về ID hoặc 'N/A'
-      return employeeId || 'N/A';
-    }
+    if (!employeesList || employeesList.length === 0) return employeeId || 'N/A';
     const employee = employeesList.find(emp => emp.id === employeeId);
-    // Nếu tìm thấy nhân viên, trả về tên, ngược lại trả về ID hoặc 'N/A'
     return employee ? employee.name : (employeeId || 'N/A');
   };
 
@@ -275,36 +204,19 @@ function TransactionHistory() {
     Object.values(t).some(val => String(val).toLowerCase().includes(searchTermBusiness.toLowerCase()))
   );
 
-  // --- State và logic cho Tab 2: Hóa đơn Khách hàng ---
-  /* const [customerInvoices, setCustomerInvoices] = useState(() => {
-    const saved = localStorage.getItem('th_customerInvoices_v2');
-    return saved ? JSON.parse(saved) : INITIAL_CUSTOMER_INVOICES;
-  });
-  const [searchTermCustomer, setSearchTermCustomer] = useState('');
-  const [viewingCustomerInvoice, setViewingCustomerInvoice] = useState(null);
-
-  useEffect(() => {
-    localStorage.setItem('th_customerInvoices_v2', JSON.stringify(customerInvoices));
-  }, [customerInvoices]);
-
   const filteredCustomerInvoices = customerInvoices.filter(inv =>
-    Object.values(inv).some(val => String(val).toLowerCase().includes(searchTermCustomer.toLowerCase()))
-  ); */
-
-  
-
-  const filteredCustomerInvoices = customerInvoices.filter(inv =>
-    Object.values(inv).some(val => String(val).toLowerCase().includes(searchTermCustomer.toLowerCase()))
+    Object.entries(inv).some(([key, val]) => 
+      key !== 'apiOrderData' && String(val).toLowerCase().includes(searchTermCustomer.toLowerCase())
+    )
   );
-
+  
   const handleViewCustomerInvoiceDetail = (invoice) => {
     const employeeName = getEmployeeNameDisplay(invoice.employeeId);
     setViewingCustomerInvoice({ ...invoice, employeeName });
   };
 
-  // --- Render ---
   return (
-    <div className="page-container th-page"> {/* Thêm class th-page để có thể style riêng nếu cần */}
+    <div className="page-container th-page">
       <div className="content-card">
         <h1 className="page-title">Quản Lý Lịch Sử Giao Dịch</h1>
 
@@ -359,11 +271,8 @@ function TransactionHistory() {
                           {t.type === 'expense' ? '-' : '+'} {formatCurrency(t.costs)}
                         </td>
                         <td>{getEmployeeNameDisplay(t.employeeId)}</td>
-                        {/* <td>{t.invoiceImageName ? <a href="#" onClick={(e) => { e.preventDefault(); alert(`Xem ảnh: ${t.invoiceImageName}`) }} className="link-style">Xem</a> : 'Không có'}</td> */}
                         <td className="actions-cell">
                           <button onClick={() => setViewingBusinessTransaction(t)} className="action-button view-button">Xem</button>
-                          {/* <button onClick={() => setEditingBusinessTransaction(t)} className="action-button edit-button">Sửa</button>
-                          <button onClick={() => handleDeleteBusinessTx(t.id)} className="action-button delete-button">Xóa</button> */}
                         </td>
                       </tr>
                     ))}
@@ -384,7 +293,6 @@ function TransactionHistory() {
                   value={searchTermCustomer}
                   onChange={(e) => setSearchTermCustomer(e.target.value)}
                 />
-                {/* Nút thêm hóa đơn khách hàng thường không có ở đây nếu tạo từ POS */}
               </div>
               {filteredCustomerInvoices.length > 0 ? (
                 <table className="data-table">
@@ -398,13 +306,12 @@ function TransactionHistory() {
                     {filteredCustomerInvoices.map(inv => (
                       <tr key={inv.id}>
                         <td>{inv.id}</td><td>{formatDate(inv.date, true)}</td>
-                        {/* <td>{inv.customerName} {inv.customerId ? `(${inv.customerId})` : ''}</td> */}
                         <td>{inv.customerName}</td>
                         <td>{getEmployeeNameDisplay(inv.employeeId)}</td>
                         <td style={{ textAlign: 'right' }}>{formatCurrency(inv.totalAmount)}</td>
                         <td><span className={`status-badge status-${inv.status.toLowerCase().replace(/\s+/g, '-')}`}>{inv.status}</span></td>
                         <td className="actions-cell">
-                          <button onClick={() => setViewingCustomerInvoice(inv)} className="action-button view-button">Xem</button>
+                          <button onClick={() => handleViewCustomerInvoiceDetail(inv)} className="action-button view-button">Xem</button>
                         </td>
                       </tr>
                     ))}
@@ -422,13 +329,12 @@ function TransactionHistory() {
           onClose={() => setShowAddBusinessModal(false)}
           onAddTransaction={handleAddBusinessTx}
           employeesList={employeesList}
-          generateId={generateId}
         />
       )}
       {editingBusinessTransaction && (
         <EditBusinessTransactionModal
           transactionToEdit={editingBusinessTransaction}
-          onUpdateTransaction={handleUpdateBusinessTx}
+          onUpdateTransaction={() => {}} // Placeholder
           employeesList={employeesList}
           onClose={() => setEditingBusinessTransaction(null)}
           formatDate={formatDate}
@@ -439,8 +345,6 @@ function TransactionHistory() {
           transaction={{
             ...viewingBusinessTransaction,
             employeeName: getEmployeeNameDisplay(viewingBusinessTransaction.employeeId),
-            // invoiceImageName giờ đây có thể là tên file gốc (từ viewingBusinessTransaction.invoiceImageName)
-            // invoiceImageNameUrl là URL đầy đủ (từ viewingBusinessTransaction.invoiceImageNameUrl)
           }}
           onClose={() => setViewingBusinessTransaction(null)}
           formatDate={formatDate}
@@ -457,14 +361,14 @@ function TransactionHistory() {
       )}
 
       <SuccessMessageModal
-        isOpen={!!successMessage} // Chỉ mở khi có thông báo thành công
+        isOpen={!!successMessage}
         successMessage={successMessage}
-        onClose={handleCloseSuccessModal} // Đóng modal khi nhấn nút
+        onClose={handleCloseSuccessModal}
       />
       <ErrorMessageModal
-        isOpen={!!errorToDisplay} // Chỉ mở khi có thông báo lỗi
-        errorMessage={errorToDisplay}
-        onClose={handleCloseErrorModal} // Đóng modal khi nhấn nút
+        isOpen={!!errorToDisplay}
+        errorMessage={errorToDisplay} // Bây giờ errorToDisplay là một chuỗi, nên sẽ hoạt động đúng
+        onClose={handleCloseErrorModal}
       />
     </div>
   );

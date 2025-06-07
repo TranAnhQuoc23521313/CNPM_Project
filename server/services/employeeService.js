@@ -32,7 +32,7 @@ class EmployeeService {
 
             const checkDuplicated = await EmployeeRepository.findExactDuplicate(detailsToCheck);
             if (checkDuplicated) {
-                const error = new Error('An identical employee (based on its details) already exists.');
+                const error = new Error('Nhân viên bạn đang thêm đã có trong hệ thống, vui lòng thử lại');
                 error.statusCode = 409; // Conflict
                 throw error;
             }

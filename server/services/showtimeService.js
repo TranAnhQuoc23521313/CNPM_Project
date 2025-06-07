@@ -19,7 +19,7 @@ class ShowtimeService {
         // 2. Lấy thông tin phim để biết thời lượng
         const movie = await movieRepository.findById(showtimeData.MAPHIM);
         if (!movie || typeof movie.THOILUONG !== 'number') {
-            const error = new Error(`Movie with MAPHIM '${showtimeData.MAPHIM}' not found or has no valid duration.`);
+            const error = new Error(`Mã phim '${showtimeData.MAPHIM}' không tìm thấy hoặc không tồn tại thời lượng`);
             error.statusCode = 400; // Hoặc 404 nếu phim không tồn tại
             throw error;
         }
@@ -58,7 +58,7 @@ class ShowtimeService {
         );
 
         if (isOverlapping) {
-            const error = new Error('Showtime conflict: Another showtime exists in this room during the selected time slot.');
+            const error = new Error('Suất chiếu bạn vừa thêm đã có trong hệ thống, vui lòng đổi thông tin suất chiếu !');
             error.statusCode = 409; // Conflict
             throw error;
         }

@@ -23,7 +23,7 @@ class TransactionHistoryService {
             };
             const isExactDuplicate = await TransactionHistoryRepository.findExactDuplicate(detailsToCheck);
             if (isExactDuplicate) {
-                const error = new Error('An identical transaction (based on all provided details) already exists.');
+                const error = new Error('Giao dịch bạn vừa thêm đã tồn trạng, hãy kiểm tra lại các trường thông tin vừa nhập !');
                 error.statusCode = 409; // Conflict
                 throw error;
             }

@@ -39,7 +39,7 @@ class ProductService {
 
             const isExactDuplicate = await productRepository.findExactDuplicate(detailsToCheck);
             if (isExactDuplicate) { // findExactDuplicate nên trả về boolean
-                const error = new Error('An identical product (based on its details) already exists.');
+                const error = new Error('Sản phẩm bạn vừa thêm đã có trong hệ thống, vui lòng hãy đổi sản phẩm hoặc thông tin khác');
                 error.statusCode = 409; // Conflict
                 throw error;
             }
