@@ -386,3 +386,84 @@
 .seatmap-error-info {
     color: #e74c3c;
 }
+
+.confirm-delete-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Quan trọng: z-index này phải cao hơn modal chính */
+  z-index: 2000; 
+}
+
+.confirm-delete-modal-content {
+  background-color: #fff;
+  padding: 25px 30px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 450px;
+  text-align: center;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.confirm-delete-modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+  color: #c82333; /* Màu đỏ cảnh báo */
+}
+
+.confirm-delete-modal-content p {
+  margin-bottom: 25px;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  color: #333;
+}
+
+.confirm-delete-modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.confirm-delete-modal-actions button {
+  padding: 10px 25px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.confirm-delete-modal-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.confirm-delete-modal-actions button:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+.confirm-delete-modal-actions .btn-cancel {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  color: #333;
+}
+.confirm-delete-modal-actions .btn-cancel:hover:not(:disabled) {
+  background-color: #e0e0e0;
+}
+
+.confirm-delete-modal-actions .btn-confirm-delete {
+  background-color: #c82333;
+  color: white;
+}
+.confirm-delete-modal-actions .btn-confirm-delete:hover:not(:disabled) {
+  background-color: #a51c2a;
+}
