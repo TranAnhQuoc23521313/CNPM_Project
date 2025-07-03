@@ -41,40 +41,34 @@ Thành viên thực hiện:
 - server/services nhận yêu cầu từ controller và chuyển tiếp đến Repositories để thực hiện yêu cầu.
 - server.js nhận tín hiệu giao tiếp giữa các PORT sau đó truyền tín hiệu cho routes để thực hiện các yêu cầu gửi từ client
 
-# Sơ đồ kiến trúc của ứng dụng
+## 15. Phân chia vai trò công việc
 
-### Sơ đồ Kiến trúc Hệ thống - CNPM Project
+| **Công việc**                          | **Trần Anh Quốc**<br>23521313 | **Trần Nhật Quang**<br>23521292 | **Nguyễn Văn Quyền**<br>23521329 | **Nguyễn Minh Quốc**<br>23521304 |
+|----------------------------------------|:------------------------------:|:-------------------------------:|:--------------------------------:|:--------------------------------:|
+| Khảo sát hiện trạng                   | x                              | x                               |                                  | x                               |
+| Xác định yêu cầu                      | x                              | x                               | x                                | x                               |
+| Thiết kế sơ đồ luồng dữ liệu         | x                              |                                 | x                                | x                               |
+| Thiết kế kiến trúc hệ thống          | x                              |                                 | x                                |                                 |
+| Vẽ mô tả Use Case                    | x                              | x                               | x                                |                                 |
+| Vẽ các sơ đồ về hệ thống             | x                              | x                               | x                                |                                 |
+| Thiết kế cơ sở dữ liệu               | x                              | x                               | x                                |                                 |
+| Thiết kế giao diện                   | x                              |                                 |                                  | x                               |
+| Thiết kế API                         |                                |                                 | x                                | x                               |
+| Kiểm thử ứng dụng                    |                                | x                               | x                                | x                               |
+| Các bài tập nhóm trong quá trình học | x                              | x                               |                                  | x                               |
+| **Mức độ đóng góp cho đồ án**        | **30**                         | **30**                          | **20**                           | **20**                          |
 
-```mermaid
-graph TD
-    %% ----- Actors & Client -----
-    subgraph "Phía Người Dùng"
-        direction LR
-        actors["<b>Actors</b><br>Admin / Staff"]
-        client_app["<b>React Application (Client)</b>"]
-    end
-    
-    actors -- "Sử dụng" --> client_app
+---
 
-    %% ----- Server - The N-Tier Architecture -----
-    subgraph "Server (Kiến trúc Đa tầng)"
-        direction TB
+### 📌 Lưu ý:
+- Bảng phân công thể hiện sự tham gia của các thành viên trong từng công việc được liệt kê.
+- Mức độ đánh giá đóng góp cho đồ án được tính dựa trên **khối lượng công việc** của mỗi cá nhân được giao, khối lượng các công việc đó là không giống nhau nên dù làm cùng, ít hay nhiều hơn nhưng **mức độ vẫn có thể sẽ khác nhau**.
+- **Báo cáo do tất cả các thành viên cùng viết**.
 
-        %% Define the layers
-        routes["<b>1. Lớp Định tuyến (Routes Layer)</b><br><i>/routes</i><br>Tiếp nhận và điều hướng HTTP Request"]
-        middlewares["<b>2. Lớp Trung gian (Middleware Layer)</b><br><i>/middleware</i><br>Xác thực, Ghi log, Xử lý lỗi"]
-        controllers["<b>3. Lớp Điều khiển (Controller Layer)</b><br><i>/controllers</i><br>Điều phối Request và Response"]
-        services["<b>4. Lớp Nghiệp vụ (Service Layer)</b><br><i>/services</i><br>Thực thi Business Logic cốt lõi"]
-        repositories["<b>5. Lớp Truy cập Dữ liệu (Repository Layer)</b><br><i>/repositories</i><br>Trừu tượng hóa việc truy vấn Database"]
-        db[("<b>6. Lớp Dữ liệu (Data Layer)</b><br>Hệ quản trị CSDL")]
+---
 
-        %% Define the flow through layers
-        routes --> middlewares
-        middlewares --> controllers
-        controllers --> services
-        services --> repositories
-        repositories --> db
-    end
-
-    %% ----- Connect Client to Server -----
-    client_app -- "Gửi API Request" --> routes
+### ✅ Nhận xét:
+- Các thành viên dù vẫn có vài công việc vẫn còn **chậm tiến độ**, nhưng nhìn chung vẫn đảm bảo được tiến độ chung của đồ án.
+- Các thành viên **hỗ trợ lẫn nhau** trong suốt quá trình thực hiện.
+- **Thường xuyên tổ chức họp**, trao đổi online hoặc trực tiếp với nhau đạt hiệu suất tốt.
+- **Mọi người đóng góp nhiều ý kiến**, giúp cải thiện chất lượng đồ án.
