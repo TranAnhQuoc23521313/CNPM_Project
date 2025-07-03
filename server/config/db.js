@@ -4,9 +4,9 @@ require('dotenv').config();
 
 const pool = mysql.createPool({
     host: 'localhost',
-    user: 'root',
-    password: 'Quoc0909561219',
-    port: 3306,
+    user: '',
+    password: '',
+    port: ,
     database: 'CNPM_QuanLyRapPhim',
 });
 
