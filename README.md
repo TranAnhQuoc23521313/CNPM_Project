@@ -45,17 +45,17 @@ Thành viên thực hiện:
 
 | **Công việc**                          | **Trần Anh Quốc**<br>23521313 | **Trần Nhật Quang**<br>23521292 | **Nguyễn Văn Quyền**<br>23521329 | **Nguyễn Minh Quốc**<br>23521304 |
 |----------------------------------------|:------------------------------:|:-------------------------------:|:--------------------------------:|:--------------------------------:|
-| Khảo sát hiện trạng                   | x                              | x                               |                                  | x                               |
+| Khảo sát hiện trạng                   | x                              | x                               |x                                  | x                               |
 | Xác định yêu cầu                      | x                              | x                               | x                                | x                               |
-| Thiết kế sơ đồ luồng dữ liệu         | x                              |                                 | x                                | x                               |
-| Thiết kế kiến trúc hệ thống          | x                              |                                 | x                                |                                 |
-| Vẽ mô tả Use Case                    | x                              | x                               | x                                |                                 |
+| Thiết kế sơ đồ luồng dữ liệu         | x                              |x                                 | x                                | x                               |
+| Thiết kế kiến trúc hệ thống          | x                              | x                                | x                                | x                                |
+| Vẽ mô tả Use Case                    | x                              | x                               | x                                |  x                               |
 | Vẽ các sơ đồ về hệ thống             | x                              | x                               | x                                |                                 |
-| Thiết kế cơ sở dữ liệu               | x                              | x                               | x                                |                                 |
-| Thiết kế giao diện                   | x                              |                                 |                                  | x                               |
-| Thiết kế API                         |                                |                                 | x                                | x                               |
-| Kiểm thử ứng dụng                    |                                | x                               | x                                | x                               |
-| Các bài tập nhóm trong quá trình học | x                              | x                               |                                  | x                               |
+| Thiết kế cơ sở dữ liệu               | x                              |                                |                                |                                 |
+| Thiết kế giao diện                   | x                              |x                                 |                                  | x                               |
+| Thiết kế API                         |x                                |                                 |                                 |                                |
+| Kiểm thử ứng dụng                    |x                               |                               | x                                |                                |
+| Các bài tập nhóm trong quá trình học | x                              | x                               |x                                  | x                               |
 | **Mức độ đóng góp cho đồ án**        | **30**                         | **30**                          | **20**                           | **20**                          |
 
 ---
@@ -68,7 +68,7 @@ Thành viên thực hiện:
 ---
 
 ### ✅ Nhận xét:
-- Các thành viên dù vẫn có vài công việc vẫn còn **chậm tiến độ**, nhưng nhìn chung vẫn đảm bảo được tiến độ chung của đồ án.
+- Các thành viên dù vẫn có vài công việc vẫn còn **chậm tiến độ**, nhưng nhìn chung **vẫn đảm bảo được tiến độ chung của đồ án**.
 - Các thành viên **hỗ trợ lẫn nhau** trong suốt quá trình thực hiện.
 - **Thường xuyên tổ chức họp**, trao đổi online hoặc trực tiếp với nhau đạt hiệu suất tốt.
 - **Mọi người đóng góp nhiều ý kiến**, giúp cải thiện chất lượng đồ án.
